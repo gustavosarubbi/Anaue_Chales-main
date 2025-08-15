@@ -33,8 +33,8 @@ export function Pricing() {
             </CardHeader>
             <CardContent>
               <div className="text-center mb-6">
-              <span className="text-moss-500 line-through text-xl">R$ 940</span>
-              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 752</span>
+              <span className="text-moss-500 line-through text-xl">R$ 952</span>
+              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 743</span>
                 <p className="text-moss-600">via Pix (pernoite)</p>
               </div>
 
@@ -71,8 +71,8 @@ export function Pricing() {
             </CardHeader>
             <CardContent>
               <div className="text-center mb-6">
-              <span className="text-moss-500 line-through text-2xl">R$ 750</span>
-              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 600</span>
+              <span className="text-moss-500 line-through text-2xl">R$ 762</span>
+              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 594</span>
                 <p className="text-moss-600">via Pix (pernoite)</p>
               </div>
 

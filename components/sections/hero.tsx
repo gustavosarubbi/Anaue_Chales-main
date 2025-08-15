@@ -266,15 +266,15 @@ export function Hero() {
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-moss-700">Finais de semana:</span>
                         <div className="text-right">
-                          <span className="text-moss-500 line-through text-sm">R$ 940</span>
-                          <span className="text-moss-900 font-bold ml-2">R$ 752</span>
+                          <span className="text-moss-500 line-through text-sm">R$ 952</span>
+                          <span className="text-moss-900 font-bold ml-2">R$ 743</span>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-moss-700">Segunda a quinta:</span>
                         <div className="text-right">
-                          <span className="text-moss-500 line-through text-sm">R$ 750</span>
-                          <span className="text-moss-900 font-bold ml-2">R$ 600</span>
+                          <span className="text-moss-500 line-through text-sm">R$ 762</span>
+                          <span className="text-moss-900 font-bold ml-2">R$ 594</span>
                         </div>
                       </div>
                     </div>
