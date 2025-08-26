@@ -50,7 +50,7 @@ export function Hero() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('chale.jpeg')`,
+            backgroundImage: `url('/Chale-1.jpg')`,
           }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-br from-moss-900/70 via-moss-800/60 to-moss-700/70"></div>

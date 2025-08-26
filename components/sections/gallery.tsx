@@ -45,162 +45,106 @@ const galleryImages = [
   {
     id: 1,
     category: "chales",
-    title: "Quarto Aconchegante",
-    description: "Interior confortável com cama king size e vista para a natureza",
-    image: "/chalet-bedroom.webp",
+    title: "Chalé Anauê",
+    description: "Vista externa do nosso chalé com arquitetura rústica e integrada à natureza",
+    image: "/Chale-1.jpg",
   },
   {
     id: 2,
     category: "chales",
-    title: "Suíte com Vista",
-    description: "Quarto com vista panorâmica para o deck e floresta",
-    image: "/chalet-bedroom-2.webp",
+    title: "Chalé na floresta",
+    description: "Design harmonioso e vista para a vegetação exuberante",
+    image: "/chale-2.jpg",
   },
   {
     id: 3,
     category: "chales",
-    title: "Chalé Exterior",
-    description: "Vista externa do chalé suspenso na natureza",
-    image: "/chalet-exterior.webp",
+    title: "Quarto com TV",
+    description: "Quarto aconchegante com cama casal e TV para seu conforto e entretenimento",
+    image: "/cama-casal-com-tv.jpg",
   },
   {
     id: 4,
     category: "chales",
-    title: "Deck Relaxante",
-    description: "Área de descanso com vista para a floresta",
-    image: "/chalet-deck.webp",
+    title: "Banheiro Moderno",
+    description: "Banheiro elegante com box de vidro e acabamentos modernos para sua comodidade",
+    image: "/banheiro-box.jpg",
   },
   {
     id: 5,
     category: "chales",
-    title: "Varanda Privativa",
-    description: "Espaço íntimo com mobiliário confortável",
-    image: "/chalet-deck-2.webp",
-  },
-  {
-    id: 6,
-    category: "chales",
-    title: "Área de Sinuca", // <-- Coloque seu novo título aqui
-    description: "Divirta-se com nossa mesa de sinuca em um ambiente aberto e agradável.", // <-- Coloque sua nova descrição aqui
-    image: "/area-sinuca.jpeg",
-  },
-  {
-    id: 14,
-    category: "chales",
-    title: "Área de Descanso na Natureza",
-    description: "Cama ao ar livre cercada pela vegetação tropical exuberante",
-    image: "/area-descanso-natureza.jpeg",
-  },
-  {
-    id: 15,
-    category: "chales",
-    title: "Banheiro Moderno",
-    description: "Banheiro elegante com box de vidro e acabamentos em madeira",
-    image: "/banheiro-moderno.jpeg",
-  },
-  {
-    id: 16,
-    category: "chales",
-    title: "Suíte Rústica",
-    description: "Quarto aconchegante com teto de madeira e cozinha integrada",
-    image: "/quarto-teto-madeira.jpeg",
-  },
-  {
-    id: 17,
-    category: "chales",
-    title: "Decoração Romântica",
-    description: "Ambiente especial preparado para momentos inesquecíveis",
-    image: "/decoracao-romantica.jpeg",
+    title: "Área de Descanso",
+    description: "Espaço relaxante para deitar e apreciar a tranquilidade do ambiente natural",
+    image: "/lugar-para-deitar-.jpg",
   },
 
   // Gastronomia
   {
+    id: 6,
+    category: "gastronomia",
+    title: "Café da Manhã",
+    description: "Café da manhã completo servido em ambiente acolhedor com vista para a natureza",
+    image: "/café-da-manha.jpg",
+  },
+  {
     id: 7,
     category: "gastronomia",
-    title: "Churrasqueira à Beira Rio",
-    description: "Área gourmet completa com vista para o Rio Negro",
-    image: "/chalet-bbq.webp",
+    title: "Churrasqueiro com Vista",
+    description: "Churrasqueiro profissional com vista privilegiada para o rio e natureza",
+    image: "/churrasqueiro-com-vista-ao-rio.jpg",
   },
   {
     id: 8,
-    category: "rio",
-    title: "Cabena em frente do Rio",
-    description: "Uma vista linda para a natureza com tranquilidade e leveza",
-    image: "/cabana.jpeg",
+    category: "gastronomia",
+    title: "Frigobar e Microondas",
+    description: "Frigobar bem equipado com microondas para sua conveniência durante a estadia",
+    image: "/frigobar-microondas.jpg",
   },
   {
-    id: 18,
+    id: 9,
     category: "gastronomia",
-    title: "Gazebo à Beira d'Água",
-    description: "Espaço gourmet com vista privilegiada do lago e cortinas elegantes",
-    image: "/gazebo-beira-agua.jpeg",
+    title: "Frigobar com Bebidas",
+    description: "Frigobar abastecido com bebidas geladas para refrescar seu dia",
+    image: "/frigobar-bebida.jpg",
   },
   {
-    id: 19,
+    id: 10,
     category: "gastronomia",
-    title: "Café da Manhã no Deck",
-    description: "Mesa preparada no deck de madeira cercado pela mata",
-    image: "/mesa-cafe-deck.jpeg",
+    title: "Mesa de Sinuca",
+    description: "Mesa de sinuca em ambiente aberto para diversão e entretenimento",
+    image: "/mesa-de-sinuca.jpg",
   },
 
   // Natureza
   {
-    id: 9,
-    category: "natureza",
-    title: "Imersão na Floresta",
-    description: "Chalé integrado à vegetação amazônica",
-    image: "/chalet-exterior.webp",
-  },
-  {
-    id: 10,
-    category: "natureza",
-    title: "Deck na Natureza",
-    description: "Área de relaxamento cercada pela mata",
-    image: "/chalet-deck.webp",
-  },
-  {
     id: 11,
     category: "natureza",
-    title: "Ambiente Natural",
-    description: "Convivência harmoniosa com a natureza",
-    image: "/chalet-deck-2.webp",
+    title: "Rio Natural",
+    description: "Vista deslumbrante do rio natural cercado pela vegetação exuberante da Amazônia",
+    image: "/rio-natural.jpg",
   },
   {
-    id: 20,
+    id: 12,
     category: "natureza",
-    title: "Rede com Vista do Lago",
-    description: "Relaxamento total em rede suspensa com vista panorâmica",
-    image: "/rede-vista-lago.jpeg",
-  },
-  {
-    id: 24,
-    category: "natureza",
-    title: "Chale com área",
-    description: "Vista externa do chalé suspenso na natureza",
-    image: "/chale.jpeg",
+    title: "Cadeiras à Beira do Rio",
+    description: "Cadeiras confortáveis posicionadas estrategicamente para apreciar a vista do rio",
+    image: "/cadeiras-beira-rio.jpg",
   },
 
   // Rio
   {
-    id: 12,
-    category: "rio",
-    title: "Acesso ao Rio",
-    description: "Deck com acesso direto às águas do Rio Negro",
-    image: "/chalet-water.webp",
-  },
-  {
     id: 13,
     category: "rio",
-    title: "Churrasqueira Beira Rio",
-    description: "Área gourmet com vista privilegiada do rio",
-    image: "/chalet-bbq.webp",
+    title: "Redes à Beira do Rio",
+    description: "Redes suspensas à beira do rio para relaxamento total em contato com a natureza",
+    image: "/redes-a-beira-do-rio.jpg",
   },
   {
-    id: 21,
+    id: 14,
     category: "rio",
-    title: "Vista do Lago com Boia",
-    description: "Paisagem deslumbrante do lago com boia de unicórnio e vegetação exuberante",
-    image: "/lago-vista-boia.jpeg",
+    title: "Stand-Up Paddle",
+    description: "Atividade de Stand-Up Paddle no rio para aventura e diversão na água",
+    image: "/Stand-Up-Paddle.jpg",
   },
 ]
 
@@ -275,12 +219,12 @@ export function Gallery() {
               {filteredImages.length > 0 && (
                 <>
                   {/* Main Image */}
-                  <div className="relative aspect-[3/2] overflow-hidden">
+                  <div className="relative aspect-[3/2] overflow-hidden bg-moss-100">
                     <Image
                       src={filteredImages[currentImageIndex].image || "/placeholder.svg"}
                       alt={filteredImages[currentImageIndex].title}
                       fill
-                      className="object-cover transition-all duration-500"
+                      className="object-contain transition-all duration-500"
                       crossOrigin="anonymous"
                     />
 
@@ -326,7 +270,7 @@ export function Gallery() {
               <button
                 key={image.id}
                 onClick={() => goToImage(index)}
-                className={`flex-shrink-0 relative aspect-[4/3] w-20 md:w-24 rounded-lg overflow-hidden transition-all duration-300 ${
+                className={`flex-shrink-0 relative aspect-[4/3] w-20 md:w-24 rounded-lg overflow-hidden transition-all duration-300 bg-moss-100 ${
                   index === currentImageIndex
                     ? "ring-2 ring-moss-500 ring-offset-2 scale-105"
                     : "opacity-70 hover:opacity-100"
@@ -336,7 +280,7 @@ export function Gallery() {
                   src={image.image || "/placeholder.svg"}
                   alt={image.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   crossOrigin="anonymous"
                 />
               </button>
