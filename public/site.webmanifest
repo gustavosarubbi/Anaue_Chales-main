@@ -1,0 +1,16 @@
+{
+  "name": "Anauê Jungle Chalés",
+  "short_name": "Anauê Chalés",
+  "description": "Escape para a natureza em nossos chalés exclusivos à beira do rio no Tarumã, Manaus",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#4a6741",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+}
