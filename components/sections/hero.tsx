@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Phone, Wifi, Camera, Heart, Menu, X, MessageCircle, Percent } from "lucide-react"
+import { MapPin, Phone, Wifi, Camera, Heart, Menu, X, MessageCircle, Percent, Calendar } from "lucide-react"
 import Link from "next/link"
 
 export function Hero() {
@@ -122,9 +122,9 @@ export function Hero() {
                 }`}
                 asChild
               >
-                <Link href="https://wa.me/559294197052" target="_blank">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Reservar
+                <Link href="#calendario">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Verificar Disponibilidade
                 </Link>
               </Button>
 
@@ -162,9 +162,9 @@ export function Hero() {
                   ))}
                   <div className="pt-4 border-t border-moss-600">
                     <Button className="w-full bg-white text-moss-600 hover:bg-moss-50" asChild>
-                      <Link href="https://wa.me/559294197052" target="_blank">
-                        <Phone className="mr-2 h-4 w-4" />
-                        Reservar Agora
+                      <Link href="#calendario">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Verificar Disponibilidade
                       </Link>
                     </Button>
                   </div>
@@ -215,9 +215,9 @@ export function Hero() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg" asChild>
-                  <Link href="https://wa.me/559294197052" target="_blank">
-                    <MessageCircle className="mr-2 h-5 w-5" />
-                    Reservar Agora
+                  <Link href="#calendario">
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Verificar Disponibilidade
                   </Link>
                 </Button>
                 <Button
@@ -280,12 +280,9 @@ export function Hero() {
                     </div>
 
                     <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3" asChild>
-                      <Link
-                        href="https://wa.me/559294197052?text=Olá! Vi o desconto de 20% e gostaria de fazer uma reserva!"
-                        target="_blank"
-                      >
-                        <MessageCircle className="mr-2 h-5 w-5" />
-                        Garantir Desconto
+                      <Link href="#calendario">
+                        <Calendar className="mr-2 h-5 w-5" />
+                        Verificar Disponibilidade
                       </Link>
                     </Button>
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, CalendarIcon, Check, X, RefreshCw } from "lucide-react"
+import { ChevronLeft, ChevronRight, CalendarIcon, Check, X, RefreshCw, MessageCircle } from "lucide-react"
 
 interface AvailabilityResponse {
   success: boolean
@@ -16,7 +16,6 @@ interface AvailabilityResponse {
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [availability, setAvailability] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<string>("")
@@ -96,24 +95,6 @@ export function Calendar() {
     return availability[dateStr] || "available"
   }
 
-  const isDateSelected = (dateStr: string) => {
-    return selectedDates.includes(dateStr)
-  }
-
-  const handleDateClick = (day: number) => {
-    if (!day) return
-
-    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day)
-    const status = getDateStatus(dateStr)
-
-    if (status === "booked") return
-
-    if (isDateSelected(dateStr)) {
-      setSelectedDates(selectedDates.filter((d) => d !== dateStr))
-    } else {
-      setSelectedDates([...selectedDates, dateStr])
-    }
-  }
 
   const navigateMonth = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate)
@@ -125,14 +106,6 @@ export function Calendar() {
     setCurrentDate(newDate)
   }
 
-  const handleReservation = () => {
-    if (selectedDates.length === 0) return
-
-    const dates = selectedDates.sort().join(", ")
-    const message = `Olá! Gostaria de fazer uma reserva para as seguintes datas: ${dates}`
-    const whatsappUrl = `https://wa.me/559294197052?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
-  }
 
   const days = getDaysInMonth(currentDate)
 
@@ -230,31 +203,23 @@ export function Calendar() {
 
                     const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day)
                     const status = getDateStatus(dateStr)
-                    const isSelected = isDateSelected(dateStr)
                     const isToday =
                       new Date().toDateString() ===
                       new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString()
 
                     return (
-                      <button
+                      <div
                         key={dateStr}
-                        onClick={() => handleDateClick(day)}
-                        disabled={status === "booked" || loading}
                         className={`
                           p-2 text-sm rounded-lg transition-all duration-200 relative
-                          ${status === "available" && !isSelected ? "bg-white hover:bg-moss-100 text-moss-800 border border-moss-200" : ""}
-                          ${status === "available" && isSelected ? "bg-moss-600 text-white" : ""}
-                          ${status === "booked" ? "bg-red-100 text-red-400 cursor-not-allowed" : ""}
-                          ${loading ? "opacity-50 cursor-not-allowed" : ""}
-                          ${isToday ? "ring-2 ring-moss-400" : ""}
+                          ${status === "available" ? "bg-green-100 text-green-800 border border-green-200" : ""}
+                          ${status === "booked" ? "bg-red-100 text-red-400" : ""}
+                          ${loading ? "opacity-50" : ""}
                         `}
                       >
                         {day}
-                        {status === "available" && isSelected && (
-                          <Check className="h-3 w-3 absolute top-0 right-0 text-white" />
-                        )}
                         {status === "booked" && <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />}
-                      </button>
+                      </div>
                     )
                   })}
                 </div>
@@ -273,12 +238,8 @@ export function Calendar() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white border border-moss-200 rounded"></div>
+                    <div className="w-6 h-6 bg-green-100 border border-green-200 rounded"></div>
                     <span className="text-moss-700">Disponível</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-moss-600 rounded"></div>
-                    <span className="text-moss-700">Selecionado</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-red-100 rounded relative">
@@ -286,88 +247,35 @@ export function Calendar() {
                     </div>
                     <span className="text-moss-700">Ocupado</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-white border-2 border-moss-400 rounded"></div>
-                    <span className="text-moss-700">Hoje</span>
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* Selected Dates */}
-              {selectedDates.length > 0 && (
-                <Card className="bg-gradient-to-r from-moss-100 to-beige-100 border-moss-200">
-                  <CardHeader>
-                    <CardTitle className="text-moss-900">Datas Selecionadas</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 mb-4">
-                      {selectedDates.sort().map((date) => (
-                        <div key={date} className="flex items-center justify-between bg-white/60 p-2 rounded">
-                          <span className="text-moss-800">
-                            {new Date(date + "T00:00:00").toLocaleDateString("pt-BR")}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedDates(selectedDates.filter((d) => d !== date))}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                    <Button onClick={handleReservation} className="w-full bg-moss-600 hover:bg-moss-700 text-white">
-                      Reservar via WhatsApp
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
 
               {/* Quick Actions */}
-              <Card className="bg-white border-moss-200">
-                <CardHeader>
-                  <CardTitle className="text-moss-900">Ações Rápidas</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+              <Card className="bg-white border-moss-200 shadow-lg">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-bold text-moss-900 mb-2">Pronto para reservar?</h3>
+                    <p className="text-moss-600 text-sm">Entre em contato conosco pelo WhatsApp e garante sua vaga!</p>
+                  </div>
+                  
                   <Button
-                    variant="outline"
-                    className="w-full border-moss-300 text-moss-700 hover:bg-moss-50 bg-transparent"
-                    onClick={() => setSelectedDates([])}
-                  >
-                    Limpar Seleção
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-moss-300 text-moss-700 hover:bg-moss-50 bg-transparent"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg"
                     asChild
                   >
                     <a
-                      href="https://wa.me/559294197052?text=Olá! Gostaria de verificar a disponibilidade para outras datas."
+                      href="https://wa.me/559294197052"
                       target="_blank"
                       rel="noreferrer"
                     >
-                      Consultar Outras Datas
+                      <MessageCircle className="mr-3 h-6 w-6" />
+                      Faça sua reserva agora
                     </a>
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-moss-300 text-moss-700 hover:bg-moss-50 bg-transparent"
-                    onClick={fetchAvailability}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Atualizando...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Atualizar Disponibilidade
-                      </>
-                    )}
-                  </Button>
+                  
+                  <p className="text-xs text-moss-500 mt-4">
+                    ✨ Resposta rápida garantida
+                  </p>
                 </CardContent>
               </Card>
             </div>

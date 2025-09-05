@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Heart } from "lucide-react"
+import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Heart, Zap } from "lucide-react"
 
 const features = [
   {
@@ -37,6 +37,12 @@ const features = [
     icon: Shield,
     title: "Segurança Total",
     description: "Monitorado por câmeras e alarmes de segurança 24h",
+    highlight: true,
+  },
+  {
+    icon: Zap,
+    title: "Gerador de Energia",
+    description: "Gerador próprio para garantir energia 24h, mesmo em caso de queda de energia",
     highlight: true,
   },
   {

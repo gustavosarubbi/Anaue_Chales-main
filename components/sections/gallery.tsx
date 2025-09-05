@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Home, Utensils, Waves, TreePine, Camera, Heart } from "lucide-react"
+import { ChevronLeft, ChevronRight, Home, Utensils, Waves, TreePine, Camera, Heart, Calendar } from "lucide-react"
 import Image from "next/image"
 
 const galleryCategories = [
@@ -296,12 +296,9 @@ export function Gallery() {
               <h3 className="text-xl font-bold text-moss-900 mb-2">Gostou do que viu?</h3>
               <p className="text-moss-700 mb-6">Reserve agora e viva essa experiência única na natureza amazônica</p>
               <Button className="bg-moss-600 hover:bg-moss-700 text-white" asChild>
-                <a
-                  href="https://wa.me/559294197052?text=Olá! Vi as fotos da galeria e gostaria de fazer uma reserva."
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Fazer Reserva
+                <a href="#calendario">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Verificar Disponibilidade
                 </a>
               </Button>
             </CardContent>

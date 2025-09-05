@@ -29,7 +29,7 @@ export function Location() {
             <CardContent className="p-0">
               <div className="aspect-video w-full">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.0123456789!2d-60.0123456!3d-3.0123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM8KwMDAnNDQuNCJTIDYwwrAwMCc0NC40Ilc!5e0!3m2!1spt-BR!2sbr!4v1234567890123"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.485337445665!2d-60.096383900000006!3d-2.9627469!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c3dbaac5b11f5%3A0x85f34b546f03fa0f!2zQW5hdcOqIEp1bmdsZSBDaGFsw6lz!5e0!3m2!1spt-BR!2sbr!4v1757047079339!5m2!1spt-BR!2sbr"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -40,26 +40,9 @@ export function Location() {
                 ></iframe>
               </div>
               <div className="p-6 bg-gradient-to-r from-moss-50 to-beige-50">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button className="bg-moss-600 hover:bg-moss-700 text-white" asChild>
-                    <Link
-                      href="https://wa.me/559294197052?text=Olá! Gostaria de informações sobre a localização."
-                      target="_blank"
-                    >
-                      <MapPin className="mr-2 h-4 w-4" />
-                      Solicitar Localização
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-moss-600 text-moss-600 hover:bg-moss-50 bg-transparent"
-                    asChild
-                  >
-                    <Link href="https://waze.com/ul/h6xmr0kz2b" target="_blank">
-                      <Navigation className="mr-2 h-4 w-4" />
-                      Abrir no Waze
-                    </Link>
-                  </Button>
+                <div className="text-center">
+                  <p className="text-moss-900 font-bold text-lg mb-1">Anauê Jungle Chalés</p>
+                  <p className="text-moss-700 text-sm">R. Cedrinho - Tarumã Açu, Manaus - AM, 69022-000</p>
                 </div>
               </div>
             </CardContent>

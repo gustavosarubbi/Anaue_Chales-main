@@ -49,7 +49,7 @@ export function Contact() {
               <Button className="w-full bg-green-600 hover:bg-green-700 text-white" asChild>
                 <Link href="https://wa.me/559294197052" target="_blank">
                   <MessageCircle className="mr-2 h-4 w-4" />
-                  Abrir WhatsApp
+                  Falar no WhatsApp
                 </Link>
               </Button>
             </CardContent>

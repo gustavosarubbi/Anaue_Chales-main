@@ -50,11 +50,9 @@ export function Pricing() {
               </div>
 
               <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white" asChild>
-                <Link
-                  href="https://wa.me/559294197052?text=Olá! Gostaria de reservar para o final de semana."
-                  target="_blank"
-                >
-                  Reservar Final de Semana
+                <Link href="#calendario">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Verificar Disponibilidade
                 </Link>
               </Button>
             </CardContent>
@@ -92,11 +90,9 @@ export function Pricing() {
                 className="w-full border-moss-600 text-moss-600 hover:bg-moss-50 bg-transparent"
                 asChild
               >
-                <Link
-                  href="https://wa.me/559294197052?text=Olá! Gostaria de reservar para meio de semana."
-                  target="_blank"
-                >
-                  Reservar Meio de Semana
+                <Link href="#calendario">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Verificar Disponibilidade
                 </Link>
               </Button>
             </CardContent>

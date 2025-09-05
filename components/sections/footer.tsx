@@ -89,7 +89,7 @@ export function Footer() {
                 <div>
                   <p className="text-white font-medium">Tarumã, Manaus - AM</p>
                   <Link
-                    href="https://waze.com/ul/h6xmr0kz2b"
+                    href="https://waze.com/ul?q=R.+Cedrinho+-+Tarumã+Açu,+Manaus+-+AM,+69022-000"
                     target="_blank"
                     className="text-moss-200 text-sm hover:text-beige-300 transition-colors flex items-center gap-1"
                   >
@@ -140,10 +140,14 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg text-white mb-6">Ações Rápidas</h4>
             <div className="space-y-3">
-              <Button className="w-full bg-green-600 hover:bg-green-700 text-white justify-start" asChild>
-                <Link href="https://wa.me/559294197052?text=Olá! Gostaria de fazer uma reserva." target="_blank">
+              <Button
+                variant="outline"
+                className="w-full border-green-600 text-green-400 hover:bg-green-600 hover:text-white justify-start bg-transparent"
+                asChild
+              >
+                <Link href="https://wa.me/559294197052" target="_blank">
                   <MessageCircle className="mr-2 h-4 w-4" />
-                  Fazer Reserva
+                  Falar no WhatsApp
                 </Link>
               </Button>
 
@@ -152,10 +156,7 @@ export function Footer() {
                 className="w-full border-moss-600 text-moss-200 hover:bg-moss-700 hover:text-white justify-start bg-transparent"
                 asChild
               >
-                <Link
-                  href="https://wa.me/559294197052?text=Olá! Gostaria de verificar a disponibilidade."
-                  target="_blank"
-                >
+                <Link href="#calendario">
                   <Calendar className="mr-2 h-4 w-4" />
                   Ver Disponibilidade
                 </Link>
@@ -166,7 +167,7 @@ export function Footer() {
                 className="w-full border-moss-600 text-moss-200 hover:bg-moss-700 hover:text-white justify-start bg-transparent"
                 asChild
               >
-                <Link href="https://waze.com/ul/h6xmr0kz2b" target="_blank">
+                <Link href="https://waze.com/ul?q=R.+Cedrinho+-+Tarumã+Açu,+Manaus+-+AM,+69022-000" target="_blank">
                   <Navigation className="mr-2 h-4 w-4" />
                   Como Chegar
                 </Link>
@@ -227,15 +228,15 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Floating WhatsApp Button */}
+      {/* Floating Calendar Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           size="lg"
-          className="rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+          className="rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
           asChild
         >
-          <Link href="https://wa.me/559294197052" target="_blank">
-            <MessageCircle className="h-6 w-6" />
+          <Link href="#calendario">
+            <Calendar className="h-6 w-6" />
           </Link>
         </Button>
       </div>
