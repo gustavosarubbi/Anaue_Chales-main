@@ -119,11 +119,11 @@ export function Features() {
                 <p className="text-sm text-moss-600">Não pagam</p>
               </div>
               <div className="p-4 bg-white/60 rounded-lg">
-                <p className="font-semibold text-moss-800">6 a 17 anos</p>
+                <p className="font-semibold text-moss-800">6 a 15 anos</p>
                 <p className="text-sm text-moss-600">+ R$ 50</p>
               </div>
               <div className="p-4 bg-white/60 rounded-lg">
-                <p className="font-semibold text-moss-800">A partir de 18 anos</p>
+                <p className="font-semibold text-moss-800">A partir de 16 anos</p>
                 <p className="text-sm text-moss-600">+ R$ 100</p>
               </div>
             </div>
