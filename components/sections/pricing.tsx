@@ -35,13 +35,14 @@ export function Pricing() {
               <div className="text-center mb-6">
               <span className="text-moss-500 line-through text-xl">R$ 952</span>
               <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 743</span>
-                <p className="text-moss-600">via Pix (pernoite)</p>
+                <p className="text-moss-600 font-semibold">Desconto de 20% no Pix (pernoite)</p>
+                <p className="text-xs text-moss-500">Desconto válido somente para pagamento no Pix</p>
               </div>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <Smartphone className="h-4 w-4 text-moss-600" />
-                  <span>Pagamento via Pix</span>
+                  <span>Pagamento via Pix (20% de desconto)</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <CreditCard className="h-4 w-4 text-moss-600" />
@@ -71,13 +72,14 @@ export function Pricing() {
               <div className="text-center mb-6">
               <span className="text-moss-500 line-through text-2xl">R$ 762</span>
               <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 594</span>
-                <p className="text-moss-600">via Pix (pernoite)</p>
+                <p className="text-moss-600 font-semibold">Desconto de 20% no Pix (pernoite)</p>
+                <p className="text-xs text-moss-500">Desconto válido somente para pagamento no Pix</p>
               </div>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <Smartphone className="h-4 w-4 text-beige-600" />
-                  <span>Pagamento via Pix</span>
+                  <span>Pagamento via Pix (20% de desconto)</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <CreditCard className="h-4 w-4 text-beige-600" />

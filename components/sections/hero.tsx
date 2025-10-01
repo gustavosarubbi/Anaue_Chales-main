@@ -245,12 +245,12 @@ export function Hero() {
                   <div className="text-center mb-6">
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-lg px-4 py-2 mb-4">
                       <Percent className="mr-2 h-5 w-5" />
-                      Pagamento no PIX!
+                      Desconto de 20% no pagamento via Pix
                     </Badge>
                     <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
                       <p className="text-green-800 font-bold text-lg mb-2">PIX</p>
                       <p className="text-green-700 text-sm">
-                        Aceitamos somente pagamento no PIX!
+                        Desconto válido somente para pagamento no Pix.
                       </p>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ export function Hero() {
                       </Link>
                     </Button>
 
-                    <p className="text-xs text-moss-600 mt-3">* Pagamento somente via PIX para reservas via WhatsApp</p>
+                    <p className="text-xs text-moss-600 mt-3">* Desconto de 20% válido apenas para pagamento via Pix nas reservas pelo WhatsApp</p>
                   </div>
                 </CardContent>
               </Card>
