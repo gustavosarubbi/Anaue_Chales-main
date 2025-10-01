@@ -241,16 +241,16 @@ export function Hero() {
             <div className="flex justify-center lg:justify-end">
               <Card className="bg-white/95 backdrop-blur-sm border-white/20 max-w-md w-full">
                 <CardContent className="p-8">
-                  {/* WhatsApp Discount Badge */}
+                  {/* PIX Payment Badge */}
                   <div className="text-center mb-6">
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-lg px-4 py-2 mb-4">
                       <Percent className="mr-2 h-5 w-5" />
-                      Desconto Especial!
+                      Pagamento no PIX!
                     </Badge>
                     <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                      <p className="text-green-800 font-bold text-lg mb-2">20% OFF</p>
+                      <p className="text-green-800 font-bold text-lg mb-2">PIX</p>
                       <p className="text-green-700 text-sm">
-                        Reservas feitas via WhatsApp ganham desconto especial de 20%!
+                        Aceitamos somente pagamento no PIX!
                       </p>
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export function Hero() {
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-moss-900 mb-4">Reserve Sua Experiência</h3>
                     <p className="text-moss-700 mb-6">
-                      Entre em contato conosco pelo WhatsApp e garante seu desconto exclusivo!
+                      Entre em contato conosco pelo WhatsApp e garante sua reserva com pagamento no PIX!
                     </p>
 
                     {/* Pricing Preview */}
@@ -286,7 +286,7 @@ export function Hero() {
                       </Link>
                     </Button>
 
-                    <p className="text-xs text-moss-600 mt-3">* Desconto válido apenas para reservas via WhatsApp</p>
+                    <p className="text-xs text-moss-600 mt-3">* Pagamento somente via PIX para reservas via WhatsApp</p>
                   </div>
                 </CardContent>
               </Card>

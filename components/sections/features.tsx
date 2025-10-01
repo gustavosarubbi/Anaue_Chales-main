@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Heart, Zap } from "lucide-react"
+import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Heart, Zap, Droplets } from "lucide-react"
 
 const features = [
   {
@@ -61,6 +61,12 @@ const features = [
     icon: Heart,
     title: "Pet Friendly",
     description: "Seus pets são bem-vindos! 🐕",
+    highlight: true,
+  },
+  {
+    icon: Droplets,
+    title: "Banheira de Hidromassagem",
+    description: "Banheira relaxante com hidromassagem para momentos de total relaxamento e bem-estar",
     highlight: true,
   },
 ]

@@ -77,6 +77,13 @@ const galleryImages = [
     description: "Espaço relaxante para deitar e apreciar a tranquilidade do ambiente natural",
     image: "/lugar-para-deitar-.jpg",
   },
+  {
+    id: 15,
+    category: "chales",
+    title: "Banheira de Hidromassagem",
+    description: "Banheira relaxante com hidromassagem para momentos de total relaxamento e bem-estar",
+    image: "/banheira.jpeg",
+  },
 
   // Gastronomia
   {
