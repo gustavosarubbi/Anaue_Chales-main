@@ -204,7 +204,7 @@ export function Hero() {
                 </div>
                 <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <Heart className="h-4 w-4 text-white" />
-                  <span className="text-white font-medium">Pet Friendly</span>
+                  <span className="text-white font-medium">Não Pet Friendly</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
                   <MapPin className="h-4 w-4 text-white" />

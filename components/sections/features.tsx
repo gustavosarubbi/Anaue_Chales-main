@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Heart, Zap, Droplets } from "lucide-react"
+import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Ban, Zap, Droplets } from "lucide-react"
 
 const features = [
   {
@@ -58,10 +58,10 @@ const features = [
     highlight: false,
   },
   {
-    icon: Heart,
-    title: "Pet Friendly",
-    description: "Seus pets são bem-vindos! 🐕",
-    highlight: true,
+    icon: Ban,
+    title: "Não Pet Friendly",
+    description: "Pets não são permitidos no local",
+    highlight: false,
   },
   {
     icon: Droplets,

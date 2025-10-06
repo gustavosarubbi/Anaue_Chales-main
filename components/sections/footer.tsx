@@ -10,10 +10,11 @@ import {
   Users,
   Wifi,
   Shield,
-  Heart,
+  Ban,
   Navigation,
   Calendar,
   Star,
+  Coffee,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -114,15 +115,15 @@ export function Footer() {
                 <span className="text-sm">Segurança 24h</span>
               </div>
               <div className="flex items-center gap-2 text-moss-200">
-                <Heart className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Pet Friendly</span>
+                <Ban className="h-4 w-4 text-beige-300" />
+                <span className="text-sm">Não Pet Friendly</span>
               </div>
               <div className="flex items-center gap-2 text-moss-200">
                 <Users className="h-4 w-4 text-beige-300" />
                 <span className="text-sm">Até 6 pessoas</span>
               </div>
               <div className="flex items-center gap-2 text-moss-200">
-                <Calendar className="h-4 w-4 text-beige-300" />
+                <Coffee className="h-4 w-4 text-beige-300" />
                 <span className="text-sm">Café da manhã incluso</span>
               </div>
             </div>
