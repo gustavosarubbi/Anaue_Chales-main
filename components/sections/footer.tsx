@@ -190,7 +190,12 @@ export function Footer() {
                   </div>
                   <div className="text-moss-300 text-xs mt-2">
                     <p>Valores via Pix. Parcelado com juros da máquina.</p>
-                    <p className="mt-1">Consulte valores para pessoas adicionais.</p>
+                    <div className="text-xs text-moss-600 mt-2 text-center">
+              <p>* Valores para o casal.</p>
+              <p>Crianças até 5 anos não pagam.</p>
+              <p>De 6 a 15 anos: <span className="text-moss-900 font-bold">R$ 100</span></p>
+              <p>A partir de 16 anos: <span className="text-moss-900 font-bold">R$ 150</span></p>
+            </div>
                   </div>
                 </div>
               </CardContent>

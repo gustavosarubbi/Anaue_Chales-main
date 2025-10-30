@@ -264,16 +264,15 @@ export function Hero() {
                     {/* Pricing Preview */}
                     <div className="bg-moss-50 p-4 rounded-lg mb-6">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-moss-700">Finais de semana:</span>
-                        <div className="text-right">
-                          <span className="text-moss-900 font-bold">R$ 800</span>
-                        </div>
+                        <span className="text-moss-700 text-left">
+                          Finais de semana:
+                          <span className="text-xs block">(feriados e vésperas de feriados)</span>
+                        </span>
+                        <span className="text-moss-900 font-bold">R$ 800</span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-moss-700">Segunda a quinta:</span>
-                        <div className="text-right">
-                          <span className="text-moss-900 font-bold">R$ 650</span>
-                        </div>
+                        <span className="text-moss-900 font-bold">R$ 650</span>
                       </div>
                       <div className="text-xs text-moss-600 mt-2 text-center">
                         <p>Valores para o casal (Pernoite) via Pix</p>
@@ -288,7 +287,12 @@ export function Hero() {
                       </Link>
                     </Button>
 
-                    <p className="text-xs text-moss-600 mt-3">* Valores para o casal. Consulte valores para pessoas adicionais.</p>
+                    <div className="text-xs text-moss-600 mt-3">
+                      <p>* Valores para o casal.</p>
+                      <p>Crianças até 5 anos não pagam.</p>
+                      <p>De 6 a 15 anos: <span className="text-moss-900 font-bold">R$ 100</span></p>
+                      <p>A partir de 16 anos: <span className="text-moss-900 font-bold">R$ 150</span></p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
