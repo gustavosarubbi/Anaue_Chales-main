@@ -47,6 +47,14 @@ export function Pricing() {
                   <CreditCard className="h-4 w-4 text-moss-600" />
                   <span>Parcelado com juros da máquina</span>
                 </div>
+                <div className="pt-2 border-t border-moss-200">
+                  <p className="text-sm font-medium text-moss-800 mb-1">Pessoa adicional:</p>
+                  <div className="text-xs text-moss-700 space-y-1">
+                    <p>• Até 5 anos: não pagam</p>
+                    <p>• De 6 a 15 anos: adicional de R$ 100</p>
+                    <p>• A partir de 16 anos: adicional de R$ 150</p>
+                  </div>
+                </div>
               </div>
 
               <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white" asChild>
@@ -83,6 +91,14 @@ export function Pricing() {
                   <CreditCard className="h-4 w-4 text-beige-600" />
                   <span>Parcelado com juros da máquina</span>
                 </div>
+                <div className="pt-2 border-t border-beige-200">
+                  <p className="text-sm font-medium text-moss-800 mb-1">Pessoa adicional:</p>
+                  <div className="text-xs text-moss-700 space-y-1">
+                    <p>• Até 5 anos: não pagam</p>
+                    <p>• De 6 a 15 anos: adicional de R$ 100</p>
+                    <p>• A partir de 16 anos: adicional de R$ 150</p>
+                  </div>
+                </div>
               </div>
 
               <Button
@@ -99,31 +115,7 @@ export function Pricing() {
           </Card>
         </div>
 
-        {/* Additional Person Pricing */}
-        <Card className="bg-gradient-to-r from-beige-50 to-moss-50 border-beige-200 mb-12">
-          <CardHeader>
-            <CardTitle className="text-center text-moss-900 flex items-center justify-center gap-2">
-              <Users className="h-5 w-5" />
-              Valores para Pessoa Adicional
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="p-4 bg-white/60 rounded-lg">
-                <div className="text-xl font-bold text-moss-800 mb-2">Até 5 anos</div>
-                <p className="text-moss-600 font-medium">Não pagam</p>
-              </div>
-              <div className="p-4 bg-white/60 rounded-lg">
-                <div className="text-xl font-bold text-moss-800 mb-2">De 6 a 15 anos</div>
-                <p className="text-moss-600 font-medium">Adicional de R$ 100</p>
-              </div>
-              <div className="p-4 bg-white/60 rounded-lg">
-                <div className="text-xl font-bold text-moss-800 mb-2">A partir de 16 anos</div>
-                <p className="text-moss-600 font-medium">Adicional de R$ 150</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Schedule Info */}
         <Card className="bg-gradient-to-r from-moss-50 to-beige-50 border-moss-200">

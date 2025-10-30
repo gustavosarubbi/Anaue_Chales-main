@@ -126,11 +126,11 @@ export function Features() {
               </div>
               <div className="p-4 bg-white/60 rounded-lg">
                 <p className="font-semibold text-moss-800">6 a 15 anos</p>
-                <p className="text-sm text-moss-600">+ R$ 50</p>
+                <p className="text-sm text-moss-600">+ R$ 100</p>
               </div>
               <div className="p-4 bg-white/60 rounded-lg">
                 <p className="font-semibold text-moss-800">A partir de 16 anos</p>
-                <p className="text-sm text-moss-600">+ R$ 100</p>
+                <p className="text-sm text-moss-600">+ R$ 150</p>
               </div>
             </div>
           </CardContent>
