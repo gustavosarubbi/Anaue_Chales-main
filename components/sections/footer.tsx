@@ -178,15 +178,19 @@ export function Footer() {
             {/* Pricing Summary */}
             <Card className="mt-6 bg-moss-800/50 border-moss-600">
               <CardContent className="p-4">
-                <h5 className="font-medium text-white mb-3">Valores pelo Whatsapp</h5>
+                <h5 className="font-medium text-white mb-3">Valores para o Casal (Pernoite)</h5>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-moss-200">
                     <span>Finais de semana:</span>
-                    <span className="text-white font-medium">R$ 762</span>
+                    <span className="text-white font-medium">R$ 800</span>
                   </div>
                   <div className="flex justify-between text-moss-200">
                     <span>Segunda a quinta:</span>
-                    <span className="text-white font-medium">R$ 594</span>
+                    <span className="text-white font-medium">R$ 650</span>
+                  </div>
+                  <div className="text-moss-300 text-xs mt-2">
+                    <p>Valores via Pix. Parcelado com juros da máquina.</p>
+                    <p className="mt-1">Consulte valores para pessoas adicionais.</p>
                   </div>
                 </div>
               </CardContent>

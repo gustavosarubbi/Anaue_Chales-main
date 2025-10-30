@@ -245,12 +245,12 @@ export function Hero() {
                   <div className="text-center mb-6">
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-lg px-4 py-2 mb-4">
                       <Percent className="mr-2 h-5 w-5" />
-                      Desconto de 20%
+                      Melhores Preços
                     </Badge>
                     <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
                       <p className="text-green-800 font-bold text-lg mb-2">PIX</p>
                       <p className="text-green-700 text-sm">
-                        Desconto válido somente para pagamento no Pix.
+                        Valores especiais para pagamento via Pix.
                       </p>
                     </div>
                   </div>
@@ -266,16 +266,18 @@ export function Hero() {
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-moss-700">Finais de semana:</span>
                         <div className="text-right">
-                          <span className="text-moss-500 line-through text-sm">R$ 952</span>
-                          <span className="text-moss-900 font-bold ml-2">R$ 743</span>
+                          <span className="text-moss-900 font-bold">R$ 800</span>
                         </div>
                       </div>
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-2">
                         <span className="text-moss-700">Segunda a quinta:</span>
                         <div className="text-right">
-                          <span className="text-moss-500 line-through text-sm">R$ 762</span>
-                          <span className="text-moss-900 font-bold ml-2">R$ 594</span>
+                          <span className="text-moss-900 font-bold">R$ 650</span>
                         </div>
+                      </div>
+                      <div className="text-xs text-moss-600 mt-2 text-center">
+                        <p>Valores para o casal (Pernoite) via Pix</p>
+                        <p>Parcelado com juros da máquina</p>
                       </div>
                     </div>
 
@@ -286,7 +288,7 @@ export function Hero() {
                       </Link>
                     </Button>
 
-                    <p className="text-xs text-moss-600 mt-3">* Desconto de 20% válido apenas para pagamento via Pix nas reservas pelo WhatsApp</p>
+                    <p className="text-xs text-moss-600 mt-3">* Valores para o casal. Consulte valores para pessoas adicionais.</p>
                   </div>
                 </CardContent>
               </Card>

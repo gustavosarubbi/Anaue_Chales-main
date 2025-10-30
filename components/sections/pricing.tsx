@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, CreditCard, Smartphone } from "lucide-react"
+import { Calendar, Clock, CreditCard, Smartphone, Users } from "lucide-react"
 import Link from "next/link"
 
 export function Pricing() {
@@ -29,20 +29,19 @@ export function Pricing() {
                 <Calendar className="h-5 w-5" />
                 Finais de Semana
               </CardTitle>
-              <p className="text-sm text-moss-700">Sexta a sábado, sábado a domingo, ou domingo a segunda-feira</p>
+              <p className="text-sm text-moss-700">Sexta a sábado, sábado a domingo, domingo a segunda-feira e feriados</p>
             </CardHeader>
             <CardContent>
               <div className="text-center mb-6">
-              <span className="text-moss-500 line-through text-xl">R$ 952</span>
-              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 743</span>
-                <p className="text-moss-600 font-semibold">Desconto de 20% no Pix (pernoite)</p>
-                <p className="text-xs text-moss-500">Desconto válido somente para pagamento no Pix</p>
+                <span className="text-moss-900 font-bold text-4xl">R$ 800</span>
+                <p className="text-moss-600 font-semibold">Via Pix (pernoite)</p>
+                <p className="text-xs text-moss-500">Parcelado com juros da máquina</p>
               </div>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <Smartphone className="h-4 w-4 text-moss-600" />
-                  <span>Pagamento via Pix (20% de desconto)</span>
+                  <span>Pagamento via Pix</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <CreditCard className="h-4 w-4 text-moss-600" />
@@ -70,16 +69,15 @@ export function Pricing() {
             </CardHeader>
             <CardContent>
               <div className="text-center mb-6">
-              <span className="text-moss-500 line-through text-2xl">R$ 762</span>
-              <span className="text-moss-900 font-bold ml-2 text-4xl">R$ 594</span>
-                <p className="text-moss-600 font-semibold">Desconto de 20% no Pix (pernoite)</p>
-                <p className="text-xs text-moss-500">Desconto válido somente para pagamento no Pix</p>
+                <span className="text-moss-900 font-bold text-4xl">R$ 650</span>
+                <p className="text-moss-600 font-semibold">Via Pix (pernoite)</p>
+                <p className="text-xs text-moss-500">Parcelado com juros da máquina</p>
               </div>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <Smartphone className="h-4 w-4 text-beige-600" />
-                  <span>Pagamento via Pix (20% de desconto)</span>
+                  <span>Pagamento via Pix</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-moss-700">
                   <CreditCard className="h-4 w-4 text-beige-600" />
@@ -100,6 +98,32 @@ export function Pricing() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Additional Person Pricing */}
+        <Card className="bg-gradient-to-r from-beige-50 to-moss-50 border-beige-200 mb-12">
+          <CardHeader>
+            <CardTitle className="text-center text-moss-900 flex items-center justify-center gap-2">
+              <Users className="h-5 w-5" />
+              Valores para Pessoa Adicional
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-white/60 rounded-lg">
+                <div className="text-xl font-bold text-moss-800 mb-2">Até 5 anos</div>
+                <p className="text-moss-600 font-medium">Não pagam</p>
+              </div>
+              <div className="p-4 bg-white/60 rounded-lg">
+                <div className="text-xl font-bold text-moss-800 mb-2">De 6 a 15 anos</div>
+                <p className="text-moss-600 font-medium">Adicional de R$ 100</p>
+              </div>
+              <div className="p-4 bg-white/60 rounded-lg">
+                <div className="text-xl font-bold text-moss-800 mb-2">A partir de 16 anos</div>
+                <p className="text-moss-600 font-medium">Adicional de R$ 150</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Schedule Info */}
         <Card className="bg-gradient-to-r from-moss-50 to-beige-50 border-moss-200">
