@@ -24,7 +24,7 @@ export function Pricing() {
                 <div>
                   <p className="font-semibold text-orange-900 mb-1">📅 Período Especial - Final de Ano</p>
                   <p className="text-sm text-orange-800">
-                    Nos dias <strong>24 a 31 de dezembro</strong>, os valores estão disponíveis somente via WhatsApp.
+                    Nos dias <strong>24 e 31 de dezembro</strong>, os valores estão disponíveis somente via WhatsApp.
                     Entre em contato conosco para consultar as tarifas especiais desta época!
                   </p>
                 </div>

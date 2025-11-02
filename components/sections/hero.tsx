@@ -292,7 +292,7 @@ export function Hero() {
                     {/* Observação especial para dezembro */}
                     <div className="pt-3 border-t border-moss-200">
                       <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 a 31 de Dezembro</p>
+                        <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 e 31 de Dezembro</p>
                         <p className="text-xs text-orange-800 leading-relaxed">
                           Valores somente via <strong>WhatsApp</strong>
                         </p>
