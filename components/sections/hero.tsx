@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Phone, Wifi, Camera, Heart, Menu, X, MessageCircle, Percent, Calendar } from "lucide-react"
+import { MapPin, Phone, Wifi, Camera, Heart, Menu, X, MessageCircle, Calendar, Smartphone } from "lucide-react"
 import Link from "next/link"
 
 export function Hero() {
@@ -176,45 +176,51 @@ export function Hero() {
       </header>
 
       {/* Hero Content */}
-      <div className="container mx-auto px-4 py-16 relative z-10 flex items-center min-h-screen">
-        <div className="max-w-6xl mx-auto pt-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 min-h-screen flex items-center">
+        <div className="w-full max-w-7xl mx-auto pt-20 pb-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left space-y-6 lg:space-y-8">
               {/* Main Title */}
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-                Anauê Jungle
-                <span className="block text-beige-200">Chalés</span>
-              </h1>
+              <div>
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-3 leading-tight">
+                  Anauê Jungle
+                  <span className="block text-beige-200 mt-2">Chalés</span>
+                </h1>
+              </div>
 
               {/* Subtitle */}
-              <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl leading-relaxed">
-              O seu refúgio na floresta com conforto, segurança, charme e exclusividade
+              <p className="text-lg sm:text-xl md:text-2xl text-white/95 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                O seu refúgio na floresta com conforto, segurança, charme e exclusividade
               </p>
 
               {/* Key Features */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Wifi className="h-4 w-4 text-white" />
-                  <span className="text-white font-medium">Wi-Fi</span>
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3">
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                  <Wifi className="h-4 w-4 text-white flex-shrink-0" />
+                  <span className="text-white font-medium text-sm sm:text-base">Wi-Fi</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Camera className="h-4 w-4 text-white" />
-                  <span className="text-white font-medium">Segurança 24h</span>
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                  <Camera className="h-4 w-4 text-white flex-shrink-0" />
+                  <span className="text-white font-medium text-sm sm:text-base">Segurança 24h</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Heart className="h-4 w-4 text-white" />
-                  <span className="text-white font-medium">Não Pet Friendly</span>
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                  <Heart className="h-4 w-4 text-white flex-shrink-0" />
+                  <span className="text-white font-medium text-sm sm:text-base">Não Pet Friendly</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <MapPin className="h-4 w-4 text-white" />
-                  <span className="text-white font-medium">Tarumã</span>
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                  <MapPin className="h-4 w-4 text-white flex-shrink-0" />
+                  <span className="text-white font-medium text-sm sm:text-base">Tarumã</span>
                 </div>
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg" asChild>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                <Button 
+                  size="lg" 
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold w-full sm:w-auto" 
+                  asChild
+                >
                   <Link href="#calendario">
                     <Calendar className="mr-2 h-5 w-5" />
                     Verificar Disponibilidade
@@ -223,7 +229,7 @@ export function Hero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white text-white hover:bg-white/10 px-8 py-4 text-lg bg-transparent backdrop-blur-sm"
+                  className="border-2 border-white text-white hover:bg-white/20 px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-transparent backdrop-blur-sm w-full sm:w-auto"
                   onClick={() => scrollToSection("#pricing")}
                 >
                   Ver Preços
@@ -231,77 +237,96 @@ export function Hero() {
               </div>
 
               {/* Contact Info */}
-              <div className="text-white/80">
-                <p className="text-lg font-medium">📲 (92) 99419-7052</p>
-                <p className="text-sm">📍 @anaue.chales</p>
+              <div className="text-white/90 space-y-1 pt-2">
+                <p className="text-base sm:text-lg font-medium">📲 (92) 99419-7052</p>
+                <p className="text-sm sm:text-base">📍 @anaue.chales</p>
               </div>
             </div>
 
             {/* Right Content - Reservation Card */}
-            <div className="flex justify-center lg:justify-end">
-              <Card className="bg-white/95 backdrop-blur-sm border-white/20 max-w-md w-full">
+            <div className="flex justify-center lg:justify-end mt-10 lg:mt-0">
+              <Card className="bg-white border-moss-200 shadow-xl max-w-md w-full">
                 <CardContent className="p-8">
-                  {/* PIX Payment Badge */}
+                  {/* Header do Card */}
                   <div className="text-center mb-6">
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-lg px-4 py-2 mb-4">
-                      <Percent className="mr-2 h-5 w-5" />
-                      Melhores Preços
-                    </Badge>
-                    <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                      <p className="text-green-800 font-bold text-lg mb-2">PIX</p>
-                      <p className="text-green-700 text-sm">
-                        Valores especiais para pagamento via Pix.
-                      </p>
-                    </div>
+                    <h3 className="text-2xl font-bold text-moss-900 mb-3">Reserve Agora</h3>
+                    <p className="text-sm text-moss-600 leading-relaxed">
+                      Entre em contato pelo WhatsApp e garanta sua reserva
+                    </p>
                   </div>
 
-                  <div className="text-center">
-                    <h3 className="text-2xl font-bold text-moss-900 mb-4">Reserve Sua Experiência</h3>
-                    <p className="text-moss-700 mb-6">
-                      Entre em contato conosco pelo WhatsApp e garante sua reserva com pagamento no PIX!
-                    </p>
-
-                    {/* Pricing Preview */}
-                    <div className="bg-moss-50 p-4 rounded-lg mb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-moss-700 text-left">
-                          Finais de semana:
-                          <span className="text-xs block">(feriados e vésperas de feriados)</span>
-                        </span>
-                        <span className="text-moss-900 font-bold">R$ 800</span>
-                      </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-moss-700">Segunda a quinta:</span>
-                        <span className="text-moss-900 font-bold">R$ 650</span>
-                      </div>
-                      <div className="text-xs text-moss-600 mt-2 text-center">
-                        <p>Valores para o casal (Pernoite) via Pix</p>
-                        <p>Parcelado com juros da máquina</p>
-                      </div>
-                      
-                      {/* Observação especial para dezembro */}
-                      <div className="mt-3 pt-3 border-t border-moss-200">
-                        <div className="bg-orange-50 border border-orange-200 rounded p-2">
-                          <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 a 31 de Dezembro</p>
-                          <p className="text-xs text-orange-800">
-                            Valores somente via <strong>WhatsApp</strong>
+                  {/* Pricing Section */}
+                  <div className="bg-moss-50 rounded-xl p-5 mb-6 space-y-4 border border-moss-100">
+                    {/* Finais de Semana */}
+                    <div className="pb-3 border-b border-moss-200">
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-moss-900 mb-1">Finais de Semana</p>
+                          <p className="text-xs text-moss-600">
+                            Sexta a segunda, feriados e vésperas
                           </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-moss-900">R$ 800</p>
+                          <p className="text-xs text-moss-600">por noite</p>
                         </div>
                       </div>
                     </div>
 
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3" asChild>
-                      <Link href="#calendario">
-                        <Calendar className="mr-2 h-5 w-5" />
-                        Verificar Disponibilidade
-                      </Link>
-                    </Button>
+                    {/* Segunda a Quinta */}
+                    <div>
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-moss-900 mb-1">Segunda a Quinta</p>
+                          <p className="text-xs text-moss-600">
+                            Exceto feriados e vésperas
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-moss-900">R$ 650</p>
+                          <p className="text-xs text-moss-600">por noite</p>
+                        </div>
+                      </div>
+                    </div>
 
-                    <div className="text-xs text-moss-600 mt-3">
-                      <p>* Valores para o casal.</p>
-                      <p>Crianças até 5 anos não pagam.</p>
-                      <p>De 6 a 15 anos: <span className="text-moss-900 font-bold">R$ 100</span></p>
-                      <p>A partir de 16 anos: <span className="text-moss-900 font-bold">R$ 150</span></p>
+                    {/* Observação especial para dezembro */}
+                    <div className="pt-3 border-t border-moss-200">
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 a 31 de Dezembro</p>
+                        <p className="text-xs text-orange-800 leading-relaxed">
+                          Valores somente via <strong>WhatsApp</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informações de Pagamento */}
+                  <div className="mb-6 space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-moss-700">
+                      <Smartphone className="h-4 w-4 text-moss-600" />
+                      <span>Pagamento via PIX ou parcelado</span>
+                    </div>
+                    <div className="text-xs text-moss-600 pl-6">
+                      Parcelado com juros da máquina
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6 font-semibold mb-4" asChild>
+                    <Link href="#calendario">
+                      <Calendar className="mr-2 h-5 w-5" />
+                      Verificar Disponibilidade
+                    </Link>
+                  </Button>
+
+                  {/* Informações Adicionais */}
+                  <div className="bg-moss-50 rounded-lg p-4 space-y-2 border border-moss-100">
+                    <p className="text-xs font-semibold text-moss-900 mb-2">Informações Adicionais:</p>
+                    <div className="text-xs text-moss-600 space-y-1">
+                      <p>• Valores para o casal (por pernoite)</p>
+                      <p>• Crianças até 5 anos não pagam</p>
+                      <p>• De 6 a 15 anos: <span className="text-moss-900 font-bold">+R$ 100</span></p>
+                      <p>• A partir de 16 anos: <span className="text-moss-900 font-bold">+R$ 150</span></p>
                     </div>
                   </div>
                 </CardContent>
