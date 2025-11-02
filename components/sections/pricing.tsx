@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, CreditCard, Smartphone, Users } from "lucide-react"
+import { Calendar, Clock, CreditCard, Smartphone, Users, MessageCircle } from "lucide-react"
 import Link from "next/link"
 
 export function Pricing() {
@@ -15,6 +15,22 @@ export function Pricing() {
           <p className="text-lg text-moss-700 max-w-2xl mx-auto">
             Tarifas especiais para diferentes períodos da semana
           </p>
+          
+          {/* Observação especial para dezembro */}
+          <div className="mt-6 max-w-2xl mx-auto">
+            <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-lg text-left">
+              <div className="flex items-start gap-2">
+                <MessageCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-orange-900 mb-1">📅 Período Especial - Final de Ano</p>
+                  <p className="text-sm text-orange-800">
+                    Nos dias <strong>24 a 31 de dezembro</strong>, os valores estão disponíveis somente via WhatsApp.
+                    Entre em contato conosco para consultar as tarifas especiais desta época!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Pricing Cards */}

@@ -278,6 +278,16 @@ export function Hero() {
                         <p>Valores para o casal (Pernoite) via Pix</p>
                         <p>Parcelado com juros da máquina</p>
                       </div>
+                      
+                      {/* Observação especial para dezembro */}
+                      <div className="mt-3 pt-3 border-t border-moss-200">
+                        <div className="bg-orange-50 border border-orange-200 rounded p-2">
+                          <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 a 31 de Dezembro</p>
+                          <p className="text-xs text-orange-800">
+                            Valores somente via <strong>WhatsApp</strong>
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
                     <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3" asChild>

@@ -251,6 +251,23 @@ export function Calendar() {
               </Card>
 
 
+              {/* Observação especial para dezembro */}
+              {(currentDate.getMonth() === 11) && (
+                <Card className="bg-orange-50 border-orange-200 shadow-md mb-6">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-2">
+                      <MessageCircle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold text-orange-900 text-sm mb-1">📅 Período Especial - 24 a 31 de Dezembro</p>
+                        <p className="text-xs text-orange-800">
+                          Os valores para este período estão disponíveis somente via <strong>WhatsApp</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Quick Actions */}
               <Card className="bg-white border-moss-200 shadow-lg">
                 <CardContent className="p-8 text-center">
