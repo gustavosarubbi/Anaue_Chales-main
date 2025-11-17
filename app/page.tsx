@@ -7,12 +7,19 @@ import { ContactForm } from "@/components/sections/contact-form"
 import { Pricing } from "@/components/sections/pricing"
 import { Contact } from "@/components/sections/contact"
 import { Footer } from "@/components/sections/footer"
+import { ScrollToTop } from "@/components/ui/scroll-to-top"
+import { ScrollIndicator } from "@/components/ui/scroll-indicator"
+import { WhatsAppButton } from "@/components/ui/whatsapp-button"
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Hero Section */}
-      <Hero />
+    <>
+      {/* Scroll Progress Indicator */}
+      <ScrollIndicator />
+
+      <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        {/* Hero Section */}
+        <Hero />
 
       {/* Features Section */}
       <Features />
@@ -37,6 +44,11 @@ export default function HomePage() {
 
       {/* Footer */}
       <Footer />
-    </main>
+
+        {/* Floating Action Buttons */}
+        <WhatsAppButton />
+        <ScrollToTop />
+      </main>
+    </>
   )
 }

@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export function Location() {
   return (
-    <section id="localizacao" className="py-20 bg-gradient-to-br from-beige-50 to-moss-50">
+    <section id="localizacao" className="py-20 bg-gradient-to-br from-beige-50 to-moss-50 texture-waves relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">

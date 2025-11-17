@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export function Contact() {
   return (
-    <section id="contato" className="py-20 bg-gradient-to-br from-moss-900 to-moss-800 text-white">
+    <section id="contato" className="py-20 bg-gradient-to-br from-moss-900 to-moss-800 text-white texture-noise relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">

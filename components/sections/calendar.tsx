@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, CalendarIcon, Check, X, RefreshCw, MessageCircle } from "lucide-react"
+import { CalendarSkeleton } from "@/components/ui/skeleton"
+import { ChevronLeft, ChevronRight, CalendarIcon, Check, X, RefreshCw, MessageCircle, ShoppingCart } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface AvailabilityResponse {
   success: boolean
@@ -15,11 +17,14 @@ interface AvailabilityResponse {
 }
 
 export function Calendar() {
+  const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [availability, setAvailability] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<string>("")
   const [error, setError] = useState<string>("")
+  const [selectedCheckIn, setSelectedCheckIn] = useState<Date | null>(null)
+  const [selectedCheckOut, setSelectedCheckOut] = useState<Date | null>(null)
 
   const monthNames = [
     "Janeiro",
@@ -95,6 +100,86 @@ export function Calendar() {
     return availability[dateStr] || "available"
   }
 
+  const handleDateClick = (dateStr: string, day: number) => {
+    if (loading) return
+
+    const status = getDateStatus(dateStr)
+    if (status === "booked") return
+
+    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    if (clickedDate < today) return
+
+    if (!selectedCheckIn || (selectedCheckIn && selectedCheckOut)) {
+      // Start new selection
+      setSelectedCheckIn(clickedDate)
+      setSelectedCheckOut(null)
+    } else if (selectedCheckIn && !selectedCheckOut) {
+      // Complete selection
+      if (clickedDate <= selectedCheckIn) {
+        // If clicked date is before or equal to check-in, make it the new check-in
+        setSelectedCheckIn(clickedDate)
+        setSelectedCheckOut(null)
+      } else {
+        // Check if all dates in range are available
+        const datesInRange = getDatesInRange(selectedCheckIn, clickedDate)
+        const allAvailable = datesInRange.every((date) => {
+          const dateStr = formatDate(date.getFullYear(), date.getMonth(), date.getDate())
+          return getDateStatus(dateStr) === "available"
+        })
+
+        if (allAvailable) {
+          setSelectedCheckOut(clickedDate)
+        } else {
+          // Invalid range, reset
+          setSelectedCheckIn(clickedDate)
+          setSelectedCheckOut(null)
+        }
+      }
+    }
+  }
+
+  const getDatesInRange = (start: Date, end: Date): Date[] => {
+    const dates: Date[] = []
+    const current = new Date(start)
+    while (current <= end) {
+      dates.push(new Date(current))
+      current.setDate(current.getDate() + 1)
+    }
+    return dates
+  }
+
+  const handleReserveClick = () => {
+    if (selectedCheckIn && selectedCheckOut) {
+      const checkInStr = formatDateForUrl(selectedCheckIn)
+      const checkOutStr = formatDateForUrl(selectedCheckOut)
+      router.push(`/checkout?check_in=${checkInStr}&check_out=${checkOutStr}`)
+    }
+  }
+
+  const formatDateForUrl = (date: Date): string => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+  }
+
+  const isDateInRange = (dateStr: string): boolean => {
+    if (!selectedCheckIn || !selectedCheckOut) return false
+
+    const date = new Date(dateStr)
+    return date >= selectedCheckIn && date <= selectedCheckOut
+  }
+
+  const isCheckInDate = (dateStr: string): boolean => {
+    if (!selectedCheckIn) return false
+    return dateStr === formatDateForUrl(selectedCheckIn)
+  }
+
+  const isCheckOutDate = (dateStr: string): boolean => {
+    if (!selectedCheckOut) return false
+    return dateStr === formatDateForUrl(selectedCheckOut)
+  }
+
 
   const navigateMonth = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate)
@@ -110,14 +195,14 @@ export function Calendar() {
   const days = getDaysInMonth(currentDate)
 
   return (
-    <section id="calendario" className="py-20 bg-white">
+    <section id="calendario" className="py-20 bg-white texture-grid relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">📅 Disponibilidade</Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-moss-900 mb-4">Verifique Nossa Disponibilidade</h2>
           <p className="text-lg text-moss-700 max-w-2xl mx-auto">
-            Selecione as datas desejadas e faça sua reserva diretamente pelo WhatsApp
+            Selecione as datas desejadas no calendário e finalize sua reserva online
           </p>
           <div className="flex items-center justify-center gap-4 mt-4">
             {loading && (
@@ -160,7 +245,7 @@ export function Calendar() {
         <div className="max-w-4xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Calendar */}
-            <Card className="bg-gradient-to-br from-moss-50 to-beige-50 border-moss-200">
+            <Card className="bg-gradient-to-br from-moss-50 to-beige-50 border-moss-200 animate-fadeInUp">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <Button
@@ -168,6 +253,7 @@ export function Calendar() {
                     size="icon"
                     onClick={() => navigateMonth("prev")}
                     className="hover:bg-moss-100"
+                    disabled={loading}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -179,12 +265,17 @@ export function Calendar() {
                     size="icon"
                     onClick={() => navigateMonth("next")}
                     className="hover:bg-moss-100"
+                    disabled={loading}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
+                {loading && Object.keys(availability).length === 0 ? (
+                  <CalendarSkeleton />
+                ) : (
+                  <>
                 {/* Week days header */}
                 <div className="grid grid-cols-7 gap-1 mb-2">
                   {weekDays.map((day) => (
@@ -202,27 +293,63 @@ export function Calendar() {
                     }
 
                     const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day)
+                    const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+                    const isPastDate = currentDateObj < today
+                    
                     const status = getDateStatus(dateStr)
                     const isToday =
                       new Date().toDateString() ===
                       new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString()
+                    const inRange = isDateInRange(dateStr)
+                    const isCheckIn = isCheckInDate(dateStr)
+                    const isCheckOut = isCheckOutDate(dateStr)
+                    const isSelectable = status === "available" && !loading && !isPastDate
 
-                    return (
-                      <div
-                        key={dateStr}
-                        className={`
-                          p-2 text-sm rounded-lg transition-all duration-200 relative
-                          ${status === "available" ? "bg-green-100 text-green-800 border border-green-200" : ""}
-                          ${status === "booked" ? "bg-red-100 text-red-400" : ""}
-                          ${loading ? "opacity-50" : ""}
-                        `}
-                      >
-                        {day}
-                        {status === "booked" && <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />}
-                      </div>
-                    )
+                                    return (
+                                      <button
+                                        key={dateStr}
+                                        type="button"
+                                        onClick={() => handleDateClick(dateStr, day)}
+                                        disabled={!isSelectable}
+                                        className={`
+                                          p-2 text-sm rounded-lg transition-all duration-300 relative
+                                          min-h-[40px] min-w-[40px] flex items-center justify-center
+                                          ${isPastDate
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
+                                            : ""
+                                          }
+                                          ${status === "available" && !inRange && !isCheckIn && !isCheckOut && !isPastDate
+                                            ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 hover:scale-110 hover:shadow-md cursor-pointer active:scale-95"
+                                            : ""
+                                          }
+                                          ${status === "booked" && !isPastDate
+                                            ? "bg-red-100 text-red-400 cursor-not-allowed opacity-60"
+                                            : ""
+                                          }
+                                          ${inRange && !isCheckIn && !isCheckOut
+                                            ? "bg-moss-200 text-moss-900 border border-moss-300 animate-scaleIn"
+                                            : ""
+                                          }
+                                          ${isCheckIn || isCheckOut
+                                            ? "bg-moss-600 text-white border-2 border-moss-700 font-bold shadow-lg animate-scaleIn"
+                                            : ""
+                                          }
+                                          ${loading ? "opacity-50 cursor-not-allowed" : ""}
+                                          ${isToday && !inRange && !isCheckIn && !isCheckOut ? "ring-2 ring-moss-400 ring-offset-2" : ""}
+                                        `}
+                                      >
+                                        {day}
+                                        {status === "booked" && <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />}
+                                        {isCheckIn && <span className="text-[10px] absolute top-0 left-0 p-0.5 bg-moss-700 rounded-br">In</span>}
+                                        {isCheckOut && <span className="text-[10px] absolute top-0 left-0 p-0.5 bg-moss-700 rounded-br">Out</span>}
+                                      </button>
+                                    )
                   })}
                 </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -239,13 +366,17 @@ export function Calendar() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-green-100 border border-green-200 rounded"></div>
-                    <span className="text-moss-700">Disponível</span>
+                    <span className="text-moss-700 text-sm">Disponível</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-red-100 rounded relative">
                       <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />
                     </div>
-                    <span className="text-moss-700">Ocupado</span>
+                    <span className="text-moss-700 text-sm">Ocupado</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-gray-100 rounded opacity-50"></div>
+                    <span className="text-moss-700 text-sm">Data passada</span>
                   </div>
                 </CardContent>
               </Card>
@@ -270,25 +401,72 @@ export function Calendar() {
 
               {/* Quick Actions */}
               <Card className="bg-white border-moss-200 shadow-lg">
-                <CardContent className="p-8 text-center">
-                  <div className="mb-6">
+                <CardContent className="p-8 text-center space-y-4">
+                  <div>
                     <h3 className="text-xl font-bold text-moss-900 mb-2">Pronto para reservar?</h3>
-                    <p className="text-moss-600 text-sm">Entre em contato conosco pelo WhatsApp e garante sua vaga!</p>
+                    {selectedCheckIn && selectedCheckOut ? (
+                      <div className="mb-4 space-y-2">
+                        <p className="text-sm text-moss-700">
+                          Check-in: <strong>{selectedCheckIn.toLocaleDateString("pt-BR")}</strong>
+                        </p>
+                        <p className="text-sm text-moss-700">
+                          Check-out: <strong>{selectedCheckOut.toLocaleDateString("pt-BR")}</strong>
+                        </p>
+                        <p className="text-xs text-moss-600">
+                          Clique no botão abaixo para finalizar sua reserva
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-moss-600 text-sm mb-4">
+                        Selecione as datas no calendário e faça sua reserva online
+                      </p>
+                    )}
                   </div>
-                  
-                  <Button
-                    className="w-full bg-green-600 hover:bg-green-700 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg"
-                    asChild
-                  >
-                    <a
-                      href="https://wa.me/559294197052"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <MessageCircle className="mr-3 h-6 w-6" />
-                      Faça sua reserva agora
-                    </a>
-                  </Button>
+
+                  {selectedCheckIn && selectedCheckOut ? (
+                    <>
+                      <Button
+                        onClick={handleReserveClick}
+                        className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container animate-scaleIn"
+                      >
+                        <ShoppingCart className="mr-3 h-6 w-6" />
+                        Reservar Agora
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedCheckIn(null)
+                          setSelectedCheckOut(null)
+                        }}
+                        className="w-full min-h-[48px] active:scale-95 transition-all duration-200"
+                      >
+                        Limpar Seleção
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg mb-3 min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container"
+                        onClick={() => router.push("/checkout")}
+                      >
+                        <ShoppingCart className="mr-3 h-6 w-6" />
+                        Reservar Online
+                      </Button>
+                      <Button
+                        className="w-full bg-moss-600 hover:bg-moss-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200"
+                        asChild
+                      >
+                        <a
+                          href="https://wa.me/559294197052"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <MessageCircle className="mr-3 h-6 w-6" />
+                          Falar no WhatsApp
+                        </a>
+                      </Button>
+                    </>
+                  )}
                   
                   <p className="text-xs text-moss-500 mt-4">
                     ✨ Resposta rápida garantida

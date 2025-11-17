@@ -73,7 +73,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="comodidades" className="py-20 bg-white">
+    <section id="comodidades" className="py-20 bg-white texture-dots relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
@@ -84,27 +84,28 @@ export function Features() {
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {/* Features Grid - Mobile optimized with 3D hover */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
           {features.map((feature, index) => (
             <Card
               key={index}
-              className={`text-center transition-all duration-300 hover:shadow-lg ${
+              className={`text-center transition-all duration-300 hover:shadow-2xl card-3d animate-fadeInUp ${
                 feature.highlight ? "border-moss-200 bg-moss-50/50" : "border-beige-200 bg-beige-50/30"
               }`}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <div
-                  className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                  className={`mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-110 ${
                     feature.highlight ? "bg-moss-100" : "bg-beige-100"
                   }`}
                 >
-                  <feature.icon className={`h-8 w-8 ${feature.highlight ? "text-moss-600" : "text-beige-600"}`} />
+                  <feature.icon className={`h-7 w-7 sm:h-8 sm:w-8 transition-transform duration-300 hover:scale-110 ${feature.highlight ? "text-moss-600" : "text-beige-600"}`} />
                 </div>
-                <CardTitle className="text-lg text-moss-900">{feature.title}</CardTitle>
+                <CardTitle className="text-base sm:text-lg text-moss-900">{feature.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-moss-700 text-sm leading-relaxed">{feature.description}</p>
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                <p className="text-moss-700 text-xs sm:text-sm leading-relaxed">{feature.description}</p>
               </CardContent>
             </Card>
           ))}

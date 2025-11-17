@@ -6,7 +6,7 @@ import { MessageSquare, Phone, MessageCircle } from "lucide-react"
 export function ContactForm() {
 
   return (
-    <section className="py-20">
+    <section className="py-20 bg-gradient-to-br from-moss-50 to-beige-50 texture-crosshatch relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">

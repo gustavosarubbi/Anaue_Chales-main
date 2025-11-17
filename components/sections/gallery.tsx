@@ -1,11 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Home, Utensils, Waves, TreePine, Camera, Heart, Calendar } from "lucide-react"
+import { ChevronLeft, ChevronRight, Home, Utensils, Waves, TreePine, Camera, Heart, Calendar, X, ZoomIn } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
+import useEmblaCarousel from "embla-carousel-react"
+import Autoplay from "embla-carousel-autoplay"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
+import { VisuallyHidden } from "@/components/ui/visually-hidden"
 
 const galleryCategories = [
   {
@@ -158,30 +163,76 @@ const galleryImages = [
 export function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all")
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isZoomOpen, setIsZoomOpen] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<typeof galleryImages[0] | null>(null)
 
   const filteredImages =
     activeCategory === "all" ? galleryImages : galleryImages.filter((img) => img.category === activeCategory)
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % filteredImages.length)
-  }
+  // Embla Carousel configuration with touch support
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { 
+      loop: true,
+      align: "center",
+      skipSnaps: false,
+      dragFree: false,
+    },
+    [Autoplay({ delay: 5000, stopOnInteraction: true })]
+  )
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length)
-  }
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev()
+  }, [emblaApi])
 
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index)
-  }
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext()
+  }, [emblaApi])
 
-  // Reset index when category changes
+  const scrollTo = useCallback((index: number) => {
+    if (emblaApi) emblaApi.scrollTo(index)
+  }, [emblaApi])
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return
+    setCurrentImageIndex(emblaApi.selectedScrollSnap())
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+    emblaApi.on("select", onSelect)
+    emblaApi.on("reInit", onSelect)
+    return () => {
+      emblaApi.off("select", onSelect)
+    }
+  }, [emblaApi, onSelect])
+
+  // Reset carousel when category changes
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId)
     setCurrentImageIndex(0)
+    if (emblaApi) {
+      emblaApi.reInit()
+    }
   }
 
+  const handleImageZoom = (image: typeof galleryImages[0]) => {
+    setSelectedImage(image)
+    setIsZoomOpen(true)
+  }
+
+  // Ensure currentImageIndex is always valid
+  useEffect(() => {
+    if (filteredImages.length > 0 && currentImageIndex >= filteredImages.length) {
+      setCurrentImageIndex(0)
+      if (emblaApi) {
+        emblaApi.scrollTo(0)
+      }
+    }
+  }, [filteredImages, currentImageIndex, emblaApi])
+
   return (
-    <section id="galeria" className="py-20 bg-gradient-to-br from-beige-50 to-moss-50">
+    <section id="galeria" className="py-20 bg-gradient-to-br from-beige-50 to-moss-50 texture-organic relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -219,81 +270,197 @@ export function Gallery() {
           </p>
         </div>
 
-        {/* Main Carousel */}
+        {/* Main Carousel with Touch Support */}
         <div className="max-w-4xl mx-auto mb-8">
-          <Card className="overflow-hidden bg-white/90 backdrop-blur-sm border-moss-200">
+          <Card className="overflow-hidden bg-white/90 backdrop-blur-sm border-moss-200 shadow-xl">
             <CardContent className="p-0 relative">
               {filteredImages.length > 0 && (
                 <>
-                  {/* Main Image */}
-                  <div className="relative aspect-[3/2] overflow-hidden bg-moss-100">
-                    <Image
-                      src={filteredImages[currentImageIndex].image || "/placeholder.svg"}
-                      alt={filteredImages[currentImageIndex].title}
-                      fill
-                      className="object-contain transition-all duration-500"
-                      crossOrigin="anonymous"
-                    />
+                  {/* Embla Carousel Container */}
+                  <div className="overflow-hidden" ref={emblaRef}>
+                    <div className="flex touch-pan-y">
+                      {filteredImages.map((image, index) => (
+                        <div
+                          key={image.id}
+                          className="flex-[0_0_100%] min-w-0"
+                        >
+                          <div className="relative aspect-[3/2] overflow-hidden bg-moss-100 cursor-pointer group">
+                            <Image
+                              src={image.image || "/placeholder.svg"}
+                              alt={image.title}
+                              fill
+                              className="object-contain transition-all duration-500 group-hover:scale-105"
+                              crossOrigin="anonymous"
+                              priority={index === 0}
+                            />
+                            
+                            {/* Zoom Button Overlay */}
+                            <button
+                              onClick={() => handleImageZoom(image)}
+                              className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all duration-300"
+                              aria-label="Ampliar imagem"
+                            >
+                              <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-110">
+                                <ZoomIn className="h-6 w-6 text-moss-900" />
+                              </div>
+                            </button>
 
-                    {/* Navigation Arrows */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
-                      onClick={prevImage}
-                    >
-                      <ChevronLeft className="h-6 w-6" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm"
-                      onClick={nextImage}
-                    >
-                      <ChevronRight className="h-6 w-6" />
-                    </Button>
-
-                    {/* Image Counter */}
-                    <div className="absolute top-4 right-4 bg-black/40 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
-                      {currentImageIndex + 1} / {filteredImages.length}
+                            {/* Image Counter */}
+                            <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1.5 rounded-full text-sm backdrop-blur-sm font-medium">
+                              {currentImageIndex + 1} / {filteredImages.length}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Image Info */}
-                  <div className="p-6 bg-gradient-to-r from-moss-50 to-beige-50">
-                    <h3 className="text-xl font-bold text-moss-900 mb-2">{filteredImages[currentImageIndex].title}</h3>
-                    <p className="text-moss-700">{filteredImages[currentImageIndex].description}</p>
+                  {/* Navigation Arrows */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 md:left-4 top-[25%] -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm rounded-full h-10 w-10 md:h-12 md:w-12 transition-all duration-300"
+                    onClick={scrollPrev}
+                    aria-label="Imagem anterior"
+                  >
+                    <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 md:right-4 top-[25%] -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm rounded-full h-10 w-10 md:h-12 md:w-12 transition-all duration-300"
+                    onClick={scrollNext}
+                    aria-label="Próxima imagem"
+                  >
+                    <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                  </Button>
+
+                  {/* Progress Indicators (Dots) */}
+                  <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full">
+                    {filteredImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => scrollTo(index)}
+                        className={`transition-all duration-300 rounded-full ${
+                          index === currentImageIndex
+                            ? "bg-white w-8 h-2"
+                            : "bg-white/50 hover:bg-white/80 w-2 h-2"
+                        }`}
+                        aria-label={`Ir para imagem ${index + 1}`}
+                      />
+                    ))}
                   </div>
+
+                  {/* Image Info */}
+                  {filteredImages[currentImageIndex] && (
+                    <div className="p-6 bg-gradient-to-r from-moss-50 to-beige-50 animate-fadeIn">
+                      <h3 className="text-xl font-bold text-moss-900 mb-2">{filteredImages[currentImageIndex].title}</h3>
+                      <p className="text-moss-700">{filteredImages[currentImageIndex].description}</p>
+                    </div>
+                  )}
                 </>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Thumbnail Navigation */}
+        {/* Thumbnail Navigation with Smooth Scroll */}
         <div className="max-w-4xl mx-auto">
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x">
             {filteredImages.map((image, index) => (
               <button
                 key={image.id}
-                onClick={() => goToImage(index)}
-                className={`flex-shrink-0 relative aspect-[4/3] w-20 md:w-24 rounded-lg overflow-hidden transition-all duration-300 bg-moss-100 ${
+                onClick={() => scrollTo(index)}
+                className={`flex-shrink-0 relative aspect-[4/3] w-20 md:w-24 rounded-lg overflow-hidden transition-all duration-300 bg-moss-100 snap-start ${
                   index === currentImageIndex
-                    ? "ring-2 ring-moss-500 ring-offset-2 scale-105"
-                    : "opacity-70 hover:opacity-100"
+                    ? "ring-3 ring-moss-500 ring-offset-2 scale-105 shadow-lg"
+                    : "opacity-70 hover:opacity-100 hover:scale-105 hover:shadow-md"
                 }`}
               >
                 <Image
                   src={image.image || "/placeholder.svg"}
                   alt={image.title}
                   fill
-                  className="object-contain"
+                  className="object-contain transition-transform duration-300"
                   crossOrigin="anonymous"
                 />
+                {index === currentImageIndex && (
+                  <div className="absolute inset-0 border-2 border-moss-500 rounded-lg pointer-events-none" />
+                )}
               </button>
             ))}
           </div>
         </div>
+
+        {/* Zoom Modal */}
+        <Dialog open={isZoomOpen} onOpenChange={setIsZoomOpen}>
+          <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95 border-0">
+            <VisuallyHidden>
+              <DialogTitle>Visualização ampliada da imagem</DialogTitle>
+            </VisuallyHidden>
+            <div className="relative w-full h-full flex items-center justify-center">
+              {selectedImage && (
+                <>
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={selectedImage.image || "/placeholder.svg"}
+                      alt={selectedImage.title}
+                      fill
+                      className="object-contain"
+                      crossOrigin="anonymous"
+                      priority
+                    />
+                  </div>
+                  
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setIsZoomOpen(false)}
+                    className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full p-3 transition-all duration-300"
+                    aria-label="Fechar zoom"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+
+                  {/* Image Info Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+                    <h3 className="text-2xl font-bold mb-2">{selectedImage.title}</h3>
+                    <p className="text-white/90">{selectedImage.description}</p>
+                  </div>
+
+                  {/* Navigation in Zoom */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm rounded-full h-12 w-12"
+                    onClick={() => {
+                      scrollPrev()
+                      const currentIndex = filteredImages.findIndex(img => img.id === selectedImage.id)
+                      const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredImages.length - 1
+                      setSelectedImage(filteredImages[prevIndex])
+                    }}
+                    aria-label="Imagem anterior"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm rounded-full h-12 w-12"
+                    onClick={() => {
+                      scrollNext()
+                      const currentIndex = filteredImages.findIndex(img => img.id === selectedImage.id)
+                      const nextIndex = (currentIndex + 1) % filteredImages.length
+                      setSelectedImage(filteredImages[nextIndex])
+                    }}
+                    aria-label="Próxima imagem"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Call to Action */}
         <div className="text-center mt-12">
@@ -303,10 +470,10 @@ export function Gallery() {
               <h3 className="text-xl font-bold text-moss-900 mb-2">Gostou do que viu?</h3>
               <p className="text-moss-700 mb-6">Reserve agora e viva essa experiência única na natureza amazônica</p>
               <Button className="bg-moss-600 hover:bg-moss-700 text-white" asChild>
-                <a href="#calendario">
+                <Link href="/checkout">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Verificar Disponibilidade
-                </a>
+                  Reservar Agora
+                </Link>
               </Button>
             </CardContent>
           </Card>

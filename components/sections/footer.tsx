@@ -157,17 +157,6 @@ export function Footer() {
                 className="w-full border-moss-600 text-moss-200 hover:bg-moss-700 hover:text-white justify-start bg-transparent"
                 asChild
               >
-                <Link href="#calendario">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Ver Disponibilidade
-                </Link>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full border-moss-600 text-moss-200 hover:bg-moss-700 hover:text-white justify-start bg-transparent"
-                asChild
-              >
                 <Link href="https://waze.com/ul?q=R.+Cedrinho+-+Tarumã+Açu,+Manaus+-+AM,+69022-000" target="_blank">
                   <Navigation className="mr-2 h-4 w-4" />
                   Como Chegar
@@ -239,10 +228,10 @@ export function Footer() {
       </div>
 
       {/* Floating Calendar Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-4 md:right-8 z-50">
         <Button
-          size="lg"
-          className="rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+          size="icon"
+          className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"
           asChild
         >
           <Link href="#calendario">

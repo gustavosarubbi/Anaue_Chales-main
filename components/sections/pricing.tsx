@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-20 bg-white">
+    <section id="pricing" className="py-20 bg-white texture-lines relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
@@ -33,12 +33,12 @@ export function Pricing() {
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        {/* Pricing Cards - Mobile optimized */}
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-12">
           {/* Weekend Pricing */}
-          <Card className="border-moss-200 bg-gradient-to-br from-moss-50 to-moss-100 relative overflow-hidden">
+          <Card className="border-moss-200 bg-gradient-to-br from-moss-50 to-moss-100 relative overflow-hidden hover-lift animate-fadeInLeft">
             <div className="absolute top-4 right-4">
-              <Badge className="bg-moss-600 text-white">Popular</Badge>
+              <Badge className="bg-moss-600 text-white shadow-lg">Popular</Badge>
             </div>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-moss-900">
@@ -73,17 +73,17 @@ export function Pricing() {
                 </div>
               </div>
 
-              <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white" asChild>
-                <Link href="#calendario">
+              <Button className="w-full bg-moss-600 hover:bg-moss-700 active:scale-95 text-white min-h-[48px] shadow-md hover:shadow-lg transition-all duration-200 ripple-container" asChild>
+                <Link href="/checkout">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Verificar Disponibilidade
+                  Reservar Agora
                 </Link>
               </Button>
             </CardContent>
           </Card>
 
           {/* Weekday Pricing */}
-          <Card className="border-beige-200 bg-gradient-to-br from-beige-50 to-beige-100">
+          <Card className="border-beige-200 bg-gradient-to-br from-beige-50 to-beige-100 hover-lift animate-fadeInRight">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-moss-900">
                 <Calendar className="h-5 w-5" />
@@ -119,12 +119,12 @@ export function Pricing() {
 
               <Button
                 variant="outline"
-                className="w-full border-moss-600 text-moss-600 hover:bg-moss-50 bg-transparent"
+                className="w-full border-moss-600 text-moss-600 hover:bg-moss-50 active:scale-95 bg-transparent min-h-[48px] transition-all duration-200"
                 asChild
               >
-                <Link href="#calendario">
+                <Link href="/checkout">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Verificar Disponibilidade
+                  Reservar Agora
                 </Link>
               </Button>
             </CardContent>

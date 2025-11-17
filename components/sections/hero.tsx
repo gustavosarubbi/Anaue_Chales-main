@@ -182,43 +182,43 @@ export function Hero() {
             {/* Left Content */}
             <div className="text-center lg:text-left space-y-6 lg:space-y-8">
               {/* Main Title */}
-              <div>
+              <div className="animate-fadeInDown">
                 <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-3 leading-tight">
                   Anauê Jungle
-                  <span className="block text-beige-200 mt-2">Chalés</span>
+                  <span className="block text-beige-200 mt-2 animate-fadeInUp animate-delay-200">Chalés</span>
                 </h1>
               </div>
 
               {/* Subtitle */}
-              <p className="text-lg sm:text-xl md:text-2xl text-white/95 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-lg sm:text-xl md:text-2xl text-white/95 max-w-2xl mx-auto lg:mx-0 leading-relaxed animate-fadeInUp animate-delay-300">
                 O seu refúgio na floresta com conforto, segurança, charme e exclusividade
               </p>
 
               {/* Key Features */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3">
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 animate-fadeInUp animate-delay-400">
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
                   <Wifi className="h-4 w-4 text-white flex-shrink-0" />
                   <span className="text-white font-medium text-sm sm:text-base">Wi-Fi</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
                   <Camera className="h-4 w-4 text-white flex-shrink-0" />
                   <span className="text-white font-medium text-sm sm:text-base">Segurança 24h</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
                   <Heart className="h-4 w-4 text-white flex-shrink-0" />
                   <span className="text-white font-medium text-sm sm:text-base">Não Pet Friendly</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5">
+                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
                   <MapPin className="h-4 w-4 text-white flex-shrink-0" />
                   <span className="text-white font-medium text-sm sm:text-base">Tarumã</span>
                 </div>
               </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+              {/* CTA Buttons - Optimized for mobile touch */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fadeInUp animate-delay-500">
                 <Button 
                   size="lg" 
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold w-full sm:w-auto" 
+                  className="bg-green-600 hover:bg-green-700 active:scale-95 text-white px-8 py-4 text-base sm:text-lg font-semibold w-full sm:w-auto min-h-[48px] transition-all duration-200 shadow-lg hover:shadow-xl ripple-container" 
                   asChild
                 >
                   <Link href="#calendario">
@@ -229,7 +229,7 @@ export function Hero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-2 border-white text-white hover:bg-white/20 px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold bg-transparent backdrop-blur-sm w-full sm:w-auto"
+                  className="border-2 border-white text-white hover:bg-white/20 active:scale-95 px-8 py-4 text-base sm:text-lg font-semibold bg-transparent backdrop-blur-sm w-full sm:w-auto min-h-[48px] transition-all duration-200"
                   onClick={() => scrollToSection("#pricing")}
                 >
                   Ver Preços
@@ -245,11 +245,11 @@ export function Hero() {
 
             {/* Right Content - Reservation Card */}
             <div className="flex justify-center lg:justify-end mt-10 lg:mt-0">
-              <Card className="bg-white border-moss-200 shadow-xl max-w-md w-full">
-                <CardContent className="p-8">
+              <Card className="bg-white border-moss-200 shadow-2xl max-w-md w-full animate-fadeInUp hover-lift">
+                <CardContent className="p-6 sm:p-8">
                   {/* Header do Card */}
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-moss-900 mb-3">Reserve Agora</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-moss-900 mb-3">Reserve Agora</h3>
                     <p className="text-sm text-moss-600 leading-relaxed">
                       Entre em contato pelo WhatsApp e garanta sua reserva
                     </p>
@@ -311,11 +311,11 @@ export function Hero() {
                     </div>
                   </div>
 
-                  {/* CTA Button */}
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6 font-semibold mb-4" asChild>
-                    <Link href="#calendario">
+                  {/* CTA Button - Mobile optimized */}
+                  <Button className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-base sm:text-lg py-4 sm:py-6 font-semibold mb-4 min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container" asChild>
+                    <Link href="/checkout">
                       <Calendar className="mr-2 h-5 w-5" />
-                      Verificar Disponibilidade
+                      Reservar Agora
                     </Link>
                   </Button>
 
