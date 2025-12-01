@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { DatePicker } from "@/components/checkout/DatePicker"
+import { AvailabilityCalendar } from "@/components/checkout/calendar/AvailabilityCalendar"
 import { ReservationForm, ReservationFormData } from "@/components/checkout/ReservationForm"
 import { PriceCalculator } from "@/components/checkout/PriceCalculator"
 import { PaymentSummary } from "@/components/checkout/PaymentSummary"
@@ -308,11 +308,12 @@ function CheckoutContent() {
                       Você verá o valor total da reserva ao lado, antes de seguir para os dados pessoais.
                     </p>
                   </div>
-                  <DatePicker
+                  <AvailabilityCalendar
                     checkIn={checkIn}
                     checkOut={checkOut}
                     onDatesChange={handleDatesChange}
                     minDate={new Date()}
+                    numberOfMonths={1}
                   />
 
                   {checkIn && checkOut && (

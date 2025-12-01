@@ -50,7 +50,7 @@ export function Pricing() {
             <CardContent>
               <div className="text-center mb-6">
                 <span className="text-moss-900 font-bold text-4xl">R$ 800</span>
-                <p className="text-moss-600 font-semibold">Via Pix (pernoite)</p>
+                <p className="text-moss-600 font-semibold">Via Pix (pernoite - valor para casal)</p>
                 <p className="text-xs text-moss-500">Parcelado com juros da máquina</p>
               </div>
 
@@ -94,7 +94,7 @@ export function Pricing() {
             <CardContent>
               <div className="text-center mb-6">
                 <span className="text-moss-900 font-bold text-4xl">R$ 650</span>
-                <p className="text-moss-600 font-semibold">Via Pix (pernoite)</p>
+                <p className="text-moss-600 font-semibold">Via Pix (pernoite - valor para casal)</p>
                 <p className="text-xs text-moss-500">Parcelado com juros da máquina</p>
               </div>
 

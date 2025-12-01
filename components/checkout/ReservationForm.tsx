@@ -147,6 +147,7 @@ export function ReservationForm({ onSubmit, isLoading = false, defaultValues }: 
           <div className="rounded-lg bg-moss-50 p-3 text-xs text-moss-700">
             <p className="font-semibold mb-1">Informações:</p>
             <ul className="list-disc list-inside space-y-1">
+              <li>Valores base são para casal (2 adultos)</li>
               <li>Crianças até 5 anos não pagam</li>
               <li>Crianças de 6 a 15 anos: R$ 100/noite</li>
               <li>Adultos extras (acima de 2): R$ 150/noite</li>

@@ -57,7 +57,7 @@ export function PriceCalculator({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
-              {priceCalculation.totalNights} {priceCalculation.totalNights === 1 ? "noite" : "noites"}
+              {priceCalculation.totalNights} {priceCalculation.totalNights === 1 ? "noite" : "noites"} (valor para casal)
             </span>
             <span className="font-medium">
               R$ {priceCalculation.basePrice.toFixed(2)}
@@ -73,7 +73,7 @@ export function PriceCalculator({
                       day: "2-digit",
                       month: "short",
                     })}
-                    {night.isWeekend && " (fim de semana)"}
+                    {night.isWeekend && " (fim de semana)"} (casal)
                   </span>
                   <span>R$ {night.price.toFixed(2)}</span>
                 </div>
@@ -118,8 +118,8 @@ export function PriceCalculator({
             <strong>Informações:</strong>
           </p>
           <ul className="mt-1 list-disc list-inside space-y-1">
-            <li>Finais de semana: R$ {PRICING.WEEKEND.toFixed(2)}/noite</li>
-            <li>Dias úteis: R$ {PRICING.WEEKDAY.toFixed(2)}/noite</li>
+            <li>Finais de semana: R$ {PRICING.WEEKEND.toFixed(2)}/noite (valor para casal)</li>
+            <li>Dias úteis: R$ {PRICING.WEEKDAY.toFixed(2)}/noite (valor para casal)</li>
             <li>Crianças até 5 anos não pagam</li>
             <li>Crianças 6-15 anos: R$ {PRICING.EXTRA_CHILD.toFixed(2)}/noite</li>
             <li>Adultos extras: R$ {PRICING.EXTRA_ADULT.toFixed(2)}/noite</li>

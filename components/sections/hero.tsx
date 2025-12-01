@@ -268,7 +268,7 @@ export function Hero() {
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-moss-900">R$ 800</p>
-                          <p className="text-xs text-moss-600">por noite</p>
+                          <p className="text-xs text-moss-600">por noite (valor para casal)</p>
                         </div>
                       </div>
                     </div>
@@ -284,7 +284,7 @@ export function Hero() {
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-moss-900">R$ 650</p>
-                          <p className="text-xs text-moss-600">por noite</p>
+                          <p className="text-xs text-moss-600">por noite (valor para casal)</p>
                         </div>
                       </div>
                     </div>
