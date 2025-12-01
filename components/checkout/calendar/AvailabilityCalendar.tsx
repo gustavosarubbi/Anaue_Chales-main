@@ -51,47 +51,85 @@ export function AvailabilityCalendar({
       return
     }
 
-    // Verificar se está ocupada
-    const dateStr = format(normalizedDate, "yyyy-MM-dd")
-    if (availability[dateStr]) {
-      return
-    }
-
     // Verificar se é passado
     if (normalizedDate < minDate) {
       return
     }
 
+    const dateStr = format(normalizedDate, "yyyy-MM-dd")
+
     // Lógica de seleção
     if (!checkIn || (checkIn && checkOut)) {
-      // Nova seleção: definir check-in
+      // Se já tem check-in e check-out, e clicar no check-in novamente, deselecionar
+      if (checkIn && checkOut && isSameDay(normalizedDate, checkIn)) {
+        onDatesChange(undefined, undefined)
+        return
+      }
+      // Se já tem check-in e check-out, e clicar no check-out novamente, deselecionar check-out
+      if (checkIn && checkOut && isSameDay(normalizedDate, checkOut)) {
+        onDatesChange(checkIn, undefined)
+        return
+      }
+      // Nova seleção: definir check-in (só se não estiver ocupada)
+      if (availability[dateStr]) {
+        return
+      }
       onDatesChange(normalizedDate, undefined)
     } else if (checkIn && !checkOut) {
+      // Se clicar no mesmo dia do check-in, deselecionar
+      if (isSameDay(normalizedDate, checkIn)) {
+        onDatesChange(undefined, undefined)
+        return
+      }
       // Selecionar check-out
       if (normalizedDate <= checkIn) {
-        // Se a data selecionada é antes ou igual ao check-in, definir novo check-in
+        // Se a data selecionada é antes ou igual ao check-in, definir novo check-in (só se não estiver ocupada)
+        if (availability[dateStr]) {
+          return
+        }
         onDatesChange(normalizedDate, undefined)
       } else {
-        // Validar que todas as datas entre check-in e check-out estão disponíveis
-        let allAvailable = true
-        const datesToCheck = []
+        // Calcular o dia seguinte ao check-in
+        const nextDay = new Date(checkIn)
+        nextDay.setDate(nextDay.getDate() + 1)
+        const isNextDay = isSameDay(normalizedDate, nextDay)
+
+        // Se for o dia seguinte ao check-in, permitir mesmo que esteja ocupado
+        if (isNextDay) {
+          onDatesChange(checkIn, normalizedDate)
+          return
+        }
+
+        // Para outros dias, verificar se há no máximo 1 dia ocupado consecutivo
         let current = new Date(checkIn)
         current.setDate(current.getDate() + 1)
+        
+        let consecutiveOccupied = 0
+        let maxConsecutiveOccupied = 0
+        let hasOccupiedDays = false
 
+        // Verificar apenas os dias entre check-in e check-out (excluindo o check-out)
         while (current < normalizedDate) {
-          datesToCheck.push(new Date(current))
           const checkDateStr = format(current, "yyyy-MM-dd")
           if (availability[checkDateStr]) {
-            allAvailable = false
-            break
+            hasOccupiedDays = true
+            consecutiveOccupied++
+            maxConsecutiveOccupied = Math.max(maxConsecutiveOccupied, consecutiveOccupied)
+          } else {
+            consecutiveOccupied = 0
           }
           current.setDate(current.getDate() + 1)
         }
 
-        if (allAvailable) {
+        // Permitir se não houver dias ocupados OU se houver no máximo 1 dia ocupado consecutivo
+        if (!hasOccupiedDays || maxConsecutiveOccupied <= 1) {
+          // Permitir check-out mesmo que o próprio dia esteja ocupado
           onDatesChange(checkIn, normalizedDate)
         } else {
-          // Se há datas ocupadas no meio, definir novo check-in
+          // Se há mais de 1 dia ocupado consecutivo, definir novo check-in (só se não estiver ocupada)
+          if (availability[dateStr]) {
+            return
+          }
           onDatesChange(normalizedDate, undefined)
         }
       }

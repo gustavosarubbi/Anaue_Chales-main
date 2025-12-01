@@ -34,5 +34,6 @@ export interface CalendarDayProps {
   onClick: (date: Date) => void
   isSelected: boolean
   isInRange: boolean
+  canClickWhenOccupied?: boolean
 }
 

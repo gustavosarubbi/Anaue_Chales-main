@@ -1,73 +1,73 @@
 "use client"
 
 import React from "react"
-import { ArrowRightCircle, ArrowRight } from "lucide-react"
+import { ArrowRightCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CalendarDayProps } from "./types"
 
-export function CalendarDay({ day, onClick, isSelected, isInRange }: CalendarDayProps) {
+export function CalendarDay({ day, onClick, isSelected, isInRange, canClickWhenOccupied = false }: CalendarDayProps) {
   const handleClick = () => {
-    if (day.status !== 'disabled' && day.status !== 'occupied') {
+    // Permitir clique se não estiver desabilitado e:
+    // - Não estiver ocupado, OU
+    // - Estiver ocupado mas pode ser clicado (dia seguinte ao check-in)
+    if (day.status !== 'disabled' && (day.status !== 'occupied' || canClickWhenOccupied)) {
       onClick(day.date)
     }
   }
 
   const getDayClasses = () => {
+    // Prioridade: check-in e check-out primeiro
+    const isCheckIn = day.status === 'check-in'
+    const isCheckOut = day.status === 'check-out'
+    
+    // Se for check-in ou check-out, aplicar estilo verde escuro diretamente
+    if (isCheckIn || isCheckOut) {
+      return cn(
+        "relative flex items-center justify-center",
+        "w-full h-full",
+        "text-sm",
+        "font-medium",
+        "rounded",
+        "transition-colors duration-150",
+        "cursor-pointer",
+        "select-none",
+        "bg-green-700 text-white z-10"
+      )
+    }
+    
     const baseClasses = cn(
       "relative flex items-center justify-center",
-      "w-8 h-9 sm:w-9 sm:h-10 lg:w-10 lg:h-11",
-      "text-xs sm:text-sm",
+      "w-full h-full",
+      "text-sm",
       "font-medium",
-      "rounded-md",
-      "m-0 p-0",
-      "mx-auto",
-      "transition-all duration-200 ease-out",
+      "rounded",
+      "transition-colors duration-150",
       "cursor-pointer",
       "select-none",
-      "touch-manipulation", // Melhora experiência mobile
       {
-        // Disponível
-        "bg-moss-50 hover:bg-moss-100 hover:scale-105 hover:shadow-md": 
-          day.status === 'available' && !isSelected && !isInRange,
-        "text-moss-900 border border-moss-200": 
+        // Disponível - light green square
+        "bg-green-100 hover:bg-green-200 text-gray-900": 
           day.status === 'available' && !isSelected && !isInRange,
         
-        // Ocupado
-        "bg-gray-100 text-gray-400 cursor-not-allowed": 
+        // Ocupado (mas pode ser clicável se for dia seguinte ao check-in)
+        "bg-gray-100 text-gray-400 opacity-50": 
           day.status === 'occupied',
-        "opacity-50": day.status === 'occupied',
-        "relative overflow-hidden": day.status === 'occupied',
+        "cursor-not-allowed": 
+          day.status === 'occupied' && !canClickWhenOccupied,
+        "cursor-pointer": 
+          day.status === 'occupied' && canClickWhenOccupied,
         
-        // Desabilitado (passado)
-        "bg-gray-50 text-gray-300 cursor-not-allowed": 
+        // Desabilitado (passado) - faded grey
+        "bg-gray-50 text-gray-300 cursor-not-allowed opacity-40": 
           day.status === 'disabled',
-        "opacity-40": day.status === 'disabled',
         
-        // Hoje (mas não selecionado)
-        "ring-2 ring-moss-500 ring-offset-1 sm:ring-offset-2": 
-          day.status === 'today' && !isSelected && !isInRange,
-        "bg-moss-50 text-moss-900": 
+        // Hoje (mas não selecionado) - trata como disponível
+        "bg-green-100 hover:bg-green-200 text-gray-900": 
           day.status === 'today' && !isSelected && !isInRange,
         
-        // Check-in
-        "bg-gradient-to-br from-moss-600 to-moss-700 text-white shadow-lg shadow-moss-600/50": 
-          day.status === 'check-in',
-        "border-2 border-moss-800": day.status === 'check-in',
-        "rounded-l-md": day.status === 'check-in',
-        
-        // Check-out
-        "bg-gradient-to-br from-moss-700 to-moss-800 text-white shadow-lg shadow-moss-700/50": 
-          day.status === 'check-out',
-        "border-2 border-moss-900": day.status === 'check-out',
-        "rounded-r-md": day.status === 'check-out',
-        
-        // No meio do período selecionado
-        "bg-gradient-to-r from-moss-300 to-moss-400 text-moss-900": 
+        // No meio do período selecionado - light green
+        "bg-green-100 text-gray-900": 
           isInRange && !isSelected,
-        "rounded-none": isInRange && !isSelected,
-        
-        // Selecionado (check-in ou check-out)
-        "scale-105 z-10": isSelected,
       }
     )
 
@@ -78,7 +78,7 @@ export function CalendarDay({ day, onClick, isSelected, isInRange }: CalendarDay
     <button
       type="button"
       onClick={handleClick}
-      disabled={day.status === 'disabled' || day.status === 'occupied'}
+      disabled={day.status === 'disabled' || (day.status === 'occupied' && !canClickWhenOccupied)}
       className={getDayClasses()}
       aria-label={`${day.date.toLocaleDateString('pt-BR')} - ${
         day.status === 'check-in' ? `Check-in em ${day.date.toLocaleDateString('pt-BR')}` :
@@ -107,33 +107,28 @@ export function CalendarDay({ day, onClick, isSelected, isInRange }: CalendarDay
         {day.date.getDate()}
       </span>
       
-      {/* Badge Check-in */}
+      {/* Badge Check-in - IN no canto superior direito */}
       {day.status === 'check-in' && (
-        <div className="absolute -top-0.5 -right-0.5 z-20 bg-moss-800 text-white text-[7px] font-bold px-1 py-0.5 rounded-full border border-moss-900 shadow-sm">
+        <div className="absolute top-0 right-0 z-20 text-white text-[8px] font-bold px-1 py-0.5">
           IN
         </div>
       )}
       
-      {/* Badge Check-out */}
+      {/* Badge Check-out - OUT no canto superior direito */}
       {day.status === 'check-out' && (
-        <div className="absolute -top-0.5 -right-0.5 z-20 bg-moss-900 text-white text-[7px] font-bold px-1 py-0.5 rounded-full border border-moss-950 shadow-sm">
+        <div className="absolute top-0 right-0 z-20 text-white text-[8px] font-bold px-1 py-0.5">
           OUT
         </div>
       )}
       
-      {/* Ícone Check-in */}
+      {/* Ícone Check-in - seta no canto superior esquerdo */}
       {day.status === 'check-in' && (
-        <ArrowRightCircle className="absolute top-0 left-0 w-2.5 h-2.5 text-white/70" />
+        <ArrowRightCircle className="absolute top-0 left-0 w-3 h-3 text-white/90 z-20" />
       )}
       
-      {/* Ícone Check-out */}
+      {/* Ícone Check-out - seta no canto superior esquerdo */}
       {day.status === 'check-out' && (
-        <ArrowRight className="absolute top-0 left-0 w-2.5 h-2.5 text-white/70" />
-      )}
-      
-      {/* Indicador de hoje (quando não selecionado) */}
-      {day.isToday && !isSelected && !isInRange && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-moss-600" />
+        <ArrowRightCircle className="absolute top-0 left-0 w-3 h-3 text-white/90 z-20" />
       )}
     </button>
   )
