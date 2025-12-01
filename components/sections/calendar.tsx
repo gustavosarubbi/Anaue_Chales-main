@@ -1,479 +1,462 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CalendarSkeleton } from "@/components/ui/skeleton"
-import { ChevronLeft, ChevronRight, CalendarIcon, Check, X, RefreshCw, MessageCircle, ShoppingCart } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Calendar as CalendarIcon,
+  RefreshCw,
+  X,
+  ShoppingCart,
+  MessageCircle,
+  Star,
+  AlertCircle
+} from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import Link from "next/link"
 
-interface AvailabilityResponse {
-  success: boolean
-  availability: Record<string, string>
-  lastUpdated: string
-  eventsCount: number
-  error?: string
+interface CalendarDay {
+  day: number | null
+  date: Date | null
+  isCurrentMonth: boolean
 }
 
-export function Calendar() {
-  const router = useRouter()
+// Constantes
+const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+const WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+
+// Componente de calendário
+function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [availability, setAvailability] = useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<string>("")
-  const [error, setError] = useState<string>("")
-  const [selectedCheckIn, setSelectedCheckIn] = useState<Date | null>(null)
-  const [selectedCheckOut, setSelectedCheckOut] = useState<Date | null>(null)
+  const [bookedDatesList, setBookedDatesList] = useState<Set<string>>(new Set())
+  const [loadingAvailability, setLoadingAvailability] = useState(false)
 
-  const monthNames = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro",
-  ]
-
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+  // Buscar disponibilidade quando componente montar e quando mudar de mês
+  useEffect(() => {
+    fetchAvailability()
+  }, [currentDate])
 
   const fetchAvailability = async () => {
+    setLoadingAvailability(true)
     try {
-      setLoading(true)
-      setError("")
-
-      const response = await fetch("/api/availability")
-      const data: AvailabilityResponse = await response.json()
-
-      if (data.success) {
-        setAvailability(data.availability)
-        setLastUpdated(data.lastUpdated)
-      } else {
-        setError(data.error || "Erro ao carregar disponibilidade")
+      const response = await fetch('/api/availability', {
+        cache: 'no-store'
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.availability) {
+          const datesSet = new Set<string>(Object.keys(data.availability))
+          setBookedDatesList(datesSet)
+          const updateTime = new Date()
+          onUpdate?.(updateTime)
+        }
       }
-    } catch (err) {
-      setError("Erro de conexão")
-      console.error("Erro ao buscar disponibilidade:", err)
+    } catch (error) {
+      console.error('Erro ao buscar disponibilidade:', error)
     } finally {
-      setLoading(false)
+      setLoadingAvailability(false)
     }
   }
 
-  useEffect(() => {
-    fetchAvailability()
-  }, [])
+  // Normalizar data para string YYYY-MM-DD
+  const normalizeDate = (date: Date): string => {
+    const normalized = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
+    const year = normalized.getFullYear()
+    const month = String(normalized.getMonth() + 1).padStart(2, '0')
+    const day = String(normalized.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
+  // Verificar se data está no passado
+  const isPastDate = (date: Date): boolean => {
+    const dateStr = normalizeDate(date)
+    const today = normalizeDate(new Date())
+    return dateStr < today
+  }
+
+  // Verificar se data está reservada
+  const isBooked = (date: Date | null): boolean => {
+    if (!date) return false
+    return bookedDatesList.has(normalizeDate(date))
+  }
+
+  // Obter dias do calendário (memoizado para performance)
+  const calendarDays = useMemo(() => {
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth()
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
     const startingDayOfWeek = firstDay.getDay()
-
-    const days = []
-
-    // Dias vazios do início do mês
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null)
+    
+    const days: CalendarDay[] = []
+    
+    // Dias do mês anterior
+    const prevMonth = new Date(year, month, 0)
+    const prevMonthDays = prevMonth.getDate()
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      const day = prevMonthDays - i
+      const dayDate = new Date(year, month - 1, day)
+      days.push({
+        day,
+        date: dayDate,
+        isCurrentMonth: false
+      })
     }
-
-    // Dias do mês
+    
+    // Dias do mês atual
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push(day)
+      const dayDate = new Date(year, month, day)
+      days.push({
+        day,
+        date: dayDate,
+        isCurrentMonth: true
+      })
     }
-
+    
+    // Completar até 42 dias (6 semanas)
+    const remainingDays = 42 - days.length
+    for (let day = 1; day <= remainingDays; day++) {
+      const dayDate = new Date(year, month + 1, day)
+      days.push({
+        day,
+        date: dayDate,
+        isCurrentMonth: false
+      })
+    }
+    
     return days
-  }
+  }, [currentDate])
 
-  const formatDate = (year: number, month: number, day: number) => {
-    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-  }
-
-  const getDateStatus = (dateStr: string) => {
-    return availability[dateStr] || "available"
-  }
-
-  const handleDateClick = (dateStr: string, day: number) => {
-    if (loading) return
-
-    const status = getDateStatus(dateStr)
-    if (status === "booked") return
-
-    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    if (clickedDate < today) return
-
-    if (!selectedCheckIn || (selectedCheckIn && selectedCheckOut)) {
-      // Start new selection
-      setSelectedCheckIn(clickedDate)
-      setSelectedCheckOut(null)
-    } else if (selectedCheckIn && !selectedCheckOut) {
-      // Complete selection
-      if (clickedDate <= selectedCheckIn) {
-        // If clicked date is before or equal to check-in, make it the new check-in
-        setSelectedCheckIn(clickedDate)
-        setSelectedCheckOut(null)
-      } else {
-        // Check if all dates in range are available
-        const datesInRange = getDatesInRange(selectedCheckIn, clickedDate)
-        const allAvailable = datesInRange.every((date) => {
-          const dateStr = formatDate(date.getFullYear(), date.getMonth(), date.getDate())
-          return getDateStatus(dateStr) === "available"
-        })
-
-        if (allAvailable) {
-          setSelectedCheckOut(clickedDate)
-        } else {
-          // Invalid range, reset
-          setSelectedCheckIn(clickedDate)
-          setSelectedCheckOut(null)
-        }
-      }
-    }
-  }
-
-  const getDatesInRange = (start: Date, end: Date): Date[] => {
-    const dates: Date[] = []
-    const current = new Date(start)
-    while (current <= end) {
-      dates.push(new Date(current))
-      current.setDate(current.getDate() + 1)
-    }
-    return dates
-  }
-
-  const handleReserveClick = () => {
-    if (selectedCheckIn && selectedCheckOut) {
-      const checkInStr = formatDateForUrl(selectedCheckIn)
-      const checkOutStr = formatDateForUrl(selectedCheckOut)
-      router.push(`/checkout?check_in=${checkInStr}&check_out=${checkOutStr}`)
-    }
-  }
-
-  const formatDateForUrl = (date: Date): string => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-  }
-
-  const isDateInRange = (dateStr: string): boolean => {
-    if (!selectedCheckIn || !selectedCheckOut) return false
-
-    const date = new Date(dateStr)
-    return date >= selectedCheckIn && date <= selectedCheckOut
-  }
-
-  const isCheckInDate = (dateStr: string): boolean => {
-    if (!selectedCheckIn) return false
-    return dateStr === formatDateForUrl(selectedCheckIn)
-  }
-
-  const isCheckOutDate = (dateStr: string): boolean => {
-    if (!selectedCheckOut) return false
-    return dateStr === formatDateForUrl(selectedCheckOut)
-  }
-
-
-  const navigateMonth = (direction: "prev" | "next") => {
+  const handleMonthChange = (monthIndex: number) => {
     const newDate = new Date(currentDate)
-    if (direction === "prev") {
-      newDate.setMonth(newDate.getMonth() - 1)
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1)
-    }
+    newDate.setMonth(monthIndex)
     setCurrentDate(newDate)
   }
 
+  const handleYearChange = (year: number) => {
+    const newDate = new Date(currentDate)
+    newDate.setFullYear(year)
+    setCurrentDate(newDate)
+  }
 
-  const days = getDaysInMonth(currentDate)
+  const navigateMonth = (direction: "prev" | "next") => {
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() + (direction === "next" ? 1 : -1))
+    setCurrentDate(newDate)
+  }
+
+  // Gerar anos disponíveis
+  const availableYears = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    const years = []
+    for (let i = 0; i <= 2; i++) {
+      years.push(currentYear + i)
+    }
+    return years
+  }, [])
+
+  const isToday = (date: Date | null): boolean => {
+    if (!date) return false
+    return normalizeDate(date) === normalizeDate(new Date())
+  }
+
+  // Obter classes CSS para cada dia
+  const getDayClasses = (calendarDay: CalendarDay, isPast: boolean, isBookedDate: boolean, isTodayDate: boolean) => {
+    const baseClasses = "text-xs rounded flex items-center justify-center transition-all duration-200 font-medium relative min-h-[36px] sm:min-h-[40px]"
+    
+    if (!calendarDay.isCurrentMonth) {
+      return `${baseClasses} opacity-30 text-moss-400`
+    }
+    
+    if (isPast) {
+      return `${baseClasses} bg-gray-100 text-gray-400`
+    }
+    
+    if (isBookedDate) {
+      return `${baseClasses} bg-pink-200 text-pink-700 font-bold`
+    }
+    
+    if (isTodayDate) {
+      return `${baseClasses} bg-moss-200 text-moss-800 font-semibold ring-2 ring-moss-400`
+    }
+    
+    return `${baseClasses} bg-moss-100 text-moss-700 font-semibold`
+  }
 
   return (
-    <section id="calendario" className="py-20 bg-white texture-grid relative">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">📅 Disponibilidade</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-moss-900 mb-4">Verifique Nossa Disponibilidade</h2>
-          <p className="text-lg text-moss-700 max-w-2xl mx-auto">
-            Selecione as datas desejadas no calendário e finalize sua reserva online
-          </p>
-          <div className="flex items-center justify-center gap-4 mt-4">
-            {loading && (
-              <div className="flex items-center gap-2 text-moss-600">
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Carregando disponibilidade...</span>
-              </div>
-            )}
-            {error && (
-              <div className="flex items-center gap-2 text-red-600">
-                <X className="h-4 w-4" />
-                <span className="text-sm">{error}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={fetchAvailability}
-                  className="text-red-600 hover:text-red-700"
+    <Card className="bg-white shadow-lg border-moss-200">
+      <CardContent className="p-6 sm:p-8">
+        {/* Navegação de Mês/Ano */}
+        <div className="flex items-center justify-between mb-4 gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigateMonth("prev")} 
+            aria-label="Mês anterior"
+            className="h-8 w-8 text-moss-700 hover:text-moss-900 hover:bg-moss-100"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <div className="flex gap-1.5 flex-1 justify-center items-center">
+            <Select
+              value={currentDate.getMonth().toString()}
+              onValueChange={(value) => handleMonthChange(parseInt(value))}
+            >
+              <SelectTrigger className="w-[100px] sm:w-[120px] h-8 text-xs border-moss-200 bg-white text-moss-900">
+                <SelectValue>
+                  {MONTH_NAMES[currentDate.getMonth()]}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {MONTH_NAMES.map((month, index) => (
+                  <SelectItem key={index} value={index.toString()} className="bg-white hover:bg-moss-50 text-xs">
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={currentDate.getFullYear().toString()}
+              onValueChange={(value) => handleYearChange(parseInt(value))}
+            >
+              <SelectTrigger className="w-[80px] sm:w-[90px] h-8 text-xs border-moss-200 bg-white text-moss-900">
+                <SelectValue>{currentDate.getFullYear()}</SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {availableYears.map((year) => (
+                  <SelectItem key={year} value={year.toString()} className="bg-white hover:bg-moss-50 text-xs">
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigateMonth("next")} 
+            aria-label="Próximo mês"
+            className="h-8 w-8 text-moss-700 hover:text-moss-900 hover:bg-moss-100"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Calendário - Distribuído uniformemente */}
+        <div className="px-4 sm:px-8">
+          <div className="w-full max-w-md mx-auto">
+            {/* Dias da Semana */}
+            <div className="grid grid-cols-7 mb-2 gap-1">
+              {WEEK_DAYS.map(d => (
+                <div 
+                  key={d} 
+                  className="text-xs text-moss-600 font-semibold py-1 text-center"
+                  aria-label={d}
                 >
-                  Tentar novamente
-                </Button>
+                  {d}
+                </div>
+              ))}
+            </div>
+
+            {/* Grid de Dias */}
+            {loadingAvailability ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-sm text-moss-600 animate-pulse">Carregando disponibilidade...</div>
               </div>
-            )}
-            {lastUpdated && !loading && !error && (
-              <div className="flex items-center gap-2 text-moss-600">
-                <Check className="h-4 w-4" />
-                <span className="text-sm">Atualizado: {new Date(lastUpdated).toLocaleString("pt-BR")}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={fetchAvailability}
-                  className="text-moss-600 hover:text-moss-700"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
+            ) : (
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((calendarDay, i) => {
+                  if (!calendarDay.date) return <div key={i} className="aspect-square" />
+                  
+                  const { day, date } = calendarDay
+                  const isPast = isPastDate(date)
+                  const isBookedDate = isBooked(date)
+                  const isTodayDate = isToday(date)
+                  
+                  return (
+                    <div
+                      key={i}
+                      className={getDayClasses(calendarDay, isPast, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')}
+                      aria-label={`${isBookedDate ? 'Reservado' : isPast ? 'Passado' : 'Disponível'} dia ${day} de ${MONTH_NAMES[date.getMonth()]} de ${date.getFullYear()}`}
+                    >
+                      {day}
+                      {/* Ícone X para datas ocupadas */}
+                      {isBookedDate && !isPast && (
+                        <X className="absolute top-0 right-0 h-2.5 w-2.5 text-pink-600 m-0.5" />
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
         </div>
+      </CardContent>
+    </Card>
+  )
+}
 
-        <div className="max-w-4xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Calendar */}
-            <Card className="bg-gradient-to-br from-moss-50 to-beige-50 border-moss-200 animate-fadeInUp">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigateMonth("prev")}
-                    className="hover:bg-moss-100"
-                    disabled={loading}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <CardTitle className="text-moss-900">
-                    {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigateMonth("next")}
-                    className="hover:bg-moss-100"
-                    disabled={loading}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {loading && Object.keys(availability).length === 0 ? (
-                  <CalendarSkeleton />
-                ) : (
-                  <>
-                {/* Week days header */}
-                <div className="grid grid-cols-7 gap-1 mb-2">
-                  {weekDays.map((day) => (
-                    <div key={day} className="text-center text-sm font-medium text-moss-600 p-2">
-                      {day}
-                    </div>
-                  ))}
-                </div>
+// Componente Sidebar
+function Sidebar() {
+  const whatsappNumber = "559294197052"
+  const whatsappMessage = "Olá! Gostaria de fazer uma reserva no Anauê Jungle Chalés."
 
-                {/* Calendar days */}
-                <div className="grid grid-cols-7 gap-1">
-                  {days.map((day, index) => {
-                    if (!day) {
-                      return <div key={`empty-${index}`} className="p-2"></div>
-                    }
+  const openWhatsApp = () => {
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
+    window.open(url, "_blank")
+  }
 
-                    const dateStr = formatDate(currentDate.getFullYear(), currentDate.getMonth(), day)
-                    const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-                    const today = new Date()
-                    today.setHours(0, 0, 0, 0)
-                    const isPastDate = currentDateObj < today
-                    
-                    const status = getDateStatus(dateStr)
-                    const isToday =
-                      new Date().toDateString() ===
-                      new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString()
-                    const inRange = isDateInRange(dateStr)
-                    const isCheckIn = isCheckInDate(dateStr)
-                    const isCheckOut = isCheckOutDate(dateStr)
-                    const isSelectable = status === "available" && !loading && !isPastDate
-
-                                    return (
-                                      <button
-                                        key={dateStr}
-                                        type="button"
-                                        onClick={() => handleDateClick(dateStr, day)}
-                                        disabled={!isSelectable}
-                                        className={`
-                                          p-2 text-sm rounded-lg transition-all duration-300 relative
-                                          min-h-[40px] min-w-[40px] flex items-center justify-center
-                                          ${isPastDate
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
-                                            : ""
-                                          }
-                                          ${status === "available" && !inRange && !isCheckIn && !isCheckOut && !isPastDate
-                                            ? "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 hover:scale-110 hover:shadow-md cursor-pointer active:scale-95"
-                                            : ""
-                                          }
-                                          ${status === "booked" && !isPastDate
-                                            ? "bg-red-100 text-red-400 cursor-not-allowed opacity-60"
-                                            : ""
-                                          }
-                                          ${inRange && !isCheckIn && !isCheckOut
-                                            ? "bg-moss-200 text-moss-900 border border-moss-300 animate-scaleIn"
-                                            : ""
-                                          }
-                                          ${isCheckIn || isCheckOut
-                                            ? "bg-moss-600 text-white border-2 border-moss-700 font-bold shadow-lg animate-scaleIn"
-                                            : ""
-                                          }
-                                          ${loading ? "opacity-50 cursor-not-allowed" : ""}
-                                          ${isToday && !inRange && !isCheckIn && !isCheckOut ? "ring-2 ring-moss-400 ring-offset-2" : ""}
-                                        `}
-                                      >
-                                        {day}
-                                        {status === "booked" && <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />}
-                                        {isCheckIn && <span className="text-[10px] absolute top-0 left-0 p-0.5 bg-moss-700 rounded-br">In</span>}
-                                        {isCheckOut && <span className="text-[10px] absolute top-0 left-0 p-0.5 bg-moss-700 rounded-br">Out</span>}
-                                      </button>
-                                    )
-                  })}
-                </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Legend and Reservation */}
-            <div className="space-y-6">
-              {/* Legend */}
-              <Card className="bg-white border-moss-200">
-                <CardHeader>
-                  <CardTitle className="text-moss-900 flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5" />
-                    Legenda
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 border border-green-200 rounded"></div>
-                    <span className="text-moss-700 text-sm">Disponível</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-red-100 rounded relative">
-                      <X className="h-3 w-3 absolute top-0 right-0 text-red-400" />
-                    </div>
-                    <span className="text-moss-700 text-sm">Ocupado</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-gray-100 rounded opacity-50"></div>
-                    <span className="text-moss-700 text-sm">Data passada</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-
-              {/* Observação especial para dezembro */}
-              {(currentDate.getMonth() === 11) && (
-                <Card className="bg-orange-50 border-orange-200 shadow-md mb-6">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-2">
-                      <MessageCircle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold text-orange-900 text-sm mb-1">📅 Período Especial - 24 e 31 de Dezembro</p>
-                        <p className="text-xs text-orange-800">
-                          Os valores para este período estão disponíveis somente via <strong>WhatsApp</strong>.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Quick Actions */}
-              <Card className="bg-white border-moss-200 shadow-lg">
-                <CardContent className="p-8 text-center space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-moss-900 mb-2">Pronto para reservar?</h3>
-                    {selectedCheckIn && selectedCheckOut ? (
-                      <div className="mb-4 space-y-2">
-                        <p className="text-sm text-moss-700">
-                          Check-in: <strong>{selectedCheckIn.toLocaleDateString("pt-BR")}</strong>
-                        </p>
-                        <p className="text-sm text-moss-700">
-                          Check-out: <strong>{selectedCheckOut.toLocaleDateString("pt-BR")}</strong>
-                        </p>
-                        <p className="text-xs text-moss-600">
-                          Clique no botão abaixo para finalizar sua reserva
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-moss-600 text-sm mb-4">
-                        Selecione as datas no calendário e faça sua reserva online
-                      </p>
-                    )}
-                  </div>
-
-                  {selectedCheckIn && selectedCheckOut ? (
-                    <>
-                      <Button
-                        onClick={handleReserveClick}
-                        className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container animate-scaleIn"
-                      >
-                        <ShoppingCart className="mr-3 h-6 w-6" />
-                        Reservar Agora
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedCheckIn(null)
-                          setSelectedCheckOut(null)
-                        }}
-                        className="w-full min-h-[48px] active:scale-95 transition-all duration-200"
-                      >
-                        Limpar Seleção
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg mb-3 min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container"
-                        onClick={() => router.push("/checkout")}
-                      >
-                        <ShoppingCart className="mr-3 h-6 w-6" />
-                        Reservar Online
-                      </Button>
-                      <Button
-                        className="w-full bg-moss-600 hover:bg-moss-700 active:scale-95 text-white text-center py-4 px-6 rounded-lg font-semibold text-lg min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200"
-                        asChild
-                      >
-                        <a
-                          href="https://wa.me/559294197052"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <MessageCircle className="mr-3 h-6 w-6" />
-                          Falar no WhatsApp
-                        </a>
-                      </Button>
-                    </>
-                  )}
-                  
-                  <p className="text-xs text-moss-500 mt-4">
-                    ✨ Resposta rápida garantida
-                  </p>
-                </CardContent>
-              </Card>
+  return (
+    <div className="space-y-4">
+      {/* Legenda */}
+      <Card className="bg-white border-moss-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold text-moss-900 flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4 text-moss-600" />
+            Legenda
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 pt-0">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-moss-100 border border-moss-200"></div>
+            <span className="text-xs text-moss-700">Disponível</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-pink-200 border border-pink-300 relative">
+              <X className="absolute top-0 right-0 h-2 w-2 text-pink-600 m-0.5" />
             </div>
+            <span className="text-xs text-moss-700">Ocupado</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-gray-100 border border-gray-200"></div>
+            <span className="text-xs text-moss-700">Data passada</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Aviso Especial */}
+      <Card className="bg-orange-50 border-orange-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold text-orange-900 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-orange-600" />
+            <CalendarIcon className="h-4 w-4 text-orange-600" />
+            Período Especial - 24 e 31 de Dezembro
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <p className="text-xs text-orange-800">
+            Os valores para este período estão disponíveis somente via WhatsApp.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Seção Reserva */}
+      <Card className="bg-white border-moss-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold text-moss-900">
+            Pronto para reservar?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0">
+          <p className="text-xs text-moss-600">
+            Selecione as datas no calendário e faça sua reserva online
+          </p>
+          
+          <div className="space-y-2">
+            <Button 
+              className="w-full bg-moss-600 hover:bg-moss-700 text-white text-sm h-10 font-semibold" 
+              asChild
+            >
+              <Link href="/checkout" className="flex items-center justify-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Reservar Online
+              </Link>
+            </Button>
+            
+            <Button 
+              className="w-full bg-green-700 hover:bg-green-800 text-white text-sm h-10 font-semibold" 
+              onClick={openWhatsApp}
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Falar no WhatsApp
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-1.5 pt-2 border-t border-moss-200">
+            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+            <span className="text-xs text-moss-600">Resposta rápida garantida</span>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export function Calendar() {
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+
+  // Formatar data/hora de atualização
+  const formatLastUpdated = (date: Date | null): string => {
+    if (!date) return ""
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`
+  }
+
+  const handleUpdate = (date: Date) => {
+    setLastUpdated(date)
+  }
+
+  return (
+    <section id="calendario" className="py-16 sm:py-20 bg-gradient-to-br from-moss-50 to-beige-50 texture-dots relative">
+      <div className="container mx-auto px-4">
+        {/* Header da Seção */}
+        <div className="text-center mb-8 sm:mb-10">
+          <Badge className="mb-3 bg-moss-100 text-moss-800 hover:bg-moss-200 text-xs sm:text-sm px-3 py-1 flex items-center gap-1.5 w-fit mx-auto">
+            <CalendarIcon className="h-3 w-3" />
+            Disponibilidade
+          </Badge>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-moss-900 mb-3">
+            Verifique Nossa Disponibilidade
+          </h2>
+          <p className="text-base sm:text-lg text-moss-700 max-w-2xl mx-auto mb-3">
+            Selecione as datas desejadas no calendário e finalize sua reserva online
+          </p>
+          {lastUpdated && (
+            <div className="flex items-center justify-center gap-2 text-xs text-moss-600">
+              <RefreshCw className="h-3 w-3" />
+              <span>Atualizado: {formatLastUpdated(lastUpdated)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Layout de Duas Colunas */}
+        <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Calendário - Coluna Esquerda (2/3) */}
+          <div className="lg:col-span-2">
+            <CalendarWidget onUpdate={handleUpdate} />
+          </div>
+
+          {/* Sidebar - Coluna Direita (1/3) */}
+          <div className="lg:col-span-1">
+            <Sidebar />
           </div>
         </div>
       </div>

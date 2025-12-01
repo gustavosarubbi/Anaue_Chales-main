@@ -158,6 +158,13 @@ const galleryImages = [
     description: "Atividade de Stand-Up Paddle no rio para aventura e diversão na água",
     image: "/Stand-Up-Paddle.jpg",
   },
+  {
+    id: 16,
+    category: "rio",
+    title: "Mesa na Piscina Natural",
+    description: "Mesa posicionada na piscina natural para refeições únicas em contato com a natureza",
+    image: "/mesa-na-piscina-natural.jpeg",
+  },
 ]
 
 export function Gallery() {
@@ -309,6 +316,24 @@ export function Gallery() {
                             <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1.5 rounded-full text-sm backdrop-blur-sm font-medium">
                               {currentImageIndex + 1} / {filteredImages.length}
                             </div>
+
+                            {/* Progress Indicators (Dots) - dentro da imagem */}
+                            {index === currentImageIndex && (
+                              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full">
+                                {filteredImages.map((_, dotIndex) => (
+                                  <button
+                                    key={dotIndex}
+                                    onClick={() => scrollTo(dotIndex)}
+                                    className={`transition-all duration-300 rounded-full ${
+                                      dotIndex === currentImageIndex
+                                        ? "bg-white w-8 h-2"
+                                        : "bg-white/50 hover:bg-white/80 w-2 h-2"
+                                    }`}
+                                    aria-label={`Ir para imagem ${dotIndex + 1}`}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -335,21 +360,6 @@ export function Gallery() {
                     <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
                   </Button>
 
-                  {/* Progress Indicators (Dots) */}
-                  <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full">
-                    {filteredImages.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => scrollTo(index)}
-                        className={`transition-all duration-300 rounded-full ${
-                          index === currentImageIndex
-                            ? "bg-white w-8 h-2"
-                            : "bg-white/50 hover:bg-white/80 w-2 h-2"
-                        }`}
-                        aria-label={`Ir para imagem ${index + 1}`}
-                      />
-                    ))}
-                  </div>
 
                   {/* Image Info */}
                   {filteredImages[currentImageIndex] && (

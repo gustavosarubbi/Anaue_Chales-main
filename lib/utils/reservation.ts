@@ -24,7 +24,7 @@ export interface PriceCalculation {
 
 // Preços por tipo de dia
 export const PRICING = {
-  WEEKEND: 800, // Sexta a segunda, feriados e vésperas
+  WEEKEND: 800, // Sexta a Domingo, feriados e vésperas
   WEEKDAY: 650, // Segunda a quinta
   EXTRA_ADULT: 150, // Por adulto extra (acima de 2)
   EXTRA_CHILD: 100, // Por criança (6-15 anos)
@@ -32,13 +32,13 @@ export const PRICING = {
 } as const
 
 /**
- * Verifica se uma data é fim de semana (sexta, sábado, domingo, segunda)
+ * Verifica se uma data é fim de semana (sexta, sábado, domingo)
  */
 export function isWeekend(date: Date): boolean {
   const day = date.getDay()
   // 0 = domingo, 5 = sexta, 6 = sábado
-  // Consideramos domingo=0, sexta=5, sábado=6, segunda=1 como finais de semana
-  return day === 0 || day === 5 || day === 6 || day === 1
+  // Consideramos domingo=0, sexta=5, sábado=6 como finais de semana
+  return day === 0 || day === 5 || day === 6
 }
 
 /**

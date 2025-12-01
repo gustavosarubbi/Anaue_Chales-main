@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { DatePicker } from "@/components/checkout/DatePicker"
 import { ReservationForm, ReservationFormData } from "@/components/checkout/ReservationForm"
@@ -17,7 +17,7 @@ import { WhatsAppButton } from "@/components/ui/whatsapp-button"
 
 type Step = "dates" | "form" | "payment" | "processing"
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -430,6 +430,38 @@ export default function CheckoutPage() {
       <WhatsAppButton />
       <Footer />
     </>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <main id="main-content" className="min-h-screen bg-gradient-to-b from-moss-50 to-white texture-dots pt-10 pb-24 px-4 sm:pt-12 sm:pb-28 relative">
+        <div className="container mx-auto max-w-5xl">
+          <div className="mb-8">
+            <Link href="/">
+              <Button variant="ghost" className="mb-3">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar
+              </Button>
+            </Link>
+            <h1 className="text-2xl md:text-4xl font-bold text-moss-900 mb-1">
+              Finalizar Reserva
+            </h1>
+          </div>
+          <Card className="shadow-lg border-moss-200">
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-moss-600" />
+                <span className="ml-3 text-moss-700">Carregando...</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    }>
+      <CheckoutContent />
+    </Suspense>
   )
 }
 

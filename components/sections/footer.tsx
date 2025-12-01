@@ -228,7 +228,7 @@ export function Footer() {
       </div>
 
       {/* Floating Calendar Button */}
-      <div className="fixed bottom-6 right-4 md:right-8 z-50">
+      <div className="fixed bottom-6 right-6 md:right-8 z-50">
         <Button
           size="icon"
           className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"

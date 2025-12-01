@@ -19,7 +19,7 @@ export function WhatsAppButton() {
         <TooltipTrigger asChild>
           <Button
             onClick={openWhatsApp}
-            className="fixed bottom-20 right-8 md:bottom-24 md:right-8 z-50 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"
+            className="fixed bottom-24 right-6 md:right-8 z-50 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"
             size="icon"
             aria-label="Falar no WhatsApp"
           >

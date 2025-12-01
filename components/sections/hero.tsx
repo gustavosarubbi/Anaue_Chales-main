@@ -263,7 +263,7 @@ export function Hero() {
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-moss-900 mb-1">Finais de Semana</p>
                           <p className="text-xs text-moss-600">
-                            Sexta a segunda, feriados e vésperas
+                            Sexta a Domingo, feriados e vésperas
                           </p>
                         </div>
                         <div className="text-right">
