@@ -59,7 +59,7 @@ export function Hero() {
 
       {/* Navigation Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled || isMenuOpen
           ? "bg-moss-900 shadow-md border-moss-800 py-3"
           : "bg-transparent border-white/10 py-5"
           }`}
@@ -130,7 +130,7 @@ export function Hero() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-moss-950/95 backdrop-blur-xl lg:hidden pt-24 px-6"
+            className="fixed inset-0 z-40 bg-moss-900 lg:hidden pt-24 px-6 flex flex-col"
           >
             <nav className="flex flex-col gap-4">
               {navigationItems.map((item, idx) => (
@@ -140,17 +140,19 @@ export function Hero() {
                   transition={{ delay: idx * 0.05 }}
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className="text-2xl font-heading font-medium text-white text-left py-2 border-b border-white/10"
+                  className="text-2xl font-heading font-semibold text-white text-left py-4 border-b border-white/10 active:text-moss-300 transition-colors"
                 >
                   {item.name}
                 </motion.button>
               ))}
-              <Button className="mt-8 w-full bg-moss-600 hover:bg-moss-500 text-white rounded-xl py-6 text-lg" asChild>
-                <Link href="#calendario">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Verificar Disponibilidade
-                </Link>
-              </Button>
+              <div className="mt-8">
+                <Button className="w-full bg-white text-moss-900 hover:bg-moss-50 rounded-xl py-6 text-lg font-bold shadow-lg" asChild>
+                  <Link href="#calendario" onClick={() => setIsMenuOpen(false)}>
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Reservar Agora
+                  </Link>
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}
@@ -168,10 +170,21 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
-                  Bem-vindo à Amazônia
-                </Badge>
-                <h1 className="font-heading text-6xl sm:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-6 drop-shadow-lg">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg mb-6 border border-white/20 backdrop-blur-sm"
+                >
+                  <span className="text-lg">🎭</span>
+                  Pacote Carnaval: 13 a 17 de Fev
+                </motion.div>
+                <div className="block">
+                  <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
+                    Bem-vindo à Amazônia
+                  </Badge>
+                </div>
+                <h1 className="font-heading text-5xl sm:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-6 drop-shadow-xl">
                   Anauê Jungle <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-moss-200 to-beige-200">
                     Chalés
@@ -247,6 +260,18 @@ export function Hero() {
                     </div>
 
                     <div className="space-y-4 bg-black/20 rounded-xl p-5 border border-white/5">
+                      {/* Carnaval Special */}
+                      <div className="flex justify-between items-center border-b border-purple-500/30 bg-purple-900/20 px-3 py-2 rounded-lg -mx-1 mb-1">
+                        <div>
+                          <p className="text-xs font-bold text-purple-200 uppercase tracking-tighter">Pacote Carnaval 🎭</p>
+                          <p className="text-[10px] text-purple-300/70">13 a 17 de Fev</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-purple-100">R$ 950</p>
+                          <p className="text-[10px] text-purple-300/70">noite</p>
+                        </div>
+                      </div>
+
                       <div className="flex justify-between items-center border-b border-white/10 pb-3">
                         <div>
                           <p className="text-sm font-medium text-moss-100">Finais de Semana</p>

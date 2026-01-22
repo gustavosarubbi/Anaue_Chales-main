@@ -29,7 +29,7 @@ const accommodations = [
     title: "Chalé 2 (Novo)",
     description: "Nossa mais nova opção. Design moderno com o mesmo conforto e imersão na natureza.",
     tag: "Novo",
-    image: "/Chale-2.jpg",
+    image: "/Chale 2/IMG_3200.jpg",
     features: [
       { icon: Wifi, label: "Wi-Fi Starlink" },
       { icon: Wind, label: "Ar Condicionado" },
