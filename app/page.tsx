@@ -1,5 +1,6 @@
 import { Hero } from "@/components/sections/hero"
 import { Features } from "@/components/sections/features"
+import { Accommodations } from "@/components/sections/accommodations"
 import { Gallery } from "@/components/sections/gallery"
 import { Calendar } from "@/components/sections/calendar"
 import { Location } from "@/components/sections/location"
@@ -21,29 +22,32 @@ export default function HomePage() {
         {/* Hero Section */}
         <Hero />
 
-      {/* Features Section */}
-      <Features />
+        {/* Accommodations Section */}
+        <Accommodations />
 
-      {/* Gallery Section */}
-      <Gallery />
+        {/* Features Section */}
+        <Features />
 
-      {/* Calendar Section */}
-      <Calendar />
+        {/* Gallery Section */}
+        <Gallery />
 
-      {/* Location Section */}
-      <Location />
+        {/* Calendar Section */}
+        <Calendar />
 
-      {/* Contact Form Section */}
-      <ContactForm />
+        {/* Location Section */}
+        <Location />
 
-      {/* Pricing Section */}
-      <Pricing />
+        {/* Contact Form Section */}
+        <ContactForm />
 
-      {/* Contact Section */}
-      <Contact />
+        {/* Pricing Section */}
+        <Pricing />
 
-      {/* Footer */}
-      <Footer />
+        {/* Contact Section */}
+        <Contact />
+
+        {/* Footer */}
+        <Footer />
 
         {/* Floating Action Buttons */}
         <WhatsAppButton />

@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -7,185 +9,181 @@ import {
   Instagram,
   MapPin,
   Clock,
-  Users,
   Wifi,
   Shield,
-  Ban,
-  Navigation,
+  Coffee,
+  ExternalLink,
   Calendar,
   Star,
-  Coffee,
+  ChevronRight,
+  ArrowUp
 } from "lucide-react"
 import Link from "next/link"
+import { motion } from "framer-motion"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <footer className="bg-gradient-to-br from-moss-900 via-moss-800 to-moss-900 text-white">
+    <footer className="bg-moss-900 text-white relative overflow-hidden font-sans">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-moss-900/30 blur-[120px] rounded-full pointer-events-none -z-0" />
+
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-20 relative z-10">
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12 lg:gap-8">
           {/* Brand Section */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center space-x-2 mb-6">
-              <TreePine className="h-8 w-8 text-beige-300" />
-              <div>
-                <h3 className="font-bold text-xl text-white">Anauê Jungle</h3>
-                <p className="text-beige-300 text-sm">Chalés</p>
+          <div className="lg:col-span-1 space-y-6">
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="bg-moss-900/50 p-2.5 rounded-xl border border-moss-800 transition-colors group-hover:border-moss-700">
+                <TreePine className="h-8 w-8 text-beige-300" />
               </div>
-            </div>
-            <p className="text-moss-200 text-sm leading-relaxed mb-6">
-              Escape para a natureza amazônica em nossos chalés exclusivos à beira do Rio Negro. Uma experiência única
-              de conforto e tranquilidade no coração do Tarumã.
+              <div>
+                <h3 className="font-heading font-bold text-2xl text-white leading-tight">Anauê Jungle</h3>
+                <p className="text-beige-300/80 tracking-widest uppercase text-xs">Chalés</p>
+              </div>
+            </Link>
+
+            <p className="text-moss-200 text-sm leading-relaxed max-w-sm">
+              Escape para a natureza amazônica em nossos chalés exclusivos à beira do Rio Negro.
+              Uma experiência única de conforto e tranquilidade no coração do Tarumã.
             </p>
-            <div className="flex items-center gap-2 text-sm text-moss-200">
-              <Star className="h-4 w-4 text-yellow-400" />
-              <span>Avaliação 4.9/5 pelos hóspedes</span>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-moss-900/50 border border-moss-800 text-sm text-moss-200 hover:border-moss-700 transition-colors">
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <span className="font-medium text-white">4.9/5</span>
+              <span className="text-moss-400">•</span>
+              <span>Avaliação dos hóspedes</span>
             </div>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-semibold text-lg text-white mb-6">Contato</h4>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-beige-300 flex-shrink-0" />
-                <div>
-                  <p className="text-white font-medium">(92) 99419-7052</p>
-                  <p className="text-moss-200 text-sm">Atendimento todos os dias</p>
+            <h4 className="font-heading font-semibold text-xl text-white mb-8">Contato</h4>
+            <div className="space-y-6">
+              <a href="tel:+5592994197052" className="flex items-start gap-4 group">
+                <div className="bg-moss-900 p-2 rounded-lg text-beige-300 group-hover:bg-moss-800 group-hover:text-white transition-colors">
+                  <Phone className="h-5 w-5" />
                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <MessageCircle className="h-4 w-4 text-beige-300 flex-shrink-0" />
                 <div>
-                  <Link
-                    href="https://wa.me/559294197052"
-                    target="_blank"
-                    className="text-white font-medium hover:text-beige-300 transition-colors"
-                  >
-                    WhatsApp
-                  </Link>
-                  <p className="text-moss-200 text-sm">Resposta rápida</p>
+                  <p className="text-white font-medium group-hover:text-beige-300 transition-colors">(92) 99419-7052</p>
+                  <p className="text-moss-400 text-sm">Atendimento todos os dias</p>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-center gap-3">
-                <Instagram className="h-4 w-4 text-beige-300 flex-shrink-0" />
+              <a
+                href="https://wa.me/559294197052"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-4 group"
+              >
+                <div className="bg-moss-900 p-2 rounded-lg text-beige-300 group-hover:bg-moss-800 group-hover:text-white transition-colors">
+                  <MessageCircle className="h-5 w-5" />
+                </div>
                 <div>
-                  <Link
-                    href="https://instagram.com/anaue.chales"
-                    target="_blank"
-                    className="text-white font-medium hover:text-beige-300 transition-colors"
-                  >
-                    @anaue.chales
-                  </Link>
-                  <p className="text-moss-200 text-sm">Fotos e novidades</p>
+                  <p className="text-white font-medium group-hover:text-beige-300 transition-colors">WhatsApp</p>
+                  <p className="text-moss-400 text-sm">Resposta rápida</p>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-beige-300 flex-shrink-0" />
+              <a
+                href="https://instagram.com/anaue.chales"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-4 group"
+              >
+                <div className="bg-moss-900 p-2 rounded-lg text-beige-300 group-hover:bg-moss-800 group-hover:text-white transition-colors">
+                  <Instagram className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-white font-medium group-hover:text-beige-300 transition-colors">@anaue.chales</p>
+                  <p className="text-moss-400 text-sm">Siga no Instagram</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          {/* Location & Times */}
+          <div>
+            <h4 className="font-heading font-semibold text-xl text-white mb-8">Localização</h4>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="bg-moss-900 p-2 rounded-lg text-beige-300">
+                  <MapPin className="h-5 w-5" />
+                </div>
                 <div>
                   <p className="text-white font-medium">Tarumã, Manaus - AM</p>
-                  <Link
+                  <a
                     href="https://waze.com/ul?q=R.+Cedrinho+-+Tarumã+Açu,+Manaus+-+AM,+69022-000"
                     target="_blank"
-                    className="text-moss-200 text-sm hover:text-beige-300 transition-colors flex items-center gap-1"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-moss-400 text-sm hover:text-beige-300 transition-colors mt-1 group"
                   >
-                    <Navigation className="h-3 w-3" />
-                    Abrir no Waze
-                  </Link>
+                    Abrir no Waze <ExternalLink className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </a>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Services & Amenities */}
-          <div>
-            <h4 className="font-semibold text-lg text-white mb-6">Comodidades</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-moss-200">
-                <Wifi className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Wi-Fi gratuito</span>
-              </div>
-              <div className="flex items-center gap-2 text-moss-200">
-                <Shield className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Segurança 24h</span>
-              </div>
-              <div className="flex items-center gap-2 text-moss-200">
-                <Ban className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Não Pet Friendly</span>
-              </div>
-              <div className="flex items-center gap-2 text-moss-200">
-                <Users className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Até 6 pessoas</span>
-              </div>
-              <div className="flex items-center gap-2 text-moss-200">
-                <Coffee className="h-4 w-4 text-beige-300" />
-                <span className="text-sm">Café da manhã incluso</span>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-moss-700">
-              <h5 className="font-medium text-white mb-3">Horários</h5>
-              <div className="flex items-center gap-2 text-moss-200 text-sm">
-                <Clock className="h-4 w-4 text-beige-300" />
-                <span>Check-in: 14h | Check-out: 11h</span>
+              <div className="pt-6 border-t border-moss-800/50">
+                <h5 className="font-medium text-white mb-4 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-beige-300" />
+                  Horários
+                </h5>
+                <ul className="space-y-3 text-sm text-moss-300">
+                  <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                    <span>Check-in</span>
+                    <span className="text-white font-medium font-mono">14:00</span>
+                  </li>
+                  <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                    <span>Check-out</span>
+                    <span className="text-white font-medium font-mono">11:00</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div>
-            <h4 className="font-semibold text-lg text-white mb-6">Ações Rápidas</h4>
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full border-green-600 text-green-400 hover:bg-green-600 hover:text-white justify-start bg-transparent"
-                asChild
-              >
-                <Link href="https://wa.me/559294197052" target="_blank">
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Falar no WhatsApp
-                </Link>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full border-moss-600 text-moss-200 hover:bg-moss-700 hover:text-white justify-start bg-transparent"
-                asChild
-              >
-                <Link href="https://waze.com/ul?q=R.+Cedrinho+-+Tarumã+Açu,+Manaus+-+AM,+69022-000" target="_blank">
-                  <Navigation className="mr-2 h-4 w-4" />
-                  Como Chegar
-                </Link>
-              </Button>
+          {/* Quick Actions & Amenities Summary */}
+          <div className="space-y-6">
+            <h4 className="font-heading font-semibold text-xl text-white mb-8">Navegação</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "Início", id: "inicio" },
+                { label: "Chalés", id: "chales" },
+                { label: "Comodidades", id: "comodidades" },
+                { label: "Preços", id: "pricing" },
+              ].map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => scrollToSection(e, item.id)}
+                  className="flex items-center justify-between px-4 py-3 bg-moss-900/30 border border-moss-800/50 rounded-lg text-moss-200 hover:text-white hover:bg-moss-800 hover:border-moss-700 transition-all text-sm group"
+                >
+                  {item.label}
+                  <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </a>
+              ))}
             </div>
 
-            {/* Pricing Summary */}
-            <Card className="mt-6 bg-moss-800/50 border-moss-600">
-              <CardContent className="p-4">
-                <h5 className="font-medium text-white mb-3">Valores para o Casal (Pernoite)</h5>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-moss-200">
-                    <span>Finais de semana:</span>
-                    <span className="text-white font-medium">R$ 800</span>
-                  </div>
-                  <div className="flex justify-between text-moss-200">
-                    <span>Segunda a quinta:</span>
-                    <span className="text-white font-medium">R$ 650</span>
-                  </div>
-                  <div className="text-moss-300 text-xs mt-2">
-                    <p>Valores via Pix. Parcelado com juros da máquina.</p>
-                    <div className="text-xs text-moss-600 mt-2 text-center">
-              <p>* Valores para o casal.</p>
-              <p>Crianças até 5 anos não pagam.</p>
-              <p>De 6 a 15 anos: <span className="text-moss-900 font-bold">R$ 100</span></p>
-              <p>A partir de 16 anos: <span className="text-moss-900 font-bold">R$ 150</span></p>
-            </div>
-                  </div>
+            <Card className="bg-moss-900/50 border-moss-800 backdrop-blur-sm mt-6">
+              <CardContent className="p-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-moss-300 justify-center sm:justify-start">
+                <div className="flex items-center gap-1.5">
+                  <Wifi className="h-3 w-3 text-beige-300" /> Free Wi-Fi
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Coffee className="h-3 w-3 text-beige-300" /> Café da Manhã
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Shield className="h-3 w-3 text-beige-300" /> Seguro
                 </div>
               </CardContent>
             </Card>
@@ -194,31 +192,27 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-moss-700 bg-moss-900/80">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="border-t border-moss-900 bg-moss-950 relative z-10">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
-              <p className="text-moss-200 text-sm">
+              <p className="text-moss-400 text-sm">
                 © {currentYear} Anauê Jungle Chalés. Todos os direitos reservados.
-              </p>
-              <p className="text-moss-300 text-xs mt-1">
-                Desenvolvido com 💚 para proporcionar experiências únicas na Amazônia
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <Link
-                href="https://wa.me/559294197052?text=Olá! Tenho dúvidas sobre privacidade."
-                target="_blank"
-                className="text-moss-300 hover:text-beige-300 text-xs transition-colors"
+                href="#"
+                className="text-moss-500 hover:text-beige-300 text-sm transition-colors"
+                onClick={(e) => e.preventDefault()}
               >
                 Política de Privacidade
               </Link>
-              <span className="text-moss-600">•</span>
               <Link
-                href="https://wa.me/559294197052?text=Olá! Gostaria de informações sobre termos de uso."
-                target="_blank"
-                className="text-moss-300 hover:text-beige-300 text-xs transition-colors"
+                href="#"
+                className="text-moss-500 hover:text-beige-300 text-sm transition-colors"
+                onClick={(e) => e.preventDefault()}
               >
                 Termos de Uso
               </Link>
@@ -228,17 +222,23 @@ export function Footer() {
       </div>
 
       {/* Floating Calendar Button */}
-      <div className="fixed bottom-6 right-6 md:right-8 z-50">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 1, type: "spring" }}
+        className="fixed bottom-6 right-4 z-50 hidden md:block"
+      >
         <Button
           size="icon"
-          className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"
+          className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 border-4 border-white/10 hover:border-white/20 active:scale-95 group"
           asChild
         >
-          <Link href="#calendario">
-            <Calendar className="h-6 w-6" />
+          <Link href="#pricing">
+            <Calendar className="h-6 w-6 group-hover:scale-110 transition-transform" />
+            <span className="sr-only">Ver disponibilidade</span>
           </Link>
         </Button>
-      </div>
+      </motion.div>
     </footer>
   )
 }

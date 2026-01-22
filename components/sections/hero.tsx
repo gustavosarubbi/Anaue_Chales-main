@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Phone, Wifi, Camera, Heart, Menu, X, MessageCircle, Calendar, Smartphone } from "lucide-react"
+import { MapPin, Wifi, Camera, Heart, Menu, X, Calendar, Smartphone } from "lucide-react"
 import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -44,69 +45,55 @@ export function Hero() {
   }
 
   return (
-    <section id="inicio" className="relative min-h-screen">
-      {/* Background Image */}
-      <div className="absolute inset-0">
+    <section id="inicio" className="relative min-h-screen overflow-hidden">
+      {/* Background Image with Parallax-like feel */}
+      <div className="absolute inset-0 z-0">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
           style={{
             backgroundImage: `url('/Chale-1.jpg')`,
           }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-moss-900/70 via-moss-800/60 to-moss-700/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-moss-900/60 via-moss-900/40 to-moss-900/80"></div>
       </div>
 
       {/* Navigation Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-moss-600 shadow-lg border-b border-moss-700"
-            : "bg-white/10 backdrop-blur-md border-b border-white/20"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
+          ? "bg-moss-900 shadow-md border-moss-800 py-3"
+          : "bg-transparent border-white/10 py-5"
+          }`}
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Brand */}
-            <div className="flex items-center space-x-3">
-              <img
-                src="/anaue-logo.png"
-                alt="Anauê Jungle Chalés"
-                className={`w-10 h-10 transition-all duration-300 ${isScrolled ? "opacity-100" : "opacity-80"}`}
-              />
+            <Link href="#inicio" className="flex items-center space-x-3 group" onClick={() => scrollToSection("#inicio")}>
+              <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-white/20 bg-white group-hover:border-white/50 transition-colors">
+                <img
+                  src="/anaue-logo.png"
+                  alt="Anauê Jungle Chalés"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="hidden sm:block">
-                <h1
-                  className={`font-bold text-lg transition-colors duration-300 ${
-                    isScrolled ? "text-white" : "text-white"
-                  }`}
-                >
+                <h1 className="font-heading font-bold text-lg text-white tracking-wide">
                   Anauê Jungle
                 </h1>
-                <p
-                  className={`text-xs -mt-1 transition-colors duration-300 ${
-                    isScrolled ? "text-moss-100" : "text-white/80"
-                  }`}
-                >
+                <p className="text-xs text-moss-200 tracking-wider uppercase">
                   Chalés
                 </p>
               </div>
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center gap-1">
               {navigationItems.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className={`font-medium transition-all duration-300 relative group ${
-                    isScrolled ? "text-white hover:text-moss-100" : "text-white hover:text-white/80"
-                  }`}
+                  className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-full transition-all duration-300"
                 >
                   {item.name}
-                  <span
-                    className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-200 group-hover:w-full ${
-                      isScrolled ? "bg-moss-200" : "bg-white"
-                    }`}
-                  ></span>
                 </button>
               ))}
             </nav>
@@ -115,223 +102,188 @@ export function Hero() {
             <div className="flex items-center space-x-4">
               <Button
                 size="sm"
-                className={`hidden md:flex transition-all duration-300 ${
-                  isScrolled
-                    ? "bg-white text-moss-600 hover:bg-moss-50"
-                    : "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
-                }`}
+                className="hidden md:flex bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm rounded-full px-6 transition-all duration-300"
                 asChild
               >
                 <Link href="#calendario">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Verificar Disponibilidade
+                  Reservar
                 </Link>
               </Button>
 
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`lg:hidden p-2 transition-colors duration-300 ${
-                  isScrolled ? "text-white hover:text-moss-100" : "text-white hover:text-white/80"
-                }`}
+                className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
           </div>
-
-          {/* Mobile Navigation Menu */}
-          {isMenuOpen && (
-            <div
-              className={`lg:hidden absolute top-16 left-0 right-0 shadow-lg transition-all duration-300 ${
-                isScrolled
-                  ? "bg-moss-700/95 backdrop-blur-md border-b border-moss-800"
-                  : "bg-moss-900/95 backdrop-blur-md border-b border-moss-800"
-              }`}
-            >
-              <nav className="container mx-auto px-4 py-4">
-                <div className="flex flex-col space-y-4">
-                  {navigationItems.map((item) => (
-                    <button
-                      key={item.name}
-                      onClick={() => scrollToSection(item.href)}
-                      className="text-left font-medium py-2 px-4 rounded-lg transition-all duration-200 text-white hover:text-moss-100 hover:bg-moss-600"
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                  <div className="pt-4 border-t border-moss-600">
-                    <Button className="w-full bg-white text-moss-600 hover:bg-moss-50" asChild>
-                      <Link href="#calendario">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Verificar Disponibilidade
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </nav>
-            </div>
-          )}
         </div>
       </header>
 
+      {/* Mobile Navigation Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 bg-moss-950/95 backdrop-blur-xl lg:hidden pt-24 px-6"
+          >
+            <nav className="flex flex-col gap-4">
+              {navigationItems.map((item, idx) => (
+                <motion.button
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  key={item.name}
+                  onClick={() => scrollToSection(item.href)}
+                  className="text-2xl font-heading font-medium text-white text-left py-2 border-b border-white/10"
+                >
+                  {item.name}
+                </motion.button>
+              ))}
+              <Button className="mt-8 w-full bg-moss-600 hover:bg-moss-500 text-white rounded-xl py-6 text-lg" asChild>
+                <Link href="#calendario">
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Verificar Disponibilidade
+                </Link>
+              </Button>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 min-h-screen flex items-center">
-        <div className="w-full max-w-7xl mx-auto pt-20 pb-12">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="relative z-10 min-h-screen flex items-center pt-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
             {/* Left Content */}
-            <div className="text-center lg:text-left space-y-6 lg:space-y-8">
-              {/* Main Title */}
-              <div className="animate-fadeInDown">
-                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-3 leading-tight">
-                  Anauê Jungle
-                  <span className="block text-beige-200 mt-2 animate-fadeInUp animate-delay-200">Chalés</span>
+            <div className="text-center lg:text-left space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
+                  Bem-vindo à Amazônia
+                </Badge>
+                <h1 className="font-heading text-6xl sm:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-6 drop-shadow-lg">
+                  Anauê Jungle <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-moss-200 to-beige-200">
+                    Chalés
+                  </span>
                 </h1>
-              </div>
+                <p className="text-lg sm:text-xl text-moss-100 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light">
+                  Seu refúgio exclusivo na floresta. Conforto, segurança e charme às margens do Rio Tarumã.
+                </p>
+              </motion.div>
 
-              {/* Subtitle */}
-              <p className="text-lg sm:text-xl md:text-2xl text-white/95 max-w-2xl mx-auto lg:mx-0 leading-relaxed animate-fadeInUp animate-delay-300">
-                O seu refúgio na floresta com conforto, segurança, charme e exclusividade
-              </p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="flex flex-wrap justify-center lg:justify-start gap-3"
+              >
+                {[
+                  { icon: Wifi, label: "Wi-Fi Starlink" },
+                  { icon: Camera, label: "Segurança 24h" },
+                  { icon: MapPin, label: "Tarumã" }
+                ].map((feat, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-2.5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <feat.icon className="h-4 w-4 text-moss-300" />
+                    <span className="text-white text-sm font-medium">{feat.label}</span>
+                  </div>
+                ))}
+              </motion.div>
 
-              {/* Key Features */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 animate-fadeInUp animate-delay-400">
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
-                  <Wifi className="h-4 w-4 text-white flex-shrink-0" />
-                  <span className="text-white font-medium text-sm sm:text-base">Wi-Fi</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
-                  <Camera className="h-4 w-4 text-white flex-shrink-0" />
-                  <span className="text-white font-medium text-sm sm:text-base">Segurança 24h</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
-                  <Heart className="h-4 w-4 text-white flex-shrink-0" />
-                  <span className="text-white font-medium text-sm sm:text-base">Não Pet Friendly</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2.5 hover-scale transition-all duration-300">
-                  <MapPin className="h-4 w-4 text-white flex-shrink-0" />
-                  <span className="text-white font-medium text-sm sm:text-base">Tarumã</span>
-                </div>
-              </div>
-
-              {/* CTA Buttons - Optimized for mobile touch */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fadeInUp animate-delay-500">
-                <Button 
-                  size="lg" 
-                  className="bg-green-600 hover:bg-green-700 active:scale-95 text-white px-8 py-4 text-base sm:text-lg font-semibold w-full sm:w-auto min-h-[48px] transition-all duration-200 shadow-lg hover:shadow-xl ripple-container" 
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
+              >
+                <Button
+                  size="lg"
+                  className="bg-white text-moss-900 hover:bg-moss-50 px-8 h-14 rounded-full font-semibold text-lg hover-lift shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all duration-300"
                   asChild
                 >
                   <Link href="#calendario">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Verificar Disponibilidade
+                    Ver Disponibilidade
                   </Link>
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-2 border-white text-white hover:bg-white/20 active:scale-95 px-8 py-4 text-base sm:text-lg font-semibold bg-transparent backdrop-blur-sm w-full sm:w-auto min-h-[48px] transition-all duration-200"
+                  className="border-white/30 text-white hover:bg-white/10 h-14 rounded-full px-8 text-lg font-medium backdrop-blur-sm transition-all duration-300"
                   onClick={() => scrollToSection("#pricing")}
                 >
                   Ver Preços
                 </Button>
-              </div>
-
-              {/* Contact Info */}
-              <div className="text-white/90 space-y-1 pt-2">
-                <p className="text-base sm:text-lg font-medium">📲 (92) 99419-7052</p>
-                <p className="text-sm sm:text-base">📍 @anaue.chales</p>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Right Content - Reservation Card */}
-            <div className="flex justify-center lg:justify-end mt-10 lg:mt-0">
-              <Card className="bg-white border-moss-200 shadow-2xl max-w-md w-full animate-fadeInUp hover-lift">
-                <CardContent className="p-6 sm:p-8">
-                  {/* Header do Card */}
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl sm:text-2xl font-bold text-moss-900 mb-3">Reserve Agora</h3>
-                    <p className="text-sm text-moss-600 leading-relaxed">
-                      Entre em contato pelo WhatsApp e garanta sua reserva
+            {/* Right Content - Glassmorphism Reservation Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="flex justify-center lg:justify-end"
+            >
+              <div className="relative w-full max-w-md">
+                {/* Decorative blob behind card */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-moss-500 to-beige-400 rounded-2xl blur opacity-30 animate-pulse-slow"></div>
+
+                <Card className="relative bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl text-white overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+
+                  <CardContent className="p-8 space-y-6">
+                    <div className="text-center space-y-2">
+                      <h3 className="font-heading text-2xl font-bold">Reserva Rápida</h3>
+                      <p className="text-moss-200 text-sm">Garanta seu descanso na natureza</p>
+                    </div>
+
+                    <div className="space-y-4 bg-black/20 rounded-xl p-5 border border-white/5">
+                      <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                        <div>
+                          <p className="text-sm font-medium text-moss-100">Finais de Semana</p>
+                          <p className="text-xs text-white/50">Sex - Dom</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold font-heading">R$ 800</p>
+                          <p className="text-[10px] text-white/50">casal / noite</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm font-medium text-moss-100">Segunda - Quinta</p>
+                          <p className="text-xs text-white/50">Dias úteis</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold font-heading">R$ 650</p>
+                          <p className="text-[10px] text-white/50">casal / noite</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button className="w-full h-14 bg-moss-500 hover:bg-moss-400 text-white rounded-xl font-bold text-lg shadow-lg transition-all duration-300 group" asChild>
+                      <Link href="#checkout">
+                        Reservar Agora
+                        <Smartphone className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </Button>
+
+                    <p className="text-center text-xs text-white/40">
+                      Reserva via WhatsApp • Pagamento facilitado
                     </p>
-                  </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
 
-                  {/* Pricing Section */}
-                  <div className="bg-moss-50 rounded-xl p-5 mb-6 space-y-4 border border-moss-100">
-                    {/* Finais de Semana */}
-                    <div className="pb-3 border-b border-moss-200">
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-moss-900 mb-1">Finais de Semana</p>
-                          <p className="text-xs text-moss-600">
-                            Sexta a Domingo, feriados e vésperas
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-moss-900">R$ 800</p>
-                          <p className="text-xs text-moss-600">por noite (valor para casal)</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Segunda a Quinta */}
-                    <div>
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-moss-900 mb-1">Segunda a Quinta</p>
-                          <p className="text-xs text-moss-600">
-                            Exceto feriados e vésperas
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-moss-900">R$ 650</p>
-                          <p className="text-xs text-moss-600">por noite (valor para casal)</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Observação especial para dezembro */}
-                    <div className="pt-3 border-t border-moss-200">
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-orange-900 mb-1">📅 24 e 31 de Dezembro</p>
-                        <p className="text-xs text-orange-800 leading-relaxed">
-                          Valores somente via <strong>WhatsApp</strong>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Informações de Pagamento */}
-                  <div className="mb-6 space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-moss-700">
-                      <Smartphone className="h-4 w-4 text-moss-600" />
-                      <span>Pagamento via PIX ou parcelado</span>
-                    </div>
-                    <div className="text-xs text-moss-600 pl-6">
-                      Parcelado com juros da máquina
-                    </div>
-                  </div>
-
-                  {/* CTA Button - Mobile optimized */}
-                  <Button className="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white text-base sm:text-lg py-4 sm:py-6 font-semibold mb-4 min-h-[48px] shadow-lg hover:shadow-xl transition-all duration-200 ripple-container" asChild>
-                    <Link href="/checkout">
-                      <Calendar className="mr-2 h-5 w-5" />
-                      Reservar Agora
-                    </Link>
-                  </Button>
-
-                  {/* Informações Adicionais */}
-                  <div className="bg-moss-50 rounded-lg p-4 space-y-2 border border-moss-100">
-                    <p className="text-xs font-semibold text-moss-900 mb-2">Informações Adicionais:</p>
-                    <div className="text-xs text-moss-600 space-y-1">
-                      <p>• Valores para o casal (por pernoite)</p>
-                      <p>• Crianças até 5 anos não pagam</p>
-                      <p>• De 6 a 15 anos: <span className="text-moss-900 font-bold">+R$ 100</span></p>
-                      <p>• A partir de 16 anos: <span className="text-moss-900 font-bold">+R$ 150</span></p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,9 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Ban, Zap, Droplets } from "lucide-react"
+import { motion } from "framer-motion"
 
 const features = [
   {
@@ -24,13 +27,13 @@ const features = [
   {
     icon: Wine,
     title: "Adega de Vinhos",
-    description: "Traga o seu vinho ou adquira no local",
+    description: "Temos uma Excelente carta de vinhos no local",
     highlight: false,
   },
   {
     icon: ShoppingCart,
     title: "Consumo Livre",
-    description: "Fique à vontade para levar o que quiser consumir no local",
+    description: "Fique à vontade para levar o que quiser, ou pedir pelo Ifood",
     highlight: false,
   },
   {
@@ -71,71 +74,98 @@ const features = [
   },
 ]
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+}
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+}
+
 export function Features() {
   return (
-    <section id="comodidades" className="py-20 bg-white texture-dots relative">
+    <section id="comodidades" className="py-24 bg-stone-50/50 texture-dots relative overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">🛏️ Diária para Casal</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-moss-900 mb-4">Incluído no Seu Pernoite</h2>
-          <p className="text-lg text-moss-700 max-w-2xl mx-auto">
-            Desfrute de uma experiência completa com todas as comodidades e serviços inclusos
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">🛏️ Experiência Completa</Badge>
+          <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6">Incluído no Seu Pernoite</h2>
+          <p className="text-lg text-moss-600 font-light leading-relaxed">
+            Cada detalhe foi pensado para proporcionar conforto e praticidade durante sua estadia na selva.
           </p>
         </div>
 
-        {/* Features Grid - Mobile optimized with 3D hover */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
+        {/* Features Grid */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+        >
           {features.map((feature, index) => (
-            <Card
-              key={index}
-              className={`text-center transition-all duration-300 hover:shadow-2xl card-3d animate-fadeInUp ${
-                feature.highlight ? "border-moss-200 bg-moss-50/50" : "border-beige-200 bg-beige-50/30"
-              }`}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <CardHeader className="p-4 sm:p-6">
-                <div
-                  className={`mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-110 ${
-                    feature.highlight ? "bg-moss-100" : "bg-beige-100"
+            <motion.div key={index} variants={item}>
+              <Card
+                className={`h-full text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-none ${feature.highlight
+                  ? "bg-moss-900 text-white ring-1 ring-moss-800 shadow-lg"
+                  : "bg-white text-moss-900 ring-1 ring-stone-200 shadow-sm"
                   }`}
-                >
-                  <feature.icon className={`h-7 w-7 sm:h-8 sm:w-8 transition-transform duration-300 hover:scale-110 ${feature.highlight ? "text-moss-600" : "text-beige-600"}`} />
-                </div>
-                <CardTitle className="text-base sm:text-lg text-moss-900">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                <p className="text-moss-700 text-xs sm:text-sm leading-relaxed">{feature.description}</p>
-              </CardContent>
-            </Card>
+              >
+                <CardHeader className="p-6 pb-2">
+                  <div
+                    className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${feature.highlight ? "bg-white/10 text-moss-100" : "bg-moss-50 text-moss-700"
+                      }`}
+                  >
+                    <feature.icon className="h-8 w-8" strokeWidth={1.5} />
+                  </div>
+                  <CardTitle className={`font-heading text-xl ${feature.highlight ? "text-white" : "text-moss-900"}`}>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 pb-6">
+                  <p className={`text-sm leading-relaxed font-light ${feature.highlight ? "text-moss-200" : "text-moss-600"}`}>{feature.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Additional Info */}
-        <Card className="bg-gradient-to-r from-moss-50 to-beige-50 border-moss-200">
-          <CardHeader>
-            <CardTitle className="text-center text-moss-900 flex items-center justify-center gap-2">
-              <Users className="h-5 w-5" />
-              Informações sobre Hóspedes Adicionais
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="p-4 bg-white/60 rounded-lg">
-                <p className="font-semibold text-moss-800">Até 5 anos</p>
-                <p className="text-sm text-moss-600">Não pagam</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <Card className="bg-gradient-to-r from-moss-50 to-beige-50 border-none shadow-md overflow-hidden">
+            <CardHeader className="border-b border-black/5 bg-white/50 backdrop-blur-sm">
+              <CardTitle className="text-center font-heading text-moss-900 flex items-center justify-center gap-3 text-2xl">
+                <Users className="h-6 w-6 text-moss-600" />
+                Hóspedes Adicionais
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div className="p-6 bg-white rounded-xl shadow-sm border border-moss-100 hover:border-moss-300 transition-colors">
+                  <p className="font-bold text-moss-800 text-lg mb-1">Até 5 anos</p>
+                  <p className="text-moss-600">Não pagam</p>
+                </div>
+                <div className="p-6 bg-white rounded-xl shadow-sm border border-moss-100 hover:border-moss-300 transition-colors">
+                  <p className="font-bold text-moss-800 text-lg mb-1">6 a 15 anos</p>
+                  <p className="font-heading text-2xl text-moss-600 font-bold text-moss-900">+ R$ 100</p>
+                </div>
+                <div className="p-6 bg-white rounded-xl shadow-sm border border-moss-100 hover:border-moss-300 transition-colors">
+                  <p className="font-bold text-moss-800 text-lg mb-1">A partir de 16 anos</p>
+                  <p className="font-heading text-2xl text-moss-600 font-bold text-moss-900">+ R$ 150</p>
+                </div>
               </div>
-              <div className="p-4 bg-white/60 rounded-lg">
-                <p className="font-semibold text-moss-800">6 a 15 anos</p>
-                <p className="text-sm text-moss-600">+ R$ 100</p>
-              </div>
-              <div className="p-4 bg-white/60 rounded-lg">
-                <p className="font-semibold text-moss-800">A partir de 16 anos</p>
-                <p className="text-sm text-moss-600">+ R$ 150</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </section>
   )

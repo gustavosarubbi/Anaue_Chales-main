@@ -4,9 +4,9 @@ import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  ChevronLeft,
+  ChevronRight,
   Calendar as CalendarIcon,
   RefreshCw,
   X,
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import Link from "next/link"
+import { motion } from "framer-motion"
 
 interface CalendarDay {
   day: number | null
@@ -30,17 +31,14 @@ interface CalendarDay {
   isCurrentMonth: boolean
 }
 
-// Constantes
 const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 const WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
-// Componente de calendário
 function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [bookedDatesList, setBookedDatesList] = useState<Set<string>>(new Set())
   const [loadingAvailability, setLoadingAvailability] = useState(false)
 
-  // Buscar disponibilidade quando componente montar e quando mudar de mês
   useEffect(() => {
     fetchAvailability()
   }, [currentDate])
@@ -67,7 +65,6 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
     }
   }
 
-  // Normalizar data para string YYYY-MM-DD
   const normalizeDate = (date: Date): string => {
     const normalized = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
     const year = normalized.getFullYear()
@@ -76,20 +73,17 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
     return `${year}-${month}-${day}`
   }
 
-  // Verificar se data está no passado
   const isPastDate = (date: Date): boolean => {
     const dateStr = normalizeDate(date)
     const today = normalizeDate(new Date())
     return dateStr < today
   }
 
-  // Verificar se data está reservada
   const isBooked = (date: Date | null): boolean => {
     if (!date) return false
     return bookedDatesList.has(normalizeDate(date))
   }
 
-  // Obter dias do calendário (memoizado para performance)
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
@@ -97,43 +91,28 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
     const startingDayOfWeek = firstDay.getDay()
-    
+
     const days: CalendarDay[] = []
-    
-    // Dias do mês anterior
+
     const prevMonth = new Date(year, month, 0)
     const prevMonthDays = prevMonth.getDate()
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
       const day = prevMonthDays - i
       const dayDate = new Date(year, month - 1, day)
-      days.push({
-        day,
-        date: dayDate,
-        isCurrentMonth: false
-      })
+      days.push({ day, date: dayDate, isCurrentMonth: false })
     }
-    
-    // Dias do mês atual
+
     for (let day = 1; day <= daysInMonth; day++) {
       const dayDate = new Date(year, month, day)
-      days.push({
-        day,
-        date: dayDate,
-        isCurrentMonth: true
-      })
+      days.push({ day, date: dayDate, isCurrentMonth: true })
     }
-    
-    // Completar até 42 dias (6 semanas)
+
     const remainingDays = 42 - days.length
     for (let day = 1; day <= remainingDays; day++) {
       const dayDate = new Date(year, month + 1, day)
-      days.push({
-        day,
-        date: dayDate,
-        isCurrentMonth: false
-      })
+      days.push({ day, date: dayDate, isCurrentMonth: false })
     }
-    
+
     return days
   }, [currentDate])
 
@@ -155,7 +134,6 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
     setCurrentDate(newDate)
   }
 
-  // Gerar anos disponíveis
   const availableYears = useMemo(() => {
     const currentYear = new Date().getFullYear()
     const years = []
@@ -170,59 +148,41 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
     return normalizeDate(date) === normalizeDate(new Date())
   }
 
-  // Obter classes CSS para cada dia
   const getDayClasses = (calendarDay: CalendarDay, isPast: boolean, isBookedDate: boolean, isTodayDate: boolean) => {
-    const baseClasses = "text-xs rounded flex items-center justify-center transition-all duration-200 font-medium relative min-h-[36px] sm:min-h-[40px]"
-    
-    if (!calendarDay.isCurrentMonth) {
-      return `${baseClasses} opacity-30 text-moss-400`
-    }
-    
-    if (isPast) {
-      return `${baseClasses} bg-gray-100 text-gray-400`
-    }
-    
-    if (isBookedDate) {
-      return `${baseClasses} bg-pink-200 text-pink-700 font-bold`
-    }
-    
-    if (isTodayDate) {
-      return `${baseClasses} bg-moss-200 text-moss-800 font-semibold ring-2 ring-moss-400`
-    }
-    
-    return `${baseClasses} bg-moss-100 text-moss-700 font-semibold`
+    const baseClasses = "text-sm rounded-lg flex items-center justify-center transition-all duration-200 font-medium relative min-h-[40px] sm:min-h-[44px]"
+
+    if (!calendarDay.isCurrentMonth) return `${baseClasses} opacity-20 text-moss-900`
+    if (isPast) return `${baseClasses} bg-gray-50 text-gray-400 cursor-not-allowed`
+    if (isBookedDate) return `${baseClasses} bg-red-100 text-red-700 font-bold shadow-sm`
+    if (isTodayDate) return `${baseClasses} bg-moss-200 text-moss-900 font-bold ring-2 ring-moss-500 shadow-md transform scale-105 z-10`
+
+    return `${baseClasses} bg-white text-moss-700 hover:bg-moss-50 hover:shadow-md hover:-translate-y-0.5 border border-transparent hover:border-moss-200 cursor-pointer`
   }
 
   return (
-    <Card className="bg-white shadow-lg border-moss-200">
+    <Card className="bg-white/80 backdrop-blur-md shadow-xl border-white/20 overflow-hidden">
       <CardContent className="p-6 sm:p-8">
-        {/* Navegação de Mês/Ano */}
-        <div className="flex items-center justify-between mb-4 gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigateMonth("prev")} 
-            aria-label="Mês anterior"
-            className="h-8 w-8 text-moss-700 hover:text-moss-900 hover:bg-moss-100"
+        <div className="flex items-center justify-between mb-8 gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigateMonth("prev")}
+            className="h-9 w-9 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
-          <div className="flex gap-1.5 flex-1 justify-center items-center">
+
+          <div className="flex gap-2 flex-1 justify-center items-center">
             <Select
               value={currentDate.getMonth().toString()}
               onValueChange={(value) => handleMonthChange(parseInt(value))}
             >
-              <SelectTrigger className="w-[100px] sm:w-[120px] h-8 text-xs border-moss-200 bg-white text-moss-900">
-                <SelectValue>
-                  {MONTH_NAMES[currentDate.getMonth()]}
-                </SelectValue>
+              <SelectTrigger className="w-[130px] h-9 text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg">
+                <SelectValue>{MONTH_NAMES[currentDate.getMonth()]}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
                 {MONTH_NAMES.map((month, index) => (
-                  <SelectItem key={index} value={index.toString()} className="bg-white hover:bg-moss-50 text-xs">
-                    {month}
-                  </SelectItem>
+                  <SelectItem key={index} value={index.toString()} className="font-sans">{month}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -231,71 +191,64 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
               value={currentDate.getFullYear().toString()}
               onValueChange={(value) => handleYearChange(parseInt(value))}
             >
-              <SelectTrigger className="w-[80px] sm:w-[90px] h-8 text-xs border-moss-200 bg-white text-moss-900">
+              <SelectTrigger className="w-[90px] h-9 text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg">
                 <SelectValue>{currentDate.getFullYear()}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
                 {availableYears.map((year) => (
-                  <SelectItem key={year} value={year.toString()} className="bg-white hover:bg-moss-50 text-xs">
-                    {year}
-                  </SelectItem>
+                  <SelectItem key={year} value={year.toString()} className="font-sans">{year}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigateMonth("next")} 
-            aria-label="Próximo mês"
-            className="h-8 w-8 text-moss-700 hover:text-moss-900 hover:bg-moss-100"
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigateMonth("next")}
+            className="h-9 w-9 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Calendário - Distribuído uniformemente */}
-        <div className="px-4 sm:px-8">
-          <div className="w-full max-w-md mx-auto">
-            {/* Dias da Semana */}
-            <div className="grid grid-cols-7 mb-2 gap-1">
+        <div className="px-1 sm:px-2">
+          <div className="w-full">
+            <div className="grid grid-cols-7 mb-4 gap-2">
               {WEEK_DAYS.map(d => (
-                <div 
-                  key={d} 
-                  className="text-xs text-moss-600 font-semibold py-1 text-center"
-                  aria-label={d}
-                >
+                <div key={d} className="text-xs text-moss-500 font-bold uppercase tracking-wider text-center py-1">
                   {d}
                 </div>
               ))}
             </div>
 
-            {/* Grid de Dias */}
             {loadingAvailability ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-sm text-moss-600 animate-pulse">Carregando disponibilidade...</div>
+              <div className="flex items-center justify-center py-16">
+                <div className="flex flex-col items-center gap-3">
+                  <RefreshCw className="h-6 w-6 text-moss-600 animate-spin" />
+                  <span className="text-sm text-moss-600 font-medium">Atualizando calendário...</span>
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-7 gap-1">
+              <div className="grid grid-cols-7 gap-2">
                 {calendarDays.map((calendarDay, i) => {
                   if (!calendarDay.date) return <div key={i} className="aspect-square" />
-                  
+
                   const { day, date } = calendarDay
                   const isPast = isPastDate(date)
                   const isBookedDate = isBooked(date)
                   const isTodayDate = isToday(date)
-                  
+
                   return (
                     <div
                       key={i}
                       className={getDayClasses(calendarDay, isPast, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')}
-                      aria-label={`${isBookedDate ? 'Reservado' : isPast ? 'Passado' : 'Disponível'} dia ${day} de ${MONTH_NAMES[date.getMonth()]} de ${date.getFullYear()}`}
                     >
                       {day}
-                      {/* Ícone X para datas ocupadas */}
                       {isBookedDate && !isPast && (
-                        <X className="absolute top-0 right-0 h-2.5 w-2.5 text-pink-600 m-0.5" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-red-100/50 rounded-lg">
+                          <X className="h-4 w-4 text-red-600" />
+                        </div>
                       )}
                     </div>
                   )
@@ -309,7 +262,6 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
   )
 }
 
-// Componente Sidebar
 function Sidebar() {
   const whatsappNumber = "559294197052"
   const whatsappMessage = "Olá! Gostaria de fazer uma reserva no Anauê Jungle Chalés."
@@ -320,64 +272,59 @@ function Sidebar() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Legenda */}
-      <Card className="bg-white border-moss-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold text-moss-900 flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4 text-moss-600" />
-            Legenda
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 pt-0">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-moss-100 border border-moss-200"></div>
-            <span className="text-xs text-moss-700">Disponível</span>
+    <Card className="bg-white/90 backdrop-blur-sm border-moss-100 shadow-xl overflow-hidden sticky top-24">
+      {/* Legenda Header */}
+      <CardHeader className="bg-moss-50/50 border-b border-moss-100 pb-4">
+        <CardTitle className="text-base font-heading font-bold text-moss-900 flex items-center gap-2">
+          <CalendarIcon className="h-4 w-4 text-moss-600" />
+          Legenda & Reservas
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-6 pt-6">
+        {/* Legenda Items */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-moss-50/50">
+            <div className="w-3 h-3 rounded-full bg-white border border-moss-200"></div>
+            <span className="text-sm text-moss-700 font-medium">Disponível</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-pink-200 border border-pink-300 relative">
-              <X className="absolute top-0 right-0 h-2 w-2 text-pink-600 m-0.5" />
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-red-50/50">
+            <div className="w-3 h-3 rounded-full bg-red-100 border border-red-200 flex items-center justify-center">
+              <X className="h-2 w-2 text-red-600" />
             </div>
-            <span className="text-xs text-moss-700">Ocupado</span>
+            <span className="text-sm text-moss-700 font-medium">Ocupado</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-100 border border-gray-200"></div>
-            <span className="text-xs text-moss-700">Data passada</span>
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 col-span-2">
+            <div className="w-3 h-3 rounded-full bg-gray-200 border border-gray-300"></div>
+            <span className="text-sm text-moss-500 font-medium">Data passada</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Aviso Especial */}
-      <Card className="bg-orange-50 border-orange-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold text-orange-900 flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-orange-600" />
-            <CalendarIcon className="h-4 w-4 text-orange-600" />
-            Período Especial - 24 e 31 de Dezembro
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <p className="text-xs text-orange-800">
-            Os valores para este período estão disponíveis somente via WhatsApp.
-          </p>
-        </CardContent>
-      </Card>
+        {/* Período Especial Alert */}
+        <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3">
+          <div className="mt-0.5">
+            <AlertCircle className="h-5 w-5 text-orange-600" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-orange-900 mb-1">Período Especial</p>
+            <p className="text-xs text-orange-800/90 leading-snug">
+              24 e 31 de Dezembro: Valores sob consulta.
+            </p>
+          </div>
+        </div>
 
-      {/* Seção Reserva */}
-      <Card className="bg-white border-moss-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold text-moss-900">
-            Pronto para reservar?
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 pt-0">
-          <p className="text-xs text-moss-600">
-            Selecione as datas no calendário e faça sua reserva online
-          </p>
-          
-          <div className="space-y-2">
-            <Button 
-              className="w-full bg-moss-600 hover:bg-moss-700 text-white text-sm h-10 font-semibold" 
+        <div className="h-px bg-moss-100 w-full" />
+
+        {/* CTA Section */}
+        <div className="space-y-4">
+          <div className="text-center">
+            <h4 className="font-heading font-bold text-moss-900 mb-1">Pronto para reservar?</h4>
+            <p className="text-xs text-moss-600 mb-4">Garanta sua estadia no paraíso.</p>
+          </div>
+
+          <div className="space-y-3">
+            <Button
+              className="w-full bg-moss-900 hover:bg-moss-800 text-white h-11 shadow-lg transition-all hover:scale-[1.02]"
               asChild
             >
               <Link href="/checkout" className="flex items-center justify-center gap-2">
@@ -385,30 +332,30 @@ function Sidebar() {
                 Reservar Online
               </Link>
             </Button>
-            
-            <Button 
-              className="w-full bg-green-700 hover:bg-green-800 text-white text-sm h-10 font-semibold" 
+
+            <Button
+              variant="outline"
+              className="w-full bg-transparent border-green-600 text-green-700 hover:bg-green-50 h-11"
               onClick={openWhatsApp}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              Falar no WhatsApp
+              WhatsApp
             </Button>
           </div>
 
-          <div className="flex items-center gap-1.5 pt-2 border-t border-moss-200">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-moss-500">
             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-            <span className="text-xs text-moss-600">Resposta rápida garantida</span>
+            Resposta rápida garantida
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
 export function Calendar() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  // Formatar data/hora de atualização
   const formatLastUpdated = (date: Date | null): string => {
     if (!date) return ""
     const day = String(date.getDate()).padStart(2, '0')
@@ -416,8 +363,7 @@ export function Calendar() {
     const year = date.getFullYear()
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    const seconds = String(date.getSeconds()).padStart(2, '0')
-    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`
+    return `${day}/${month}/${year} às ${hours}:${minutes}`
   }
 
   const handleUpdate = (date: Date) => {
@@ -425,39 +371,54 @@ export function Calendar() {
   }
 
   return (
-    <section id="calendario" className="py-16 sm:py-20 bg-gradient-to-br from-moss-50 to-beige-50 texture-dots relative">
-      <div className="container mx-auto px-4">
-        {/* Header da Seção */}
-        <div className="text-center mb-8 sm:mb-10">
-          <Badge className="mb-3 bg-moss-100 text-moss-800 hover:bg-moss-200 text-xs sm:text-sm px-3 py-1 flex items-center gap-1.5 w-fit mx-auto">
-            <CalendarIcon className="h-3 w-3" />
-            Disponibilidade
+    <section id="calendario" className="py-24 bg-stone-50 relative overflow-hidden">
+      {/* Simple gradient background instead of noise texture */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-moss-50/50 pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12 sm:mb-16"
+        >
+          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200 border-none px-4 py-1.5 text-sm font-medium rounded-full">
+            🗓️ Disponibilidade
           </Badge>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-moss-900 mb-3">
-            Verifique Nossa Disponibilidade
+          <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6 tracking-tight">
+            Planeje Sua Estadia
           </h2>
-          <p className="text-base sm:text-lg text-moss-700 max-w-2xl mx-auto mb-3">
-            Selecione as datas desejadas no calendário e finalize sua reserva online
+          <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto leading-relaxed">
+            Verifique as datas disponíveis em tempo real e garanta sua reserva de forma simples e segura.
           </p>
           {lastUpdated && (
-            <div className="flex items-center justify-center gap-2 text-xs text-moss-600">
+            <div className="mt-6 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-moss-100 shadow-sm text-xs font-medium text-moss-500">
               <RefreshCw className="h-3 w-3" />
-              <span>Atualizado: {formatLastUpdated(lastUpdated)}</span>
+              <span>Atualizado em: {formatLastUpdated(lastUpdated)}</span>
             </div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Layout de Duas Colunas */}
-        <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Calendário - Coluna Esquerda (2/3) */}
-          <div className="lg:col-span-2">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2"
+          >
             <CalendarWidget onUpdate={handleUpdate} />
-          </div>
+          </motion.div>
 
-          {/* Sidebar - Coluna Direita (1/3) */}
-          <div className="lg:col-span-1">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="lg:col-span-1"
+          >
             <Sidebar />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
