@@ -10,8 +10,7 @@ if (accessToken) {
   const client = new MercadoPagoConfig({
     accessToken,
     options: {
-      timeout: 5000,
-      idempotencyKey: 'abc'
+      timeout: 5000
     }
   })
   mercadoPago = new Preference(client)

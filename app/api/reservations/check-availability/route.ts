@@ -19,10 +19,10 @@ export async function POST(request: Request) {
     // Precisamos criar a data no timezone local
     const [checkInYear, checkInMonth, checkInDay] = checkIn.split('-').map(Number)
     const checkInDate = new Date(checkInYear, checkInMonth - 1, checkInDay, 0, 0, 0, 0)
-    
+
     const [checkOutYear, checkOutMonth, checkOutDay] = checkOut.split('-').map(Number)
     const checkOutDate = new Date(checkOutYear, checkOutMonth - 1, checkOutDay, 0, 0, 0, 0)
-    
+
     // Log para debug
     console.log("[DEBUG] Datas recebidas e normalizadas:", {
       checkInString: checkIn,
@@ -47,11 +47,15 @@ export async function POST(request: Request) {
     const supabase = createServerClient()
     let reservations = null
     if (supabase) {
+      const requestedCheckIn = checkInDate.toISOString().split('T')[0]
+      const requestedCheckOut = checkOutDate.toISOString().split('T')[0]
+
       const { data, error: dbError } = await supabase
         .from('reservations')
         .select('check_in, check_out')
         .eq('status', 'confirmed')
-        .or(`check_in.lte.${checkOutDate.toISOString().split('T')[0]},check_out.gte.${checkInDate.toISOString().split('T')[0]}`)
+        .lt('check_in', requestedCheckOut)
+        .gt('check_out', requestedCheckIn)
 
       if (dbError) {
         console.error('Erro ao buscar reservas do Supabase:', dbError)
@@ -66,22 +70,22 @@ export async function POST(request: Request) {
     const allBookedDates: Set<string> = new Set()
     const allCheckInDates: Set<string> = new Set() // Datas de check-in (dias que começam reservas)
 
-    // Adicionar datas dos calendários externos
-    ;[...airbnbEvents, ...bookingEvents].forEach((event) => {
-      // Normalizar datas dos eventos
-      const eventStart = new Date(event.start)
-      eventStart.setHours(0, 0, 0, 0)
-      const eventEnd = new Date(event.end)
-      eventEnd.setHours(0, 0, 0, 0)
-      
-      // Marcar a data de check-in (início da reserva)
-      const checkInStr = `${eventStart.getFullYear()}-${String(eventStart.getMonth() + 1).padStart(2, '0')}-${String(eventStart.getDate()).padStart(2, '0')}`
-      allCheckInDates.add(checkInStr)
-      
-      // Adicionar todas as noites ocupadas (excluindo o check-out)
-      const dates = getDatesBetween(eventStart, eventEnd)
-      dates.forEach((date) => allBookedDates.add(date))
-    })
+      // Adicionar datas dos calendários externos
+      ;[...airbnbEvents, ...bookingEvents].forEach((event) => {
+        // Normalizar datas dos eventos
+        const eventStart = new Date(event.start)
+        eventStart.setHours(0, 0, 0, 0)
+        const eventEnd = new Date(event.end)
+        eventEnd.setHours(0, 0, 0, 0)
+
+        // Marcar a data de check-in (início da reserva)
+        const checkInStr = `${eventStart.getFullYear()}-${String(eventStart.getMonth() + 1).padStart(2, '0')}-${String(eventStart.getDate()).padStart(2, '0')}`
+        allCheckInDates.add(checkInStr)
+
+        // Adicionar todas as noites ocupadas (excluindo o check-out)
+        const dates = getDatesBetween(eventStart, eventEnd)
+        dates.forEach((date) => allBookedDates.add(date))
+      })
 
     // Adicionar datas das reservas do Supabase
     if (reservations) {
@@ -91,11 +95,11 @@ export async function POST(request: Request) {
         start.setHours(0, 0, 0, 0)
         const end = new Date(reservation.check_out)
         end.setHours(0, 0, 0, 0)
-        
+
         // Marcar a data de check-in (início da reserva)
         const checkInStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
         allCheckInDates.add(checkInStr)
-        
+
         // Adicionar todas as noites ocupadas (excluindo o check-out)
         const dates = getDatesBetween(start, end)
         dates.forEach((date) => allBookedDates.add(date))
@@ -104,7 +108,7 @@ export async function POST(request: Request) {
 
     // Verificar se as datas solicitadas estão disponíveis
     const requestedDates = getDatesBetween(checkInDate, checkOutDate)
-    
+
     // Se check-in e check-out são no mesmo dia, verificar se há check-in nesse dia
     // (não verificar se há reserva que termina nesse dia, pois o dia está disponível)
     if (checkInDate.getTime() === checkOutDate.getTime()) {
@@ -114,7 +118,7 @@ export async function POST(request: Request) {
       // 2. OU há uma reserva em andamento nesse dia (allBookedDates)
       const isBooked = allCheckInDates.has(checkInDateStr) || allBookedDates.has(checkInDateStr)
       const conflictingDates = isBooked ? [checkInDateStr] : []
-      
+
       console.log("Verificação mesmo dia (revisada):", {
         date: checkInDateStr,
         hasCheckInOnDate: allCheckInDates.has(checkInDateStr),
@@ -122,7 +126,7 @@ export async function POST(request: Request) {
         isBooked,
         available: !isBooked,
       })
-      
+
       return NextResponse.json({
         success: true,
         available: !isBooked,
@@ -131,7 +135,7 @@ export async function POST(request: Request) {
         allBookedDates: Array.from(allBookedDates),
       })
     }
-    
+
     // Para períodos maiores que 1 dia, verificar normalmente
     const conflictingDates = requestedDates.filter((date) => allBookedDates.has(date))
 
@@ -149,7 +153,7 @@ export async function POST(request: Request) {
       sampleBookedDates: allBookedDatesArray.slice(0, 5),
       available: conflictingDates.length === 0,
     })
-    
+
     // Se check-in e check-out são no mesmo dia, verificar se a data está ocupada
     if (checkInDate.getTime() === checkOutDate.getTime()) {
       const checkInDateStr = requestedDates[0]
