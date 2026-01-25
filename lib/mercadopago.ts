@@ -1,6 +1,6 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 
-const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
+const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN?.trim()
 
 // Não lança erro se o token não estiver configurado (será configurado depois)
 // A validação será feita na rota de pagamento
