@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { validateReservationDates, calculatePrice } from '@/lib/utils/reservation'
+import { ENV } from '@/lib/utils/env'
+import { checkReservationAvailability } from '@/lib/availability'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount } = body
+    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount, chaletId } = body
 
     // Validação básica
     if (!checkIn || !checkOut || !guestName || !guestEmail || !guestPhone) {
@@ -19,7 +21,7 @@ export async function POST(request: Request) {
     // Precisamos criar a data no timezone local
     const [checkInYear, checkInMonth, checkInDay] = checkIn.split('-').map(Number)
     const checkInDate = new Date(checkInYear, checkInMonth - 1, checkInDay, 0, 0, 0, 0)
-    
+
     const [checkOutYear, checkOutMonth, checkOutDay] = checkOut.split('-').map(Number)
     const checkOutDate = new Date(checkOutYear, checkOutMonth - 1, checkOutDay, 0, 0, 0, 0)
 
@@ -30,33 +32,33 @@ export async function POST(request: Request) {
     }
 
     // Verificar disponibilidade
-    const availabilityResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/reservations/check-availability`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checkIn, checkOut }),
-    })
+    console.log('[RESERVATIONS_CREATE] Verificando disponibilidade direta')
 
-    const availabilityData = await availabilityResponse.json()
+    const availabilityResult = await checkReservationAvailability(checkIn, checkOut, chaletId || 'chale-anaue')
 
-    if (!availabilityData.success || !availabilityData.available) {
+    if (!availabilityResult.success || !availabilityResult.data?.available) {
       return NextResponse.json(
         {
           success: false,
-          error: availabilityData.conflictingDates?.length
+          error: availabilityResult.data?.conflictingDates?.length
             ? 'As datas selecionadas não estão disponíveis'
-            : 'Erro ao verificar disponibilidade',
-          conflictingDates: availabilityData.conflictingDates,
+            : (availabilityResult.error || 'Erro ao verificar disponibilidade'),
+          conflictingDates: availabilityResult.data?.conflictingDates,
         },
         { status: 400 }
       )
     }
+
+    const availabilityData = availabilityResult.data
+
 
     // Calcular preço
     const priceCalculation = calculatePrice(
       checkInDate,
       checkOutDate,
       guestCount || 2,
-      childrenCount || 0
+      childrenCount || 0,
+      chaletId || 'chale-anaue'
     )
 
     // Criar reserva no Supabase
@@ -80,6 +82,7 @@ export async function POST(request: Request) {
         children_count: childrenCount || 0,
         total_price: priceCalculation.totalPrice,
         status: 'pending',
+        chalet_id: chaletId || 'chale-anaue',
       })
       .select()
       .single()

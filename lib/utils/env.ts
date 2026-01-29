@@ -1,0 +1,33 @@
+/**
+ * Utilitário para acessar variáveis de ambiente de forma segura e limpa.
+ */
+export function getEnv(key: string, defaultValue: string = ''): string {
+    const value = process.env[key]
+
+    if (!value) {
+        return defaultValue
+    }
+
+    // Remove espaços em branco, quebras de linha e caracteres de controle
+    // Remove TUDO que não for caractere ASCII imprimível (32-126)
+    // Isso elimina espaços extras, quebras de linha e caracteres unicode ocultos (BOM, etc)
+    let sanitized = value.replace(/[^\x20-\x7E]/g, '').trim()
+
+    // Remove o prefixo 'Bearer ' se o usuário tiver colado por engano
+    if (sanitized.startsWith('Bearer ')) {
+        sanitized = sanitized.substring(7).trim()
+    }
+
+    return sanitized
+}
+
+export const ENV = {
+    SUPABASE_URL: getEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    SUPABASE_ANON_KEY: getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    SUPABASE_SERVICE_ROLE_KEY: getEnv('SUPABASE_SERVICE_ROLE_KEY'),
+    INFINITEPAY_CLIENT_ID: getEnv('INFINITEPAY_CLIENT_ID'),
+    INFINITEPAY_CLIENT_SECRET: getEnv('INFINITEPAY_CLIENT_SECRET'),
+    BASE_URL: getEnv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000'),
+}
+
+

@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export function WhatsAppButton() {
   const whatsappNumber = "559294197052"
-  const message = "Olá! Gostaria de fazer uma reserva no Anauê Jungle Chalés."
+  const message = "Olá! Tenho uma dúvida sobre o Anauê Jungle."
 
   const openWhatsApp = () => {
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
@@ -27,7 +27,7 @@ export function WhatsAppButton() {
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left" className="bg-green-700 text-white border-green-800">
-          <p>Falar no WhatsApp</p>
+          <p>Tirar Dúvidas (WhatsApp)</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

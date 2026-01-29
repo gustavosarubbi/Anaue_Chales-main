@@ -15,7 +15,7 @@ const features = [
   {
     icon: Home,
     title: "Chalé Completo",
-    description: "Micro-ondas, frigobar, forno elétrico, ar condicionado e tudo que você precisa",
+    description: "Micro-ondas, frigobar, forno elétrico, ar condicionado, TV Box e tudo que você precisa",
     highlight: true,
   },
   {

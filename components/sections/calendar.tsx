@@ -328,7 +328,7 @@ function Sidebar() {
               asChild
             >
               <Link href="/checkout" className="flex items-center justify-center gap-2">
-                <ShoppingCart className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 Reservar Online
               </Link>
             </Button>
@@ -336,10 +336,13 @@ function Sidebar() {
             <Button
               variant="outline"
               className="w-full bg-transparent border-green-600 text-green-700 hover:bg-green-50 h-11"
-              onClick={openWhatsApp}
+              onClick={() => {
+                const url = `https://wa.me/559294197052?text=${encodeURIComponent("Olá! Tenho uma dúvida sobre a disponibilidade dos chalés.")}`
+                window.open(url, "_blank")
+              }}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              WhatsApp
+              Tirar Dúvidas
             </Button>
           </div>
 

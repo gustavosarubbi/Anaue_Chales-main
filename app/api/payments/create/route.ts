@@ -1,19 +1,8 @@
 import { NextResponse } from 'next/server'
-import { mercadoPago } from '@/lib/mercadopago'
+import { createInfinitePayPayment } from '@/lib/infinitepay'
 
 export async function POST(request: Request) {
   try {
-    // Verificar se o Mercado Pago está configurado
-    if (!mercadoPago) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Mercado Pago não está configurado. Por favor, configure as credenciais do Mercado Pago nas variáveis de ambiente.' 
-        },
-        { status: 500 }
-      )
-    }
-
     const body = await request.json()
     const { reservationId, amount, guestName, guestEmail, checkIn, checkOut } = body
 
@@ -24,50 +13,41 @@ export async function POST(request: Request) {
       )
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    console.log('[PAYMENTS_CREATE] Usando InfinitePay para reserva:', reservationId)
 
-    // Criar preferência de pagamento no Mercado Pago
-    const preference = await mercadoPago.create({
-      items: [
-        {
-          id: reservationId,
-          title: `Reserva - ${guestName}`,
-          description: `Reserva de ${checkIn} até ${checkOut}`,
-          quantity: 1,
-          unit_price: parseFloat(amount.toString()),
-          currency_id: 'BRL',
-        },
-      ],
-      payer: {
+    // Criar link de pagamento na InfinitePay
+    const result = await createInfinitePayPayment({
+      amount: parseFloat(amount.toString()),
+      description: `Reserva Chalé - ${guestName} (${checkIn} a ${checkOut})`,
+      orderId: reservationId,
+      customer: {
         name: guestName,
-        email: guestEmail,
-      },
-      back_urls: {
-        success: `${baseUrl}/checkout/success`,
-        failure: `${baseUrl}/checkout/failure`,
-        pending: `${baseUrl}/checkout/pending`,
-      },
-      auto_return: 'approved',
-      external_reference: reservationId,
-      notification_url: `${baseUrl}/api/payments/webhook`,
-      statement_descriptor: 'ANAUECHALES',
+        email: guestEmail
+      }
     })
+
+    console.log('[PAYMENTS_CREATE] Link InfinitePay gerado:', result.paymentId)
 
     return NextResponse.json({
       success: true,
-      preferenceId: preference.id,
-      initPoint: preference.init_point,
-      sandboxInitPoint: preference.sandbox_init_point,
+      paymentId: result.paymentId,
+      initPoint: result.url,
+      sandboxInitPoint: result.url,
     })
   } catch (error: any) {
-    console.error('Erro ao criar pagamento:', error)
+    console.error('[PAYMENTS_CREATE] Erro fatal InfinitePay:', {
+      message: error?.message,
+      name: error?.name,
+    })
+
     return NextResponse.json(
       {
         success: false,
-        error: error?.message || 'Erro ao criar pagamento no Mercado Pago',
+        error: 'Erro ao processar pagamento com InfinitePay. Por favor, verifique as credenciais.',
       },
       { status: 500 }
     )
   }
 }
+
 

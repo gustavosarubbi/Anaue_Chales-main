@@ -7,15 +7,12 @@ export interface AvailabilityData {
 }
 
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
-let availabilityCache: {
+let availabilityCache: Record<string, {
   data: AvailabilityData | null
   timestamp: number
-} = {
-  data: null,
-  timestamp: 0,
-}
+}> = {}
 
-export function useAvailability() {
+export function useAvailability(chaletId: string = 'chale-anaue') {
   const [availability, setAvailability] = useState<Record<string, 'booked'>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -24,12 +21,13 @@ export function useAvailability() {
   const fetchAvailability = useCallback(async (forceRefresh = false) => {
     // Verificar cache
     const now = Date.now()
+    const chaletCache = availabilityCache[chaletId]
     if (
       !forceRefresh &&
-      availabilityCache.data &&
-      now - availabilityCache.timestamp < CACHE_DURATION
+      chaletCache?.data &&
+      now - chaletCache.timestamp < CACHE_DURATION
     ) {
-      setAvailability(availabilityCache.data.availability)
+      setAvailability(chaletCache.data.availability)
       setIsLoading(false)
       return
     }
@@ -44,7 +42,7 @@ export function useAvailability() {
     setError(null)
 
     try {
-      const response = await fetch('/api/availability', {
+      const response = await fetch(`/api/availability?chaletId=${chaletId}`, {
         signal: abortControllerRef.current.signal,
       })
 
@@ -57,7 +55,7 @@ export function useAvailability() {
       if (data.success !== false) {
         setAvailability(data.availability || {})
         // Atualizar cache
-        availabilityCache = {
+        availabilityCache[chaletId] = {
           data: {
             availability: data.availability || {},
             lastUpdated: data.lastUpdated || new Date().toISOString(),
@@ -75,8 +73,8 @@ export function useAvailability() {
       console.error('Erro ao buscar disponibilidade:', err)
       setError(err.message || 'Erro ao buscar disponibilidade')
       // Em caso de erro, usar cache se disponível
-      if (availabilityCache.data) {
-        setAvailability(availabilityCache.data.availability)
+      if (availabilityCache[chaletId]?.data) {
+        setAvailability(availabilityCache[chaletId].data!.availability)
       }
     } finally {
       setIsLoading(false)

@@ -19,10 +19,11 @@ export function AvailabilityCalendar({
   minDate = new Date(),
   maxDate,
   numberOfMonths = 1,
+  chaletId = 'chale-anaue',
 }: AvailabilityCalendarProps) {
-  const { availability, isLoading } = useAvailability()
+  const { availability, isLoading } = useAvailability(chaletId)
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(minDate))
-  
+
   // Calcular maxDate padrão (2 anos a partir de hoje)
   const defaultMaxDate = useMemo(() => {
     if (maxDate) return maxDate
@@ -103,7 +104,7 @@ export function AvailabilityCalendar({
         // Para outros dias, verificar se há no máximo 1 dia ocupado consecutivo
         let current = new Date(checkIn)
         current.setDate(current.getDate() + 1)
-        
+
         let consecutiveOccupied = 0
         let maxConsecutiveOccupied = 0
         let hasOccupiedDays = false
@@ -214,7 +215,7 @@ export function AvailabilityCalendar({
           ))}
         </div>
       )}
-      
+
       {/* Loading skeleton */}
       {isLoading && (
         <div className={cn(
@@ -227,7 +228,7 @@ export function AvailabilityCalendar({
               <CalendarMonth
                 month={addMonths(new Date(), i)}
                 availability={{}}
-                onDateClick={() => {}}
+                onDateClick={() => { }}
                 isLoading={true}
               />
             </div>
@@ -249,8 +250,8 @@ export function AvailabilityCalendar({
             {checkIn && checkOut
               ? `Período selecionado: ${format(checkIn, "dd/MM/yyyy", { locale: ptBR })} até ${format(checkOut, "dd/MM/yyyy", { locale: ptBR })}`
               : checkIn
-              ? `Check-in selecionado: ${format(checkIn, "dd/MM/yyyy", { locale: ptBR })}. Selecione a data de check-out.`
-              : "👆 Clique em uma data para selecionar o check-in"}
+                ? `Check-in selecionado: ${format(checkIn, "dd/MM/yyyy", { locale: ptBR })}. Selecione a data de check-out.`
+                : "👆 Clique em uma data para selecionar o check-in"}
           </p>
         </div>
       )}

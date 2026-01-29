@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { calculatePrice, PRICING, formatDatePortuguese } from "@/lib/utils/reservation"
+import { calculatePrice, PRICING, CHALET_PRICING } from "@/lib/utils/reservation"
 import { Separator } from "@/components/ui/separator"
 import { Calculator } from "lucide-react"
 
@@ -11,6 +11,7 @@ interface PriceCalculatorProps {
   checkOut: Date | undefined
   guestCount: number
   childrenCount: number
+  chaletId?: string
 }
 
 export function PriceCalculator({
@@ -18,14 +19,19 @@ export function PriceCalculator({
   checkOut,
   guestCount,
   childrenCount,
+  chaletId = 'chale-anaue',
 }: PriceCalculatorProps) {
   const priceCalculation = useMemo(() => {
     if (!checkIn || !checkOut) {
       return null
     }
 
-    return calculatePrice(checkIn, checkOut, guestCount, childrenCount)
-  }, [checkIn, checkOut, guestCount, childrenCount])
+    return calculatePrice(checkIn, checkOut, guestCount, childrenCount, chaletId)
+  }, [checkIn, checkOut, guestCount, childrenCount, chaletId])
+
+  const unitPrices = useMemo(() => {
+    return CHALET_PRICING[chaletId] || CHALET_PRICING['chale-anaue'];
+  }, [chaletId]);
 
   if (!priceCalculation || !checkIn || !checkOut) {
     return (
@@ -118,8 +124,8 @@ export function PriceCalculator({
             <strong>Informações:</strong>
           </p>
           <ul className="mt-1 list-disc list-inside space-y-1">
-            <li>Finais de semana: R$ {PRICING.WEEKEND.toFixed(2)}/noite (valor para casal)</li>
-            <li>Dias úteis: R$ {PRICING.WEEKDAY.toFixed(2)}/noite (valor para casal)</li>
+            <li>Finais de semana: R$ {unitPrices.weekend.toFixed(2)}/noite (valor para casal)</li>
+            <li>Dias úteis: R$ {unitPrices.weekday.toFixed(2)}/noite (valor para casal)</li>
             <li>Crianças até 5 anos não pagam</li>
             <li>Crianças 6-15 anos: R$ {PRICING.EXTRA_CHILD.toFixed(2)}/noite</li>
             <li>Adultos extras: R$ {PRICING.EXTRA_ADULT.toFixed(2)}/noite</li>
@@ -129,4 +135,3 @@ export function PriceCalculator({
     </Card>
   )
 }
-

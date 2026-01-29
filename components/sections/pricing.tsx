@@ -6,11 +6,15 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, CreditCard, Smartphone, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 
 export function Pricing() {
+  const masterPricing = CHALET_PRICING['chale-anaue']
+  const campingPricing = CHALET_PRICING['chale-2']
+  const carnaval = SPECIAL_PACKAGES.carnaval
+
   return (
     <section id="pricing" className="py-24 bg-white texture-lines relative">
-      {/* Background gradient splash */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[800px] bg-moss-50/50 rounded-full blur-[100px] -z-10" />
 
       <div className="container mx-auto px-4">
@@ -19,7 +23,7 @@ export function Pricing() {
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">💰 Investimento</Badge>
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6">Preços e Horários</h2>
           <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto">
-            Tarifas especiais para diferentes períodos. Viva momentos inesquecíveis sem preocupações.
+            Tarifas por pernoite para casal. Selecione o chalé no momento da reserva para ver os valores específicos.
           </p>
 
           {/* Observação especial para Carnaval */}
@@ -36,13 +40,14 @@ export function Pricing() {
                   <MessageCircle className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="font-heading font-bold text-purple-900 text-lg mb-1">🎭 Pacote Carnaval (13 a 17 de Fev)</p>
+                  <p className="font-heading font-bold text-purple-900 text-lg mb-1">{carnaval.name}</p>
                   <div className="text-purple-800">
+                    <p className="mb-1 text-sm font-medium">13 a 17 de Fevereiro</p>
                     <p className="mb-1">
-                      Diárias de <strong className="text-xl">R$ 950,00</strong> para o período de folia.
+                      Diárias de <strong className="text-xl">R$ {carnaval.price.toFixed(2)}</strong> para o período de folia.
                     </p>
                     <p>
-                      Dia 18/02 por <strong className="text-lg">R$ 800,00</strong>.
+                      Dia 18/02 por <strong className="text-lg">R$ {carnaval.latePrice.toFixed(2)}</strong>.
                     </p>
                     <span className="block mt-2 font-medium text-sm bg-purple-200/50 px-2 py-1 rounded inline-block text-purple-900">Consulte disponibilidade via WhatsApp!</span>
                   </div>
@@ -54,7 +59,7 @@ export function Pricing() {
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto mb-16">
-          {/* Weekend Pricing */}
+          {/* Master Chalet Pricing */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -64,50 +69,53 @@ export function Pricing() {
             <Card className="h-full border-moss-200 bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
               <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-moss-400 to-moss-600" />
               <div className="absolute top-6 right-6">
-                <Badge className="bg-moss-600 text-white shadow-lg text-xs px-3 py-1">Popular</Badge>
+                <Badge className="bg-moss-600 text-white shadow-lg text-xs px-3 py-1">Master</Badge>
               </div>
               <CardHeader className="pt-10 pb-2 px-8">
                 <CardTitle className="flex items-center gap-3 text-moss-900 font-heading text-2xl">
-                  <div className="bg-moss-50 p-2 rounded-lg">
-                    <Calendar className="h-6 w-6 text-moss-600" />
-                  </div>
-                  Finais de Semana
+                  Chalé Master
                 </CardTitle>
-                <p className="text-sm text-moss-500 mt-2 font-medium uppercase tracking-wide">Sex a Dom • Feriados</p>
+                <p className="text-sm text-moss-500 mt-2 font-medium uppercase tracking-wide">Privacidade e Hidromassagem</p>
               </CardHeader>
               <CardContent className="px-8 pb-8 flex flex-col flex-grow">
-                <div className="mb-8 mt-4">
-                  <span className="text-5xl font-bold text-moss-900 tracking-tight">R$ 800</span>
-                  <p className="text-moss-600 font-medium mt-1">por noite / casal</p>
+                <div className="space-y-4 mb-6 mt-4">
+                  <div className="flex justify-between items-end border-b border-moss-50 pb-2">
+                    <span className="text-moss-600 font-medium text-sm">Seg a Qui</span>
+                    <span className="text-3xl font-bold text-moss-900">R$ {masterPricing.weekday}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-moss-50 pb-2">
+                    <span className="text-moss-600 font-medium text-sm">Fins de Sem/Feriados</span>
+                    <span className="text-3xl font-bold text-moss-900">R$ {masterPricing.weekend}</span>
+                  </div>
                 </div>
 
                 <div className="space-y-4 mb-8 flex-grow">
                   <div className="flex items-start gap-3">
                     <Smartphone className="h-5 w-5 text-moss-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-moss-800">Pagamento facilitado</p>
-                      <p className="text-xs text-moss-500">Via Pix rápido e seguro</p>
+                      <p className="text-sm font-medium text-moss-800">Pagamento Instantâneo</p>
+                      <p className="text-xs text-moss-500">Via Pix ou Cartão de Crédito</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CreditCard className="h-5 w-5 text-moss-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-moss-800">Cartão de Crédito</p>
-                      <p className="text-xs text-moss-500">Parcelamos (com juros da máquina)</p>
+                      <p className="text-sm font-medium text-moss-800">Sincronizado</p>
+                      <p className="text-xs text-moss-500">Airbnb & Booking.com</p>
                     </div>
                   </div>
                 </div>
 
                 <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white h-12 text-lg rounded-xl shadow-md transition-all duration-200" asChild>
-                  <Link href="/checkout">
-                    Reservar Fim de Semana
+                  <Link href="/checkout?chalet=chale-anaue">
+                    Reservar Chalé Master
                   </Link>
                 </Button>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Weekday Pricing */}
+          {/* Camping Luxo Pricing */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -116,34 +124,40 @@ export function Pricing() {
           >
             <Card className="h-full border-stone-200 bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
               <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-stone-300 to-stone-400" />
+              <div className="absolute top-6 right-6">
+                <Badge className="bg-stone-600 text-white shadow-lg text-xs px-3 py-1">Camping Luxo</Badge>
+              </div>
               <CardHeader className="pt-10 pb-2 px-8">
                 <CardTitle className="flex items-center gap-3 text-moss-900 font-heading text-2xl">
-                  <div className="bg-stone-100 p-2 rounded-lg">
-                    <Calendar className="h-6 w-6 text-stone-600" />
-                  </div>
-                  Segunda a Quinta
+                  Camping Luxo
                 </CardTitle>
-                <p className="text-sm text-stone-500 mt-2 font-medium uppercase tracking-wide">Dias Úteis • Exceto feriados</p>
+                <p className="text-sm text-stone-500 mt-2 font-medium uppercase tracking-wide">Design Moderno e Imersão</p>
               </CardHeader>
               <CardContent className="px-8 pb-8 flex flex-col flex-grow">
-                <div className="mb-8 mt-4">
-                  <span className="text-5xl font-bold text-moss-900 tracking-tight">R$ 650</span>
-                  <p className="text-stone-600 font-medium mt-1">por noite / casal</p>
+                <div className="space-y-4 mb-6 mt-4">
+                  <div className="flex justify-between items-end border-b border-stone-50 pb-2">
+                    <span className="text-stone-600 font-medium text-sm">Seg a Qui</span>
+                    <span className="text-3xl font-bold text-moss-900">R$ {campingPricing.weekday}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-stone-50 pb-2">
+                    <span className="text-stone-600 font-medium text-sm">Fins de Sem/Feriados</span>
+                    <span className="text-3xl font-bold text-moss-900">R$ {campingPricing.weekend}</span>
+                  </div>
                 </div>
 
                 <div className="space-y-4 mb-8 flex-grow">
                   <div className="flex items-start gap-3">
                     <Smartphone className="h-5 w-5 text-stone-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-stone-800">Pagamento facilitado</p>
+                      <p className="text-sm font-medium text-stone-800">Pagamento Facilitado</p>
                       <p className="text-xs text-stone-500">Via Pix rápido e seguro</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CreditCard className="h-5 w-5 text-stone-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-stone-800">Cartão de Crédito</p>
-                      <p className="text-xs text-stone-500">Parcelamos (com juros da máquina)</p>
+                      <p className="text-sm font-medium text-stone-800">InfinitePay</p>
+                      <p className="text-xs text-stone-500">Cartão de Crédito e Parcelamento</p>
                     </div>
                   </div>
                 </div>
@@ -153,8 +167,8 @@ export function Pricing() {
                   className="w-full border-moss-200 text-moss-700 hover:bg-moss-50 h-12 text-lg rounded-xl transition-all duration-200"
                   asChild
                 >
-                  <Link href="/checkout">
-                    Reservar Dia de Semana
+                  <Link href="/checkout?chalet=chale-2">
+                    Reservar Camping Luxo
                   </Link>
                 </Button>
               </CardContent>

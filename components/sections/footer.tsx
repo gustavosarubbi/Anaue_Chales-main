@@ -197,7 +197,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
               <p className="text-moss-400 text-sm">
-                © {currentYear} Anauê Jungle Chalés. Todos os direitos reservados.
+                © {currentYear} Anauê Jungle. Todos os direitos reservados.
               </p>
             </div>
 
@@ -233,9 +233,9 @@ export function Footer() {
           className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 border-4 border-white/10 hover:border-white/20 active:scale-95 group"
           asChild
         >
-          <Link href="#pricing">
+          <Link href="/checkout">
             <Calendar className="h-6 w-6 group-hover:scale-110 transition-transform" />
-            <span className="sr-only">Ver disponibilidade</span>
+            <span className="sr-only">Explorar Disponibilidade</span>
           </Link>
         </Button>
       </motion.div>

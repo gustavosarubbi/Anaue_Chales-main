@@ -12,18 +12,18 @@ import { motion, AnimatePresence } from "framer-motion"
 // ... existing categories and images data ...
 const galleryCategories = [
   { id: "all", name: "Todos", description: "Explore todos os cantos do nosso refúgio" },
-  { id: "chale2", name: "Chalé 2 (Novo)", description: "Conheça nossa nova opção premium" },
-  { id: "chales", name: "Chalé Anauê", description: "O clássico charme rústico" },
+  { id: "chale2", name: "Chalé Camping Luxo", description: "Conheça nossa nova opção premium" },
+  { id: "chales", name: "Chalé Master", description: "O clássico charme rústico" },
   { id: "natureza", name: "Natureza & Rio", description: "Imersão total na floresta amazônica" },
   { id: "gastronomia", name: "Gastronomia", description: "Sabores e experiências únicas" },
 ]
 
 const galleryImages = [
-  // Chalé Anauê
+  // Chalé Camping Luxo (Antigo Anauê)
   {
     id: 1,
     category: "chales",
-    title: "Chalé Anauê - Exterior",
+    title: "Chalé Master - Exterior",
     description: "Vista externa do chalé integrado à natureza",
     image: "/Chale-1.jpg",
     featured: true
@@ -31,11 +31,10 @@ const galleryImages = [
   {
     id: 2,
     category: "chales",
-    title: "Chalé Anauê - Varanda",
+    title: "Chalé Master - Varanda",
     description: "Varanda aconchegante para relaxar",
     image: "/chale-2.jpg",
   },
-  // ... other Chalé 1 images ...
   {
     id: 3,
     category: "chales",
@@ -66,53 +65,26 @@ const galleryImages = [
     featured: true
   },
 
+  // Chalé Camping Luxo (Antigo Chalé 2)
+  { id: 201, category: "chale2", title: "Chalé Camping Luxo - Vista Aérea", description: "Visão geral do novo chalé", image: "/Chale 2/IMG_3189.jpg", featured: true },
+  { id: 202, category: "chale2", title: "Chalé Camping Luxo - Fachada", description: "Design moderno na selva", image: "/Chale 2/IMG_3190.jpg" },
+  { id: 203, category: "chale2", title: "Chalé Camping Luxo - Interior", description: "Espaço e conforto", image: "/Chale 2/IMG_3191.jpg" },
+  { id: 204, category: "chale2", title: "Chalé Camping Luxo - Quarto", description: "Climatizado e aconchegante", image: "/Chale 2/IMG_3192.jpg" },
+  { id: 205, category: "chale2", title: "Chalé Camping Luxo - Banheiro", description: "Privacidade e modernidade", image: "/Chale 2/IMG_3193.jpg" },
+  { id: 206, category: "chale2", title: "Chalé Camping Luxo - Detalhes", description: "Acabamento premium", image: "/Chale 2/IMG_3194.jpg" },
+  { id: 207, category: "chale2", title: "Chalé Camping Luxo - Varanda", description: "Vista arborizada", image: "/Chale 2/IMG_3195.jpg" },
+  { id: 208, category: "chale2", title: "Chalé Camping Luxo - Entrada", description: "Acesso privativo", image: "/Chale 2/IMG_3196.jpg" },
+  { id: 209, category: "chale2", title: "Chalé Camping Luxo - Conforto", description: "Espaço amplo", image: "/Chale 2/IMG_3197.jpg" },
+  { id: 210, category: "chale2", title: "Chalé Camping Luxo - Design", description: "Iluminação natural", image: "/Chale 2/IMG_3200.jpg" },
+  { id: 211, category: "chale2", title: "Chalé Camping Luxo - Estilo", description: "Móveis planejados", image: "/Chale 2/IMG_3202.jpg" },
+  { id: 212, category: "chale2", title: "Chalé Camping Luxo - Lounge", description: "Relaxamento garantido", image: "/Chale 2/IMG_3205.jpg" },
+  { id: 213, category: "chale2", title: "Chalé Camping Luxo - Suite", description: "Privacidade total", image: "/Chale 2/IMG_3212.jpg" },
+  { id: 214, category: "chale2", title: "Chalé Camping Luxo - Panorama", description: "Vista incrível", image: "/Chale 2/IMG_3221.jpg" },
+  { id: 215, category: "chale2", title: "Chalé Camping Luxo - Deck", description: "Aproveite a brisa", image: "/Chale 2/IMG_3224.jpg" },
+  { id: 216, category: "chale2", title: "Chalé Camping Luxo - Pôr do Sol", description: "Momentos mágicos", image: "/Chale 2/IMG_3225.jpg" },
+  { id: 217, category: "chale2", title: "Chalé Camping Luxo - Noite", description: "Iluminação aconchegante", image: "/Chale 2/IMG_3226.jpg" },
 
-  // Chalé 2
-  {
-    id: 201,
-    category: "chale2",
-    title: "Chalé 2 - Vista Aérea",
-    description: "Visão geral do novo chalé",
-    image: "/Chale 2/IMG_3189.jpg",
-    featured: true
-  },
-  {
-    id: 202,
-    category: "chale2",
-    title: "Chalé 2 - Fachada",
-    description: "Design moderno na selva",
-    image: "/Chale 2/IMG_3190.jpg",
-  },
-  {
-    id: 203,
-    category: "chale2",
-    title: "Chalé 2 - Interior",
-    description: "Espaço e conforto",
-    image: "/Chale 2/IMG_3191.jpg",
-  },
-  {
-    id: 204,
-    category: "chale2",
-    title: "Chalé 2 - Quarto",
-    description: "Climatizado e aconchegante",
-    image: "/Chale 2/IMG_3192.jpg",
-  },
-  {
-    id: 205,
-    category: "chale2",
-    title: "Chalé 2 - Banheiro",
-    description: "Privacidade e modernidade",
-    image: "/Chale 2/IMG_3193.jpg",
-  },
-  {
-    id: 206,
-    category: "chale2",
-    title: "Chalé 2 - Detalhes",
-    description: "Acabamento premium",
-    image: "/Chale 2/IMG_3194.jpg",
-  },
-
-  // Natureza & Rio (Combined)
+  // Natureza & Rio
   {
     id: 11,
     category: "natureza",
@@ -174,6 +146,13 @@ const galleryImages = [
     image: "/frigobar-microondas.jpg",
   },
   {
+    id: 9,
+    category: "gastronomia",
+    title: "Minibar",
+    description: "Bebidas Geladas",
+    image: "/frigobar-bebida.jpg",
+  },
+  {
     id: 10,
     category: "gastronomia",
     title: "Lazer",
@@ -181,6 +160,7 @@ const galleryImages = [
     image: "/mesa-de-sinuca.jpg",
   },
 ]
+
 
 export function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all")
@@ -227,8 +207,8 @@ export function Gallery() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat.id
-                  ? "bg-moss-700 text-white shadow-lg scale-105"
-                  : "bg-white text-stone-600 hover:bg-stone-100 hover:text-stone-900 border border-stone-200"
+                ? "bg-moss-700 text-white shadow-lg scale-105"
+                : "bg-white text-stone-600 hover:bg-stone-100 hover:text-stone-900 border border-stone-200"
                 }`}
             >
               {cat.name}

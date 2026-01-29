@@ -16,6 +16,7 @@ export interface AvailabilityCalendarProps {
   minDate?: Date
   maxDate?: Date
   numberOfMonths?: number
+  chaletId?: string
 }
 
 export interface CalendarMonthProps {

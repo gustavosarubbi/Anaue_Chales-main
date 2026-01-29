@@ -22,13 +22,35 @@ export interface PriceCalculation {
   }
 }
 
-// Preços por tipo de dia
+// Configuração de pacotes especiais (como Carnaval)
+export const SPECIAL_PACKAGES = {
+  carnaval: {
+    name: "🎭 Pacote Carnaval",
+    startDate: "2026-02-13",
+    endDate: "2026-02-17",
+    price: 950,
+    lateDate: "2026-02-18",
+    latePrice: 800,
+  }
+}
+
+// Preços por tipo de chalé e tipo de dia
+export const CHALET_PRICING: Record<string, { weekday: number; weekend: number }> = {
+  'chale-anaue': { // Chalé Master
+    weekday: 540,
+    weekend: 700,
+  },
+  'chale-2': { // Chalé Camping Luxo
+    weekday: 550,
+    weekend: 700,
+  }
+}
+
 export const PRICING = {
-  WEEKEND: 800, // Sexta a Domingo, feriados e vésperas
-  WEEKDAY: 650, // Segunda a quinta
   EXTRA_ADULT: 150, // Por adulto extra (acima de 2)
   EXTRA_CHILD: 100, // Por criança (6-15 anos)
   CHILD_UNDER_6: 0, // Crianças até 5 anos não pagam
+  SUP_BOARD: 50,    // Adicional prancha de SUP
 } as const
 
 /**
@@ -37,19 +59,16 @@ export const PRICING = {
 export function isWeekend(date: Date): boolean {
   const day = date.getDay()
   // 0 = domingo, 5 = sexta, 6 = sábado
-  // Consideramos domingo=0, sexta=5, sábado=6 como finais de semana
   return day === 0 || day === 5 || day === 6
 }
 
 /**
  * Verifica se uma data é feriado ou véspera de feriado
- * TODO: Implementar lista completa de feriados brasileiros
  */
 export function isHoliday(date: Date): boolean {
   const month = date.getMonth() + 1
   const day = date.getDate()
-  
-  // Feriados fixos brasileiros
+
   const holidays: Array<[number, number]> = [
     [1, 1],   // Ano Novo
     [4, 21],  // Tiradentes
@@ -60,7 +79,7 @@ export function isHoliday(date: Date): boolean {
     [11, 15], // Proclamação da República
     [12, 25], // Natal
   ]
-  
+
   return holidays.some(([m, d]) => m === month && d === day)
 }
 
@@ -87,37 +106,40 @@ export function calculatePrice(
   checkIn: Date,
   checkOut: Date,
   guestCount: number = 2,
-  childrenCount: number = 0
+  childrenCount: number = 0,
+  chaletId: string = 'chale-anaue'
 ): PriceCalculation {
   const nights = calculateNights(checkIn, checkOut)
   const dates = getDatesBetween(checkIn, checkOut)
-  
+
+  const pricing = CHALET_PRICING[chaletId] || CHALET_PRICING['chale-anaue']
+
   let basePrice = 0
   const nightsBreakdown = dates.map((dateStr) => {
     const date = new Date(dateStr)
     const isWeekendDay = isWeekendOrHoliday(date)
-    const nightPrice = isWeekendDay ? PRICING.WEEKEND : PRICING.WEEKDAY
-    
+    const nightPrice = isWeekendDay ? pricing.weekend : pricing.weekday
+
     basePrice += nightPrice
-    
+
     return {
       date: dateStr,
       isWeekend: isWeekendDay,
       price: nightPrice,
     }
   })
-  
+
   // Calcular preço por hóspedes extras
   // Base é 2 adultos (casal)
   const extraAdults = Math.max(0, guestCount - 2)
   const guestPrice = extraAdults * PRICING.EXTRA_ADULT * nights
-  
+
   // Crianças de 6-15 anos pagam, menores de 6 não pagam
   const payingChildren = Math.max(0, childrenCount)
   const childrenPrice = payingChildren * PRICING.EXTRA_CHILD * nights
-  
+
   const totalPrice = basePrice + guestPrice + childrenPrice
-  
+
   return {
     basePrice,
     guestPrice,
@@ -136,15 +158,15 @@ export function calculatePrice(
  */
 export function getDatesBetween(startDate: Date, endDate: Date): string[] {
   const dates: string[] = []
-  
+
   // Normalizar datas para comparar apenas o dia
   const normalizedStart = new Date(startDate)
   normalizedStart.setHours(0, 0, 0, 0)
   const normalizedEnd = new Date(endDate)
   normalizedEnd.setHours(0, 0, 0, 0)
-  
+
   const current = new Date(normalizedStart)
-  
+
   // Se check-in e check-out são no mesmo dia, retorna apenas a data de check-in
   if (normalizedStart.getTime() === normalizedEnd.getTime()) {
     const year = current.getFullYear()
@@ -153,11 +175,11 @@ export function getDatesBetween(startDate: Date, endDate: Date): string[] {
     dates.push(`${year}-${month}-${day}`)
     return dates
   }
-  
+
   // Ajustar para excluir a data de check-out
   const adjustedEnd = new Date(normalizedEnd)
   adjustedEnd.setDate(adjustedEnd.getDate() - 1)
-  
+
   while (current <= adjustedEnd) {
     const year = current.getFullYear()
     const month = String(current.getMonth() + 1).padStart(2, '0')
@@ -165,7 +187,7 @@ export function getDatesBetween(startDate: Date, endDate: Date): string[] {
     dates.push(`${year}-${month}-${day}`)
     current.setDate(current.getDate() + 1)
   }
-  
+
   return dates
 }
 
@@ -178,27 +200,27 @@ export function validateReservationDates(checkIn: Date, checkOut: Date): {
 } {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  
+
   const checkInDate = new Date(checkIn)
   checkInDate.setHours(0, 0, 0, 0)
-  
+
   const checkOutDate = new Date(checkOut)
   checkOutDate.setHours(0, 0, 0, 0)
-  
+
   if (checkInDate < today) {
     return {
       valid: false,
       error: 'A data de check-in não pode ser no passado',
     }
   }
-  
+
   if (checkOutDate < checkInDate) {
     return {
       valid: false,
       error: 'A data de check-out não pode ser anterior à data de check-in',
     }
   }
-  
+
   // Permite check-in e check-out no mesmo dia (será calculado como 1 noite)
   const nights = calculateNights(checkInDate, checkOutDate)
   if (nights < 1) {
@@ -207,7 +229,7 @@ export function validateReservationDates(checkIn: Date, checkOut: Date): {
       error: 'A reserva deve ter pelo menos 1 noite',
     }
   }
-  
+
   return { valid: true }
 }
 

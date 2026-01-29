@@ -22,10 +22,10 @@ export type ReservationFormData = z.infer<typeof reservationSchema>
 interface ReservationFormProps {
   onSubmit: (data: ReservationFormData) => void
   isLoading?: boolean
-  defaultValues?: Partial<ReservationFormData>
+  initialData?: Partial<ReservationFormData>
 }
 
-export function ReservationForm({ onSubmit, isLoading = false, defaultValues }: ReservationFormProps) {
+export function ReservationForm({ onSubmit, isLoading = false, initialData }: ReservationFormProps) {
   const {
     register,
     handleSubmit,
@@ -36,9 +36,10 @@ export function ReservationForm({ onSubmit, isLoading = false, defaultValues }: 
     defaultValues: {
       guestCount: 2,
       childrenCount: 0,
-      ...defaultValues,
+      ...initialData,
     },
   })
+
 
   const guestCount = watch("guestCount")
   const childrenCount = watch("childrenCount")

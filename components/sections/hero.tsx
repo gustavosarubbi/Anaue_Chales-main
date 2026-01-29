@@ -7,10 +7,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Wifi, Camera, Heart, Menu, X, Calendar, Smartphone } from "lucide-react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
+import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const carnaval = SPECIAL_PACKAGES.carnaval
+  const masterPricing = CHALET_PRICING['chale-anaue']
+  const campingPricing = CHALET_PRICING['chale-2']
 
   const navigationItems = [
     { name: "Início", href: "#inicio" },
@@ -51,7 +55,7 @@ export function Hero() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
           style={{
-            backgroundImage: `url('/Chale-1.jpg')`,
+            backgroundImage: `url('/Chale 2/IMG_3221.jpg')`,
           }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-b from-moss-900/60 via-moss-900/40 to-moss-900/80"></div>
@@ -105,7 +109,7 @@ export function Hero() {
                 className="hidden md:flex bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm rounded-full px-6 transition-all duration-300"
                 asChild
               >
-                <Link href="#calendario">
+                <Link href="/checkout">
                   <Calendar className="mr-2 h-4 w-4" />
                   Reservar
                 </Link>
@@ -147,7 +151,7 @@ export function Hero() {
               ))}
               <div className="mt-8">
                 <Button className="w-full bg-white text-moss-900 hover:bg-moss-50 rounded-xl py-6 text-lg font-bold shadow-lg" asChild>
-                  <Link href="#calendario" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="/checkout" onClick={() => setIsMenuOpen(false)}>
                     <Calendar className="mr-2 h-5 w-5" />
                     Reservar Agora
                   </Link>
@@ -177,7 +181,7 @@ export function Hero() {
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg mb-6 border border-white/20 backdrop-blur-sm"
                 >
                   <span className="text-lg">🎭</span>
-                  Pacote Carnaval: 13 a 17 de Fev
+                  {carnaval.name}: 13 a 17 de Fev
                 </motion.div>
                 <div className="block">
                   <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
@@ -202,7 +206,7 @@ export function Hero() {
                 className="flex flex-wrap justify-center lg:justify-start gap-3"
               >
                 {[
-                  { icon: Wifi, label: "Wi-Fi Starlink" },
+                  { icon: Wifi, label: "Wi-Fi" },
                   { icon: Camera, label: "Segurança 24h" },
                   { icon: MapPin, label: "Tarumã" }
                 ].map((feat, i) => (
@@ -224,7 +228,7 @@ export function Hero() {
                   className="bg-white text-moss-900 hover:bg-moss-50 px-8 h-14 rounded-full font-semibold text-lg hover-lift shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all duration-300"
                   asChild
                 >
-                  <Link href="#calendario">
+                  <Link href="/checkout">
                     Ver Disponibilidade
                   </Link>
                 </Button>
@@ -263,46 +267,46 @@ export function Hero() {
                       {/* Carnaval Special */}
                       <div className="flex justify-between items-center border-b border-purple-500/30 bg-purple-900/20 px-3 py-2 rounded-lg -mx-1 mb-1">
                         <div>
-                          <p className="text-xs font-bold text-purple-200 uppercase tracking-tighter">Pacote Carnaval 🎭</p>
+                          <p className="text-xs font-bold text-purple-200 uppercase tracking-tighter">{carnaval.name.split(' ')[1]} 🎭</p>
                           <p className="text-[10px] text-purple-300/70">13 a 17 de Fev</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-lg font-bold text-purple-100">R$ 950</p>
+                          <p className="text-lg font-bold text-purple-100">R$ {carnaval.price}</p>
                           <p className="text-[10px] text-purple-300/70">noite</p>
                         </div>
                       </div>
 
                       <div className="flex justify-between items-center border-b border-white/10 pb-3">
                         <div>
-                          <p className="text-sm font-medium text-moss-100">Finais de Semana</p>
-                          <p className="text-xs text-white/50">Sex - Dom</p>
+                          <p className="text-sm font-medium text-moss-100">Chalé Master</p>
+                          <p className="text-xs text-white/50">A partir de</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold font-heading">R$ 800</p>
+                          <p className="text-2xl font-bold font-heading">R$ {masterPricing.weekday}</p>
                           <p className="text-[10px] text-white/50">casal / noite</p>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-sm font-medium text-moss-100">Segunda - Quinta</p>
-                          <p className="text-xs text-white/50">Dias úteis</p>
+                          <p className="text-sm font-medium text-moss-100">Camping Luxo</p>
+                          <p className="text-xs text-white/50">A partir de</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xl font-bold font-heading">R$ 650</p>
+                          <p className="text-xl font-bold font-heading">R$ {campingPricing.weekday}</p>
                           <p className="text-[10px] text-white/50">casal / noite</p>
                         </div>
                       </div>
                     </div>
 
                     <Button className="w-full h-14 bg-moss-500 hover:bg-moss-400 text-white rounded-xl font-bold text-lg shadow-lg transition-all duration-300 group" asChild>
-                      <Link href="#checkout">
-                        Reservar Agora
-                        <Smartphone className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      <Link href="/checkout">
+                        Reservar Online
+                        <Calendar className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </Link>
                     </Button>
 
                     <p className="text-center text-xs text-white/40">
-                      Reserva via WhatsApp • Pagamento facilitado
+                      Reserva Imediata • Pague com InfinitePay
                     </p>
                   </CardContent>
                 </Card>
