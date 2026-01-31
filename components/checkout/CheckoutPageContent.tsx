@@ -9,12 +9,12 @@ import { PaymentSummary } from "@/components/checkout/PaymentSummary"
 import { CheckoutProgressBar } from "@/components/checkout/CheckoutProgressBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Loader2, CheckCircle2 } from "lucide-react"
+import { Loader2, CheckCircle2, X } from "lucide-react"
 import { calculatePrice, validateReservationDates, formatDateForInput, CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
-type Step = "chalet" | "dates" | "form" | "payment" | "processing"
+type Step = "chalet" | "dates" | "form" | "payment" | "waiting" | "processing" | "success" | "expired"
 
 export function CheckoutPageContent() {
     const searchParams = useSearchParams()
@@ -29,6 +29,9 @@ export function CheckoutPageContent() {
     const [loading, setLoading] = useState(false)
     const [availabilityLoading, setAvailabilityLoading] = useState(false)
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
+    const [reservationId, setReservationId] = useState<string | null>(null)
+    const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
+    const [timeLeft, setTimeLeft] = useState<number>(600) // 10 minutes in seconds
 
     // Dates
     const [checkIn, setCheckIn] = useState<Date | undefined>(() => {
@@ -124,9 +127,15 @@ export function CheckoutPageContent() {
 
         setFormData(data)
         setLoading(true)
+        console.log('[CHECKOUT] Iniciando submissão do formulário...', {
+            chaletId: selectedChalet,
+            checkIn: formatDateForInput(checkIn),
+            checkOut: formatDateForInput(checkOut)
+        })
 
         try {
-            // 1. Create reservation
+            // 1. Criar Reserva
+            console.log('[CHECKOUT] Criando reserva no servidor...')
             const res = await fetch("/api/reservations/create", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -139,6 +148,7 @@ export function CheckoutPageContent() {
             })
 
             const reservationResult = await res.json()
+            console.log('[CHECKOUT] Resposta da criação de reserva:', reservationResult)
 
             if (!reservationResult.success) {
                 toast.error(reservationResult.error || "Erro ao criar reserva")
@@ -147,8 +157,10 @@ export function CheckoutPageContent() {
             }
 
             setStep("payment")
+            setReservationId(reservationResult.reservation.id)
 
-            // 2. Create payment preference
+            // 2. Criar Link de Pagamento
+            console.log('[CHECKOUT] Gerando link de pagamento para reserva:', reservationResult.reservation.id)
             const payRes = await fetch("/api/payments/create", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -163,6 +175,7 @@ export function CheckoutPageContent() {
             })
 
             const paymentResult = await payRes.json()
+            console.log('[CHECKOUT] Resposta do pagamento:', paymentResult)
 
             if (!paymentResult.success) {
                 toast.error(paymentResult.error || "Erro ao criar pagamento")
@@ -170,9 +183,17 @@ export function CheckoutPageContent() {
                 return
             }
 
-            // 3. Success! Redirect to InfinitePay
-            setStep("processing")
-            window.location.href = paymentResult.initPoint || paymentResult.sandboxInitPoint
+            setPaymentUrl(paymentResult.initPoint)
+            setStep("waiting")
+            setLoading(false)
+
+            console.log('[CHECKOUT] Sucesso! Redirecionando para:', paymentResult.initPoint)
+
+            // Redirecionamento automático conforme solicitado pelo usuário
+            // Usamos window.open para criar uma nova aba
+            setTimeout(() => {
+                window.open(paymentResult.initPoint, "_blank")
+            }, 500)
         } catch (error: any) {
             console.error("Erro no processo de checkout:", error)
             toast.error(error?.message || "Erro ao processar reserva. Tente novamente.")
@@ -186,6 +207,58 @@ export function CheckoutPageContent() {
             return
         }
         setStep("form")
+    }
+
+    // Timer & Polling effect
+    useEffect(() => {
+        let timer: NodeJS.Timeout
+        let poller: NodeJS.Timeout
+
+        if (step === "waiting" && reservationId) {
+            // Timer
+            timer = setInterval(() => {
+                setTimeLeft((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer)
+                        setStep("expired")
+                        return 0
+                    }
+                    return prev - 1
+                })
+            }, 1000)
+
+            // Polling
+            poller = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/reservations/status/${reservationId}`)
+                    const data = await res.json()
+                    if (data.success) {
+                        if (data.status === "confirmed") {
+                            clearInterval(poller)
+                            clearInterval(timer)
+                            setStep("success")
+                        } else if (data.status === "expired" || data.status === "cancelled") {
+                            clearInterval(poller)
+                            clearInterval(timer)
+                            setStep("expired")
+                        }
+                    }
+                } catch (e) {
+                    console.error("Polling error:", e)
+                }
+            }, 5000) // Poll every 5 seconds
+        }
+
+        return () => {
+            if (timer) clearInterval(timer)
+            if (poller) clearInterval(poller)
+        }
+    }, [step, reservationId])
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins}:${secs.toString().padStart(2, "0")}`
     }
 
     return (
@@ -372,23 +445,99 @@ export function CheckoutPageContent() {
                         <CardContent className="pt-12 pb-12 text-center space-y-6">
                             <div className="relative inline-block">
                                 <div className="absolute inset-0 bg-moss-100 rounded-full blur-2xl opacity-50 animate-pulse" />
-                                {step === "processing" ? (
-                                    <Loader2 className="h-16 w-16 animate-spin text-moss-600 relative" />
-                                ) : (
-                                    <CheckCircle2 className="h-16 w-16 text-moss-600 relative" />
-                                )}
+                                <Loader2 className="h-16 w-16 animate-spin text-moss-600 relative" />
                             </div>
 
                             <div className="space-y-2">
                                 <h2 className="text-2xl font-bold text-moss-900 font-heading">
-                                    {step === "processing" ? "Redirecionando..." : "Reserva Criada!"}
+                                    Processando...
                                 </h2>
                                 <p className="text-moss-700 max-w-sm mx-auto">
-                                    {step === "processing"
-                                        ? "Aguarde enquanto levamos você para o ambiente seguro de pagamento da InfinitePay."
-                                        : "Sua reserva foi registrada. Você será redirecionado para o pagamento em instantes."}
+                                    Aguarde enquanto preparamos seu ambiente de pagamento.
                                 </p>
                             </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {step === "waiting" && (
+                    <Card className="shadow-lg animate-fadeInUp border-moss-200">
+                        <CardContent className="pt-12 pb-12 text-center space-y-8">
+                            <div className="space-y-4">
+                                <div className="inline-flex items-center justify-center p-4 bg-moss-50 rounded-full mb-2">
+                                    <Loader2 className="h-12 w-12 animate-spin text-moss-600" />
+                                </div>
+                                <h2 className="text-3xl font-bold text-moss-900 font-heading">
+                                    Aguardando Pagamento
+                                </h2>
+                                <p className="text-moss-600 max-w-md mx-auto">
+                                    Sua reserva está garantida por <span className="font-bold text-moss-900">{formatTime(timeLeft)}</span> minutos.
+                                    Após esse tempo, as datas serão liberadas.
+                                </p>
+                            </div>
+
+                            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 text-amber-900 text-sm">
+                                <p className="font-semibold mb-2">Instruções:</p>
+                                <ul className="text-left space-y-2 list-disc list-inside opacity-80">
+                                    <li>Abra o link de pagamento abaixo</li>
+                                    <li>Conclua o pagamento via PIX ou Cartão</li>
+                                    <li>Mantenha esta página aberta para confirmação automática</li>
+                                </ul>
+                            </div>
+
+                            <div className="flex flex-col gap-4">
+                                <Button
+                                    className="w-full h-16 bg-moss-900 hover:bg-moss-800 text-white text-lg font-bold rounded-2xl shadow-xl hover-lift"
+                                    onClick={() => window.open(paymentUrl!, "_blank")}
+                                >
+                                    Abrir Pagamento da InfinitePay
+                                </Button>
+                                <p className="text-xs text-moss-400">
+                                    Não fechou a janela de pagamento? <button onClick={() => window.open(paymentUrl!, "_blank")} className="underline hover:text-moss-600">Clique aqui</button>
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {step === "success" && (
+                    <Card className="shadow-lg animate-fadeInUp border-green-200 bg-green-50/20">
+                        <CardContent className="pt-16 pb-16 text-center space-y-6">
+                            <div className="inline-flex items-center justify-center p-4 bg-green-100 rounded-full">
+                                <CheckCircle2 className="h-16 w-16 text-green-600" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-bold text-green-900 font-heading">
+                                    Pagamento Confirmado!
+                                </h2>
+                                <p className="text-green-700 max-w-sm mx-auto">
+                                    Sua reserva foi realizada com sucesso. Em instantes você receberá a confirmação por e-mail e WhatsApp.
+                                </p>
+                            </div>
+                            <Button className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 rounded-xl" asChild>
+                                <a href="/">Voltar para o Início</a>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {step === "expired" && (
+                    <Card className="shadow-lg animate-fadeInUp border-red-200 bg-red-50/20">
+                        <CardContent className="pt-16 pb-16 text-center space-y-6">
+                            <div className="inline-flex items-center justify-center p-4 bg-red-100 rounded-full">
+                                <X className="h-16 w-16 text-red-600" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-bold text-red-900 font-heading">
+                                    Reserva Expirada
+                                </h2>
+                                <p className="text-red-700 max-w-sm mx-auto">
+                                    O tempo limite de 10 minutos para o pagamento foi atingido e as datas foram liberadas.
+                                </p>
+                            </div>
+                            <Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50 px-8 h-12 rounded-xl" onClick={() => window.location.reload()}>
+                                Tentar Novamente
+                            </Button>
                         </CardContent>
                     </Card>
                 )}

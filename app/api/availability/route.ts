@@ -62,11 +62,12 @@ export async function GET(request: Request) {
     try {
       const supabase = createServerClient()
       if (supabase) {
+        const now = new Date().toISOString()
         const { data: reservations, error: dbError } = await supabase
           .from("reservations")
-          .select("check_in, check_out")
-          .in("status", ["confirmed", "pending"])
+          .select("check_in, check_out, status, expires_at")
           .eq("chalet_id", chaletId)
+          .or(`status.eq.confirmed,and(status.eq.pending,expires_at.gt.${now})`)
 
         if (!dbError && reservations) {
           reservations.forEach((reservation) => {

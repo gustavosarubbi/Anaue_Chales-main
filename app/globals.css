@@ -648,6 +648,11 @@ body.checkout-page .skip-to-main,
 }
 
 /* Hiding reCAPTCHA v3 badge - Disclaimer added to the form per Google Terms */
-.grecaptcha-badge { 
-  visibility: hidden !important; 
+.grecaptcha-badge, 
+.g-recaptcha-bubble-wrapper,
+[id^="rc-imageselect"] { 
+  display: none !important; 
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

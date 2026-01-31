@@ -1,0 +1,46 @@
+import { NextResponse } from 'next/server'
+import { createServerClient } from '@/lib/supabase'
+
+export async function GET(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
+    try {
+        const id = params.id
+        const supabase = createServerClient()
+
+        if (!supabase) {
+            return NextResponse.json({ success: false, error: 'DB error' }, { status: 500 })
+        }
+
+        const { data: reservation, error } = await supabase
+            .from('reservations')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+        if (error || !reservation) {
+            return NextResponse.json({ success: false, error: 'Reserva não encontrada' }, { status: 404 })
+        }
+
+        const now = new Date()
+        const expiresAt = new Date(reservation.expires_at)
+        const isExpired = reservation.status === 'pending' && now > expiresAt
+
+        // Se expirou e ainda está pendente, poderíamos atualizar aqui ou apenas reportar
+        // Para garantir consistência, vamos reportar como expirado
+        const currentStatus = isExpired ? 'expired' : reservation.status
+
+        return NextResponse.json({
+            success: true,
+            status: currentStatus,
+            paymentStatus: reservation.payment_status,
+            expiresAt: reservation.expires_at,
+            serverTime: now.toISOString(),
+            isExpired
+        })
+    } catch (error) {
+        console.error('[RESERVATIONS_STATUS] Erro:', error)
+        return NextResponse.json({ success: false, error: 'Erro interno' }, { status: 500 })
+    }
+}

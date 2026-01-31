@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { User, Mail, Phone, Users, Baby, Loader2 } from "lucide-react"
 import { ENV } from "@/lib/utils/env"
+import { toast } from "sonner"
 
 const reservationSchema = z.object({
   guestName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -50,17 +51,29 @@ export function ReservationForm({ onSubmit, isLoading = false, initialData }: Re
   })
 
   const onFormSubmit = async (data: ReservationFormData) => {
+    setIsCaptchaLoading(true)
+
     if (!executeRecaptcha) {
-      console.error("ReCAPTCHA ainda não carregado")
+      console.warn("ReCAPTCHA ainda não carregado, prosseguindo para validação no servidor...")
+      onSubmit({ ...data, captchaToken: "MISSING_CLIENT_SIDE" })
+      setIsCaptchaLoading(false)
       return
     }
 
-    setIsCaptchaLoading(true)
     try {
-      const token = await executeRecaptcha("reservation_submit")
+      // Timeout de 5 segundos para o reCAPTCHA
+      const token = await Promise.race([
+        executeRecaptcha("reservation_submit"),
+        new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), 5000)
+        )
+      ])
+
       onSubmit({ ...data, captchaToken: token })
-    } catch (error) {
-      console.error("Erro ao gerar token ReCAPTCHA:", error)
+    } catch (error: any) {
+      console.warn("ReCAPTCHA bypass ativo:", error?.message)
+      // Prossegue silenciosamente para o backend decidir
+      onSubmit({ ...data, captchaToken: `BYPASS_${error?.message || "unknown"}` })
     } finally {
       setIsCaptchaLoading(false)
     }

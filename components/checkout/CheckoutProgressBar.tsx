@@ -2,12 +2,12 @@ import { CheckCircle2, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface CheckoutProgressBarProps {
-    step: "chalet" | "dates" | "form" | "payment" | "processing"
+    step: "chalet" | "dates" | "form" | "payment" | "waiting" | "processing" | "success" | "expired"
 }
 
 export function CheckoutProgressBar({ step }: CheckoutProgressBarProps) {
     const getStepStatus = (currentStep: string) => {
-        const order = ["chalet", "dates", "form", "payment", "processing"]
+        const order = ["chalet", "dates", "form", "payment", "waiting", "processing", "success", "expired"]
         const stepIndex = order.indexOf(step)
         const currentOrder = order.indexOf(currentStep as any)
 
@@ -60,7 +60,9 @@ export function CheckoutProgressBar({ step }: CheckoutProgressBarProps) {
                     {step === "chalet" && "Selecione seu Chalé"}
                     {step === "dates" && "Escolha as Datas"}
                     {step === "form" && "Seus Dados"}
-                    {(step === "payment" || step === "processing") && "Finalizando Reserva"}
+                    {(step === "payment" || step === "processing" || step === "waiting") && "Finalizando Reserva"}
+                    {step === "success" && "Reserva Confirmada"}
+                    {step === "expired" && "Reserva Expirada"}
                 </h3>
             </div>
         </div>

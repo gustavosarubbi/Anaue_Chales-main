@@ -33,8 +33,8 @@ export async function createInfinitePayPayment(data: InfinitePayPaymentData) {
     const redirectUrl = encodeURIComponent(`${ENV.BASE_URL}/checkout/success`)
     const orderNsu = encodeURIComponent(data.orderId)
 
-    // URL base do checkout público
-    const paymentUrl = `https://checkout.infinitepay.io/${tag}?items=${encodedItems}&order_nsu=${orderNsu}&redirect_url=${redirectUrl}`
+    // URL base do checkout público - Adicionando external_id para garantir compatibilidade com o webhook
+    const paymentUrl = `https://checkout.infinitepay.io/${tag}?items=${encodedItems}&order_nsu=${orderNsu}&external_id=${orderNsu}&redirect_url=${redirectUrl}`
 
     console.log('[INFINITEPAY] Link de pagamento público gerado:', paymentUrl)
 
