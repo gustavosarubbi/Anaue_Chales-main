@@ -76,7 +76,7 @@ export async function checkReservationAvailability(
             const { data: reservations, error: dbError } = await supabase
                 .from('reservations')
                 .select('check_in, check_out')
-                .eq('status', 'confirmed')
+                .in('status', ['confirmed', 'pending'])
                 .eq('chalet_id', chaletId)
                 .lt('check_in', requestedCheckOut)
                 .gt('check_out', requestedCheckIn)

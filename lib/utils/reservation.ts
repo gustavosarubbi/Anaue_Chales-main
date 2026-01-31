@@ -116,15 +116,26 @@ export function calculatePrice(
 
   let basePrice = 0
   const nightsBreakdown = dates.map((dateStr) => {
-    const date = new Date(dateStr)
-    const isWeekendDay = isWeekendOrHoliday(date)
-    const nightPrice = isWeekendDay ? pricing.weekend : pricing.weekday
+    const date = new Date(dateStr + 'T00:00:00')
+    let nightPrice = 0
+
+    // VERIFICAÇÃO DE PACOTES ESPECIAIS (ex: Carnaval)
+    const carnival = SPECIAL_PACKAGES.carnaval
+    if (dateStr >= carnival.startDate && dateStr <= carnival.endDate) {
+      nightPrice = carnival.price
+    } else if (dateStr === carnival.lateDate) {
+      nightPrice = carnival.latePrice
+    } else {
+      // Preço normal (Semana vs Fim de Semana)
+      const isWeekendDay = isWeekendOrHoliday(date)
+      nightPrice = isWeekendDay ? pricing.weekend : pricing.weekday
+    }
 
     basePrice += nightPrice
 
     return {
       date: dateStr,
-      isWeekend: isWeekendDay,
+      isWeekend: isWeekend(date), // Usamos isWeekend puro para o breakdown visual
       price: nightPrice,
     }
   })

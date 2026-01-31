@@ -6,7 +6,6 @@ import { ptBR } from "date-fns/locale/pt-BR"
 import { cn } from "@/lib/utils"
 import { useAvailability } from "@/hooks/useAvailability"
 import { CalendarMonth } from "./CalendarMonth"
-import { CalendarHeader } from "./CalendarHeader"
 import { CalendarLegend } from "./CalendarLegend"
 import { AvailabilityCalendarProps } from "./types"
 import { Loader2 } from "lucide-react"
@@ -23,6 +22,7 @@ export function AvailabilityCalendar({
 }: AvailabilityCalendarProps) {
   const { availability, isLoading } = useAvailability(chaletId)
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(minDate))
+  const [hoverDate, setHoverDate] = useState<Date | null>(null)
 
   // Calcular maxDate padrão (2 anos a partir de hoje)
   const defaultMaxDate = useMemo(() => {
@@ -166,93 +166,78 @@ export function AvailabilityCalendar({
 
 
   return (
-    <div className={cn(
-      "w-full space-y-2 sm:space-3 px-2 sm:px-0",
-      "animate-fadeInUp"
-    )}>
+    <div
+      className={cn(
+        "relative w-full space-y-6 px-1 sm:px-0",
+        "animate-fadeInUp"
+      )}
+      onMouseLeave={() => setHoverDate(null)}
+    >
       {/* Loading overlay */}
       {isLoading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-6 w-6 animate-spin text-moss-600" />
-            <p className="text-sm text-moss-600">Carregando disponibilidade...</p>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-moss-600 opacity-50" />
+            <p className="text-xs font-medium text-moss-600 uppercase tracking-widest">Sincronizando Disponibilidade...</p>
           </div>
         </div>
       )}
 
       {/* Navegação de meses */}
-      <div className="flex items-center justify-center">
-        <CalendarHeader
-          month={currentMonth}
-          onPreviousMonth={handlePreviousMonth}
-          onNextMonth={handleNextMonth}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-        />
-      </div>
+
 
       {/* Grid de meses - Responsivo */}
       {!isLoading && (
         <div className={cn(
-          "grid gap-2 sm:gap-4",
-          "grid-cols-1", // Mobile: 1 coluna
-          numberOfMonths >= 2 && "sm:grid-cols-2", // Tablet: 2 colunas
-          numberOfMonths >= 3 && "lg:grid-cols-3" // Desktop: 3 colunas se necessário
+          "grid gap-4 lg:gap-12 justify-center",
+          "grid-cols-1",
+          numberOfMonths >= 2 && "md:grid-cols-2",
+          numberOfMonths >= 3 && "lg:grid-cols-3"
         )}>
-          {monthsToDisplay.map((month) => (
+          {monthsToDisplay.map((month, index) => (
             <div key={format(month, "yyyy-MM")} className="w-full">
               <CalendarMonth
                 month={month}
                 availability={availability}
                 checkIn={checkIn}
                 checkOut={checkOut}
+                hoverDate={hoverDate}
                 onDateClick={handleDateClick}
+                onHoverDate={setHoverDate}
                 minDate={minDate}
                 maxDate={defaultMaxDate}
                 isLoading={false}
+                // Navigation Logic
+                onPreviousMonth={index === 0 ? handlePreviousMonth : undefined}
+                onNextMonth={index === monthsToDisplay.length - 1 ? handleNextMonth : undefined}
+                canGoPrevious={index === 0 ? canGoPrevious : undefined}
+                canGoNext={index === monthsToDisplay.length - 1 ? canGoNext : undefined}
               />
             </div>
           ))}
         </div>
       )}
 
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className={cn(
-          "grid gap-4 sm:gap-6",
-          "grid-cols-1",
-          numberOfMonths >= 2 && "sm:grid-cols-2",
-        )}>
-          {Array.from({ length: numberOfMonths }).map((_, i) => (
-            <div key={i} className="w-full">
-              <CalendarMonth
-                month={addMonths(new Date(), i)}
-                availability={{}}
-                onDateClick={() => { }}
-                isLoading={true}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Legenda */}
-      {!isLoading && <CalendarLegend />}
-
-      {/* Informações adicionais */}
+      {/* Legenda e Info */}
       {!isLoading && (
-        <div className={cn(
-          "text-center text-xs text-moss-600",
-          "pt-2 border-t border-moss-100",
-          "px-1"
-        )}>
-          <p className="font-medium">
-            {checkIn && checkOut
-              ? `Período selecionado: ${format(checkIn, "dd/MM/yyyy", { locale: ptBR })} até ${format(checkOut, "dd/MM/yyyy", { locale: ptBR })}`
-              : checkIn
-                ? `Check-in selecionado: ${format(checkIn, "dd/MM/yyyy", { locale: ptBR })}. Selecione a data de check-out.`
-                : "👆 Clique em uma data para selecionar o check-in"}
-          </p>
+        <div className="space-y-6 pt-4">
+          <CalendarLegend />
+
+          <div className={cn(
+            "text-center py-6 bg-moss-50/50 rounded-2xl border border-moss-100/50",
+            "mx-auto max-w-md sm:max-w-none px-4"
+          )}>
+            <p className="text-[10px] sm:text-xs font-bold text-moss-900 uppercase tracking-widest mb-1.5">
+              Status da Seleção
+            </p>
+            <p className="text-xs sm:text-sm text-moss-700 font-light">
+              {checkIn && checkOut
+                ? <span className="text-moss-950 font-medium">{format(checkIn, "dd/MM", { locale: ptBR })} — {format(checkOut, "dd/MM", { locale: ptBR })}</span>
+                : checkIn
+                  ? <span>Check-in: <strong className="text-moss-900">{format(checkIn, "dd/MM", { locale: ptBR })}</strong>. Selecione o checkout.</span>
+                  : "👆 Toque em uma data para iniciar sua reserva"}
+            </p>
+          </div>
         </div>
       )}
     </div>

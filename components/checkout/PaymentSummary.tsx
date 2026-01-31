@@ -30,63 +30,68 @@ export function PaymentSummary({
   const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Receipt className="h-5 w-5" />
+    <Card className="border-moss-100 rounded-3xl overflow-hidden shadow-sm">
+      <CardHeader className="bg-moss-50/50 pb-4">
+        <CardTitle className="flex items-center gap-2 text-moss-900 font-heading text-lg">
+          <Receipt className="h-5 w-5 text-moss-600" />
           Resumo da Reserva
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <Calendar className="h-5 w-5 text-moss-600 mt-0.5" />
+      <CardContent className="pt-6 space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="p-2.5 bg-moss-50 rounded-xl">
+              <Calendar className="h-5 w-5 text-moss-600" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-moss-900">Datas</p>
-              <p className="text-sm text-moss-700">
-                {format(checkIn, "dd/MM/yyyy")} até {format(checkOut, "dd/MM/yyyy")}
+              <p className="text-[10px] font-bold text-moss-400 uppercase tracking-widest">Datas selecionadas</p>
+              <p className="text-sm font-bold text-moss-900">
+                {format(checkIn, "dd/MM")} — {format(checkOut, "dd/MM")}
               </p>
-              <p className="text-xs text-moss-600">{nights} {nights === 1 ? "noite" : "noites"}</p>
+              <p className="text-xs text-moss-600 font-light">{nights} {nights === 1 ? "noite" : "noites"}</p>
             </div>
           </div>
 
-          <Separator />
+          <Separator className="bg-moss-100 shadow-none" />
 
-          <div className="flex items-start gap-3">
-            <Users className="h-5 w-5 text-moss-600 mt-0.5" />
+          <div className="flex items-start gap-4">
+            <div className="p-2.5 bg-moss-50 rounded-xl">
+              <Users className="h-5 w-5 text-moss-600" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-moss-900">Hóspedes</p>
-              <p className="text-sm text-moss-700">
+              <p className="text-[10px] font-bold text-moss-400 uppercase tracking-widest">Hóspedes</p>
+              <p className="text-sm font-bold text-moss-900">
                 {guestCount} {guestCount === 1 ? "adulto" : "adultos"}
-                {childrenCount > 0 && `, ${childrenCount} ${childrenCount === 1 ? "criança" : "crianças"}`}
+                {childrenCount > 0 && ` e ${childrenCount} ${childrenCount === 1 ? "criança" : "crianças"}`}
               </p>
             </div>
           </div>
 
-          <Separator />
+          <Separator className="bg-moss-100 shadow-none" />
 
-          <div>
-            <p className="text-sm font-medium text-moss-900 mb-2">Dados do Hóspede</p>
-            <div className="space-y-1 text-sm text-moss-700">
-              <p>
-                <strong>Nome:</strong> {guestName}
+          <div className="space-y-3">
+            <p className="text-[10px] font-bold text-moss-400 uppercase tracking-widest">Seus Dados</p>
+            <div className="space-y-1 text-sm text-moss-700 font-light">
+              <p className="flex justify-between items-center">
+                <span className="text-moss-400">Nome:</span>
+                <span className="font-semibold text-moss-900">{guestName}</span>
               </p>
-              <p>
-                <strong>Email:</strong> {guestEmail}
-              </p>
-              <p>
-                <strong>Telefone:</strong> {guestPhone}
+              <p className="flex justify-between items-center">
+                <span className="text-moss-400">Telefone:</span>
+                <span className="font-semibold text-moss-900">{guestPhone}</span>
               </p>
             </div>
           </div>
 
-          <Separator />
+          <Separator className="bg-moss-100 shadow-none" />
 
           <div className="flex items-center justify-between pt-2">
-            <span className="text-lg font-semibold text-moss-900">Total a Pagar</span>
-            <span className="text-2xl font-bold text-moss-900">
-              R$ {totalPrice.toFixed(2)}
-            </span>
+            <span className="text-lg font-bold text-moss-950 font-heading">Total a Pagar</span>
+            <div className="text-right">
+              <span className="text-2xl font-black text-moss-900 font-heading">
+                R$ {totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
           </div>
         </div>
       </CardContent>

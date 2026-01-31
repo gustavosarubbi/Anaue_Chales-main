@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { ReCaptchaProvider } from "@/components/providers/recaptcha-provider"
+
 export default function RootLayout({
   children,
 }: {
@@ -45,8 +47,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className="scroll-smooth">
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased overflow-x-hidden`}>
-        {children}
+      <body className={`${inter.variable} ${outfit.variable} font-sans`}>
+        <ReCaptchaProvider>
+          {children}
+        </ReCaptchaProvider>
         <Toaster />
       </body>
     </html>

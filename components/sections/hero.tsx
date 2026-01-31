@@ -64,8 +64,8 @@ export function Hero() {
       {/* Navigation Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled || isMenuOpen
-          ? "bg-moss-900 shadow-md border-moss-800 py-3"
-          : "bg-transparent border-white/10 py-5"
+          ? "bg-moss-900 shadow-md border-moss-800 py-2"
+          : "bg-transparent border-white/10 py-3"
           }`}
       >
         <div className="container mx-auto px-4">
@@ -221,11 +221,11 @@ export function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
+                className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start pt-8 pb-4"
               >
                 <Button
                   size="lg"
-                  className="bg-white text-moss-900 hover:bg-moss-50 px-8 h-14 rounded-full font-semibold text-lg hover-lift shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all duration-300"
+                  className="w-full sm:w-auto bg-white text-moss-900 hover:bg-moss-50 px-10 h-16 rounded-full font-semibold text-lg hover-lift shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all duration-300"
                   asChild
                 >
                   <Link href="/checkout">
@@ -235,7 +235,7 @@ export function Hero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white/30 text-white hover:bg-white/10 h-14 rounded-full px-8 text-lg font-medium backdrop-blur-sm transition-all duration-300"
+                  className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 h-16 rounded-full px-10 text-lg font-medium backdrop-blur-sm transition-all duration-300"
                   onClick={() => scrollToSection("#pricing")}
                 >
                   Ver Preços

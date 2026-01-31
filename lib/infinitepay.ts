@@ -1,53 +1,5 @@
 import { ENV } from './utils/env'
 
-const BASE_URL = 'https://api.cloud.infinitepay.io'
-
-interface InfinitePayToken {
-    access_token: string
-    expires_in: number
-    token_type: string
-}
-
-/**
- * Obtém um token de acesso OAuth2 da InfinitePay.
- */
-async function getAccessToken(): Promise<string | null> {
-    const clientId = ENV.INFINITEPAY_CLIENT_ID
-    const clientSecret = ENV.INFINITEPAY_CLIENT_SECRET
-
-    if (!clientId || !clientSecret) {
-        console.error('[INFINITEPAY] Client ID ou Secret não configurados.')
-        return null
-    }
-
-    try {
-        const response = await fetch(`${BASE_URL}/v2/oauth/token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                grant_type: 'client_credentials',
-                client_id: clientId,
-                client_secret: clientSecret,
-                scope: 'payments',
-            }),
-        })
-
-        if (!response.ok) {
-            const error = await response.text()
-            console.error('[INFINITEPAY] Falha na autenticação:', error)
-            return null
-        }
-
-        const data: InfinitePayToken = await response.json()
-        return data.access_token
-    } catch (error) {
-        console.error('[INFINITEPAY] Erro de rede ao buscar token:', error)
-        return null
-    }
-}
-
 export interface InfinitePayPaymentData {
     amount: number
     description: string
@@ -59,49 +11,36 @@ export interface InfinitePayPaymentData {
 }
 
 /**
- * Cria um link de pagamento (checkout) na InfinitePay.
+ * Gera um link de pagamento direto da InfinitePay (checkout.infinitepay.io).
+ * Este formato usa apenas a Tag (handle) e parâmetros na URL, sem necessidade de API Keys.
  */
 export async function createInfinitePayPayment(data: InfinitePayPaymentData) {
-    const token = await getAccessToken()
-    if (!token) throw new Error('Não foi possível autenticar na InfinitePay')
+    const tag = ENV.INFINITEPAY_TAG || 'mayana-tomaz'
 
-    try {
-        // Nota: O endpoint exato pode variar conforme a versão da API. 
-        // Usando /v2/payments conforme padrão Cloud v2.
-        const response = await fetch(`${BASE_URL}/v2/payments`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                amount: Math.round(data.amount * 100), // InfinitePay usa centavos
-                capture: true,
-                description: data.description,
-                external_id: data.orderId,
-                payment_method: 'all',
-                installments: 12, // Permitir até 12x
-                origin: 'mayana-tomaz',
-                redirect_url: `${ENV.BASE_URL}/checkout/success`,
-                webhook_url: `${ENV.BASE_URL}/api/payments/infinitepay-webhook`,
-            }),
-        })
+    // O Checkout da InfinitePay via URL (GET) espera o parâmetro 'items' como um JSON URL-encoded.
+    // O preço deve ser em CENTAVOS (inteiro).
+    const priceInCents = Math.round(data.amount * 100)
 
-        if (!response.ok) {
-            const errorMsg = await response.text()
-            throw new Error(`InfinitePay Error: ${errorMsg}`)
+    const items = [
+        {
+            name: data.description || "Reserva de Chalé",
+            price: priceInCents,
+            quantity: 1
         }
+    ]
 
-        const result = await response.json()
+    const encodedItems = encodeURIComponent(JSON.stringify(items))
+    const redirectUrl = encodeURIComponent(`${ENV.BASE_URL}/checkout/success`)
+    const orderNsu = encodeURIComponent(data.orderId)
 
-        return {
-            success: true,
-            paymentId: result.id,
-            // InfinitePay Cloud geralmente retorna uma URL de checkout ou link
-            url: result.url || result.checkout_url || result.payment_url,
-        }
-    } catch (error: any) {
-        console.error('[INFINITEPAY] Erro ao criar pagamento:', error)
-        throw error
+    // URL base do checkout público
+    const paymentUrl = `https://checkout.infinitepay.io/${tag}?items=${encodedItems}&order_nsu=${orderNsu}&redirect_url=${redirectUrl}`
+
+    console.log('[INFINITEPAY] Link de pagamento público gerado:', paymentUrl)
+
+    return {
+        success: true,
+        paymentId: `link_${data.orderId}`,
+        url: paymentUrl,
     }
 }

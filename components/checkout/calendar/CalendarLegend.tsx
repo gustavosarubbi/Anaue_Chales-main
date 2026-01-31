@@ -7,68 +7,49 @@ import { cn } from "@/lib/utils"
 export function CalendarLegend() {
   const legendItems = [
     {
-      label: "Check IN",
-      className: "bg-green-700 text-white relative",
-      badge: "IN",
-      icon: true,
+      label: "Disponível",
+      className: "bg-white border border-moss-100 text-moss-900",
     },
     {
-      label: "Check OUT",
-      className: "bg-green-700 text-white relative",
-      badge: "OUT",
-      icon: true,
+      label: "Selecionado",
+      className: "bg-moss-700 text-white rounded-full scale-90",
     },
     {
       label: "Ocupado",
-      className: "bg-gray-100 text-gray-400 relative overflow-hidden",
+      className: "text-moss-200 relative overflow-hidden",
       pattern: true,
     },
   ]
 
   return (
     <div className={cn(
-      "flex flex-wrap items-center justify-center gap-3 sm:gap-6",
-      "mt-3 sm:mt-4 pt-3 sm:pt-4",
-      "border-t border-moss-200",
-      "text-xs"
+      "flex flex-wrap items-center justify-center gap-6 sm:gap-10",
+      "mt-0",
+      "text-[10px] font-bold uppercase tracking-widest text-moss-400"
     )}>
       {legendItems.map((item, index) => (
         <div
           key={index}
-          className={cn(
-            "flex items-center gap-2",
-            "transition-all duration-200"
-          )}
+          className="flex items-center gap-2.5"
         >
           <div
             className={cn(
-              "w-7 h-7 sm:w-8 sm:h-8",
-              "rounded",
+              "w-5 h-5",
+              "rounded-full",
               "flex items-center justify-center",
-              "text-sm font-medium",
+              "text-[8px] font-bold",
               "relative",
               item.className
             )}
           >
             {item.pattern && (
-              <div
-                className="absolute inset-0 opacity-30"
-                style={{
-                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px)'
-                }}
-              />
-            )}
-            {item.badge && (
-              <div className="absolute top-0 right-0 z-30 text-white text-[7px] font-bold leading-none px-0.5">
-                {item.badge}
+              <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                <div className="w-full h-[1px] bg-moss-200 rotate-[35deg]" />
               </div>
             )}
-            {item.icon && (
-              <ArrowRightCircle className="absolute top-0 left-0 w-2.5 h-2.5 text-white/90 z-30" />
-            )}
-            <span className="relative z-10 text-xs font-medium">15</span>
+            <span className="relative z-10">{!item.pattern && "15"}</span>
           </div>
-          <span className="text-gray-700 font-medium">
+          <span>
             {item.label}
           </span>
         </div>

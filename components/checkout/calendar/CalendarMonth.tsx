@@ -1,11 +1,14 @@
 "use client"
 
 import React, { useMemo } from "react"
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, isToday } from "date-fns"
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, isToday, format } from "date-fns"
+import { ptBR } from "date-fns/locale/pt-BR"
 import { cn } from "@/lib/utils"
 import { CalendarDay } from "./CalendarDay"
 import { CalendarMonthProps, CalendarDayData, DateStatus } from "./types"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -14,10 +17,16 @@ export function CalendarMonth({
   availability,
   checkIn,
   checkOut,
+  hoverDate,
   onDateClick,
+  onHoverDate,
   minDate,
   maxDate,
   isLoading = false,
+  onPreviousMonth,
+  onNextMonth,
+  canGoPrevious,
+  canGoNext
 }: CalendarMonthProps) {
   const monthStart = startOfMonth(month)
   const monthEnd = endOfMonth(month)
@@ -63,24 +72,19 @@ export function CalendarMonth({
     if (checkIn && isSameDay(date, checkIn)) return 'check-in'
     if (checkOut && isSameDay(date, checkOut)) return 'check-out'
 
-    // Se houver check-in selecionado, verificar se este dia pode ser check-out
-    // (mesmo que ocupado, se houver no máximo 1 dia ocupado consecutivo antes dele)
     if (checkIn && !checkOut && date > checkIn) {
       const dateStr = formatDateKey(date)
       const normalizedDate = new Date(date)
       normalizedDate.setHours(0, 0, 0, 0)
 
-      // Verificar se é o dia seguinte ao check-in
       const nextDay = new Date(checkIn)
       nextDay.setDate(nextDay.getDate() + 1)
       const isNextDay = isSameDay(date, nextDay)
 
-      // Se for o dia seguinte e estiver ocupado, mostrar como disponível
       if (isNextDay && availability[dateStr]) {
         return 'available'
       }
 
-      // Para outros dias, verificar se há no máximo 1 dia ocupado consecutivo antes
       let current = new Date(checkIn)
       current.setDate(current.getDate() + 1)
 
@@ -100,7 +104,6 @@ export function CalendarMonth({
         current.setDate(current.getDate() + 1)
       }
 
-      // Se está ocupado mas há no máximo 1 dia ocupado consecutivo antes, mostrar como disponível
       if (availability[dateStr] && (!hasOccupiedDays || maxConsecutiveOccupied <= 1)) {
         return 'available'
       }
@@ -139,14 +142,56 @@ export function CalendarMonth({
 
   return (
     <div className={cn(
-      "w-full max-w-xl mx-auto",
-      "p-3 sm:p-6",
-      "bg-white rounded-lg",
-      "border border-moss-200",
-      "shadow-lg"
+      "w-full max-w-md mx-auto",
+      "p-4 sm:p-8",
+      "bg-white rounded-3xl sm:rounded-[2.5rem]",
+      "border border-moss-100/50",
+      "shadow-[0_20px_50px_rgba(0,0,0,0.04)]"
     )}>
-      {/* O container da imagem é mais simples, o mês e as setas são geralmente um componente pai.
-          Mantivemos aqui apenas o grid de dias conforme solicitado pela refatoração. */}
+      {/* Header com Navegação e Título */}
+      <div className="relative mb-6 flex items-center justify-center">
+        {onPreviousMonth && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onPreviousMonth}
+            disabled={!canGoPrevious}
+            className={cn(
+              "absolute left-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full",
+              "bg-white border border-moss-100 shadow-sm",
+              "hover:bg-moss-50 hover:text-moss-600",
+              "disabled:opacity-0 transition-all duration-300"
+            )}
+            aria-label="Mês anterior"
+          >
+            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        )}
+
+        <h3 className="text-lg font-bold text-moss-900 capitalize font-heading z-10">
+          {format(month, "MMMM yyyy", { locale: ptBR })}
+        </h3>
+
+        {onNextMonth && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onNextMonth}
+            disabled={!canGoNext}
+            className={cn(
+              "absolute right-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full",
+              "bg-white border border-moss-100 shadow-sm",
+              "hover:bg-moss-50 hover:text-moss-600",
+              "disabled:opacity-0 transition-all duration-300"
+            )}
+            aria-label="Próximo mês"
+          >
+            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        )}
+      </div>
 
       {/* Dias da semana */}
       <div className="grid grid-cols-7 mb-4">
@@ -154,10 +199,10 @@ export function CalendarMonth({
           <div
             key={index}
             className={cn(
-              "text-center text-moss-600 font-medium",
-              "text-xs",
+              "text-center text-moss-400 font-bold",
+              "text-[10px] sm:text-[11px] uppercase tracking-tighter",
               "flex items-center justify-center",
-              "py-2"
+              "py-3"
             )}
           >
             {day}
@@ -166,7 +211,7 @@ export function CalendarMonth({
       </div>
 
       {/* Grid de dias */}
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="grid grid-cols-7 gap-y-1">
         {days.map((date, index) => {
           const isCurrentMonth = isSameMonth(date, month)
           const status = getDayStatus(date)
@@ -175,7 +220,7 @@ export function CalendarMonth({
             return (
               <div
                 key={index}
-                className="w-full aspect-square opacity-0 pointer-events-none"
+                className="w-full aspect-square flex items-center justify-center opacity-0 pointer-events-none"
                 aria-hidden="true"
               />
             )
@@ -185,14 +230,8 @@ export function CalendarMonth({
           normalizedDate.setHours(0, 0, 0, 0)
           const isPastDate = normalizedDate < today
 
-          // Verificar se este dia pode ser clicado mesmo ocupado
-          // (se for o dia seguinte ao check-in OU se houver no máximo 1 dia ocupado consecutivo antes)
           let canClickWhenOccupied = false
           if (checkIn && !checkOut && date > checkIn) {
-            const normalizedDate = new Date(date)
-            normalizedDate.setHours(0, 0, 0, 0)
-
-            // Verificar se é o dia seguinte ao check-in
             const nextDay = new Date(checkIn)
             nextDay.setDate(nextDay.getDate() + 1)
             const isNextDay = isSameDay(date, nextDay)
@@ -200,7 +239,6 @@ export function CalendarMonth({
             if (isNextDay) {
               canClickWhenOccupied = true
             } else {
-              // Verificar se há no máximo 1 dia ocupado consecutivo antes deste dia
               let current = new Date(checkIn)
               current.setDate(current.getDate() + 1)
 
@@ -220,12 +258,17 @@ export function CalendarMonth({
                 current.setDate(current.getDate() + 1)
               }
 
-              // Permitir clique se houver no máximo 1 dia ocupado consecutivo
               if (!hasOccupiedDays || maxConsecutiveOccupied <= 1) {
                 canClickWhenOccupied = true
               }
             }
           }
+
+          const isHoverRange = Boolean(
+            checkIn && !checkOut && hoverDate &&
+            date > (checkIn < hoverDate ? checkIn : hoverDate) &&
+            date < (checkIn < hoverDate ? hoverDate : checkIn)
+          )
 
           const dayData: CalendarDayData = {
             date,
@@ -236,7 +279,6 @@ export function CalendarMonth({
           }
 
           return (
-            // A célula é um quadrado w-full, e o CalendarDay (botão) deve ter o styling do quadrado
             <div
               key={index}
               className="w-full aspect-square flex items-center justify-center relative"
@@ -244,9 +286,14 @@ export function CalendarMonth({
               <CalendarDay
                 day={dayData}
                 onClick={onDateClick}
+                onHover={onHoverDate}
                 isSelected={isSelected(date)}
                 isInRange={isInRange(date)}
+                isHoverRange={isHoverRange}
+                hoverDate={hoverDate}
                 canClickWhenOccupied={canClickWhenOccupied}
+                checkIn={checkIn}
+                checkOut={checkOut}
               />
             </div>
           )

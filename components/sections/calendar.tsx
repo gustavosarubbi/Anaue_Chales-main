@@ -10,7 +10,6 @@ import {
   Calendar as CalendarIcon,
   RefreshCw,
   X,
-  ShoppingCart,
   MessageCircle,
   Star,
   AlertCircle
@@ -34,19 +33,25 @@ interface CalendarDay {
 const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 const WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
-function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
+function CalendarWidget({
+  onUpdate,
+  chaletId = 'chale-anaue'
+}: {
+  onUpdate?: (date: Date) => void,
+  chaletId?: string
+}) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [bookedDatesList, setBookedDatesList] = useState<Set<string>>(new Set())
   const [loadingAvailability, setLoadingAvailability] = useState(false)
 
   useEffect(() => {
     fetchAvailability()
-  }, [currentDate])
+  }, [currentDate, chaletId])
 
   const fetchAvailability = async () => {
     setLoadingAvailability(true)
     try {
-      const response = await fetch('/api/availability', {
+      const response = await fetch(`/api/availability?chaletId=${chaletId}`, {
         cache: 'no-store'
       })
       if (response.ok) {
@@ -262,18 +267,13 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
   )
 }
 
-function Sidebar() {
+function Sidebar({ chaletId }: { chaletId: string }) {
   const whatsappNumber = "559294197052"
-  const whatsappMessage = "Olá! Gostaria de fazer uma reserva no Anauê Jungle Chalés."
-
-  const openWhatsApp = () => {
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
-    window.open(url, "_blank")
-  }
+  const chaletName = chaletId === 'chale-2' ? 'Camping Luxo' : 'Chalé Master'
+  const whatsappMessage = `Olá! Tenho uma dúvida sobre a disponibilidade do ${chaletName}.`
 
   return (
     <Card className="bg-white/90 backdrop-blur-sm border-moss-100 shadow-xl overflow-hidden sticky top-24">
-      {/* Legenda Header */}
       <CardHeader className="bg-moss-50/50 border-b border-moss-100 pb-4">
         <CardTitle className="text-base font-heading font-bold text-moss-900 flex items-center gap-2">
           <CalendarIcon className="h-4 w-4 text-moss-600" />
@@ -282,7 +282,6 @@ function Sidebar() {
       </CardHeader>
 
       <CardContent className="space-y-6 pt-6">
-        {/* Legenda Items */}
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2 p-2 rounded-lg bg-moss-50/50">
             <div className="w-3 h-3 rounded-full bg-white border border-moss-200"></div>
@@ -300,26 +299,24 @@ function Sidebar() {
           </div>
         </div>
 
-        {/* Período Especial Alert */}
         <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3">
           <div className="mt-0.5">
             <AlertCircle className="h-5 w-5 text-orange-600" />
           </div>
           <div>
-            <p className="text-sm font-bold text-orange-900 mb-1">Período Especial</p>
+            <p className="text-sm font-bold text-orange-900 mb-1">Carnaval 2026</p>
             <p className="text-xs text-orange-800/90 leading-snug">
-              24 e 31 de Dezembro: Valores sob consulta.
+              Tarifas especiais aplicadas automaticamente no checkout.
             </p>
           </div>
         </div>
 
         <div className="h-px bg-moss-100 w-full" />
 
-        {/* CTA Section */}
         <div className="space-y-4">
           <div className="text-center">
             <h4 className="font-heading font-bold text-moss-900 mb-1">Pronto para reservar?</h4>
-            <p className="text-xs text-moss-600 mb-4">Garanta sua estadia no paraíso.</p>
+            <p className="text-xs text-moss-600 mb-4">Reserve o {chaletName} agora.</p>
           </div>
 
           <div className="space-y-3">
@@ -327,7 +324,7 @@ function Sidebar() {
               className="w-full bg-moss-900 hover:bg-moss-800 text-white h-11 shadow-lg transition-all hover:scale-[1.02]"
               asChild
             >
-              <Link href="/checkout" className="flex items-center justify-center gap-2">
+              <Link href={`/checkout?chalet=${chaletId}`} className="flex items-center justify-center gap-2">
                 <CalendarIcon className="h-4 w-4" />
                 Reservar Online
               </Link>
@@ -337,7 +334,7 @@ function Sidebar() {
               variant="outline"
               className="w-full bg-transparent border-green-600 text-green-700 hover:bg-green-50 h-11"
               onClick={() => {
-                const url = `https://wa.me/559294197052?text=${encodeURIComponent("Olá! Tenho uma dúvida sobre a disponibilidade dos chalés.")}`
+                const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
                 window.open(url, "_blank")
               }}
             >
@@ -357,6 +354,7 @@ function Sidebar() {
 }
 
 export function Calendar() {
+  const [selectedChalet, setSelectedChalet] = useState('chale-anaue')
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const formatLastUpdated = (date: Date | null): string => {
@@ -375,7 +373,6 @@ export function Calendar() {
 
   return (
     <section id="calendario" className="py-24 bg-stone-50 relative overflow-hidden">
-      {/* Simple gradient background instead of noise texture */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-moss-50/50 pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -391,26 +388,50 @@ export function Calendar() {
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6 tracking-tight">
             Planeje Sua Estadia
           </h2>
-          <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto leading-relaxed">
-            Verifique as datas disponíveis em tempo real e garanta sua reserva de forma simples e segura.
+          <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto leading-relaxed mb-10">
+            Verifique as das disponíveis em tempo real e garanta sua reserva de forma simples e segura.
           </p>
+
+          <div className="flex justify-center mb-4">
+            <div className="inline-flex p-1 bg-moss-100/50 rounded-2xl border border-moss-100 shadow-inner">
+              <button
+                onClick={() => setSelectedChalet('chale-anaue')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${selectedChalet === 'chale-anaue'
+                    ? 'bg-white text-moss-900 shadow-md'
+                    : 'text-moss-600 hover:text-moss-800'
+                  }`}
+              >
+                Chalé Master
+              </button>
+              <button
+                onClick={() => setSelectedChalet('chale-2')}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${selectedChalet === 'chale-2'
+                    ? 'bg-white text-moss-900 shadow-md'
+                    : 'text-moss-600 hover:text-moss-800'
+                  }`}
+              >
+                Camping Luxo
+              </button>
+            </div>
+          </div>
+
           {lastUpdated && (
-            <div className="mt-6 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-moss-100 shadow-sm text-xs font-medium text-moss-500">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-moss-100 shadow-sm text-xs font-medium text-moss-500">
               <RefreshCw className="h-3 w-3" />
-              <span>Atualizado em: {formatLastUpdated(lastUpdated)}</span>
+              <span>Atualizado para {selectedChalet === 'chale-2' ? 'Camping Luxo' : 'Chalé Master'} às {formatLastUpdated(lastUpdated).split('às')[1]}</span>
             </div>
           )}
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            key={selectedChalet}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
             className="lg:col-span-2"
           >
-            <CalendarWidget onUpdate={handleUpdate} />
+            <CalendarWidget onUpdate={handleUpdate} chaletId={selectedChalet} />
           </motion.div>
 
           <motion.div
@@ -420,7 +441,7 @@ export function Calendar() {
             transition={{ delay: 0.3 }}
             className="lg:col-span-1"
           >
-            <Sidebar />
+            <Sidebar chaletId={selectedChalet} />
           </motion.div>
         </div>
       </div>

@@ -4,7 +4,6 @@ import { Accommodations } from "@/components/sections/accommodations"
 import { Gallery } from "@/components/sections/gallery"
 import { Calendar } from "@/components/sections/calendar"
 import { Location } from "@/components/sections/location"
-import { ContactForm } from "@/components/sections/contact-form"
 import { Pricing } from "@/components/sections/pricing"
 import { Contact } from "@/components/sections/contact"
 import { Footer } from "@/components/sections/footer"
@@ -31,20 +30,17 @@ export default function HomePage() {
         {/* Gallery Section */}
         <Gallery />
 
-        {/* Calendar Section */}
-        <Calendar />
-
-        {/* Location Section */}
-        <Location />
-
-        {/* Contact Form Section */}
-        <ContactForm />
-
         {/* Pricing Section */}
         <Pricing />
 
-        {/* Contact Section */}
+        {/* Calendar Section */}
+        <Calendar />
+
+        {/* Contact Section (Merged Channels) */}
         <Contact />
+
+        {/* Location Section */}
+        <Location />
 
         {/* Footer */}
         <Footer />

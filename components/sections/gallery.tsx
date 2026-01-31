@@ -165,10 +165,15 @@ const galleryImages = [
 export function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all")
   const [selectedImage, setSelectedImage] = useState<typeof galleryImages[0] | null>(null)
+  const [showAll, setShowAll] = useState(false)
+
+  const INITIAL_DISPLAY_LIMIT = 6
 
   const filteredImages = activeCategory === "all"
     ? galleryImages
     : galleryImages.filter(img => img.category === activeCategory)
+
+  const displayedImages = showAll ? filteredImages : filteredImages.slice(0, INITIAL_DISPLAY_LIMIT)
 
   const handleNext = () => {
     if (!selectedImage) return
@@ -182,6 +187,11 @@ export function Gallery() {
     const currentIndex = filteredImages.findIndex(img => img.id === selectedImage.id)
     const prevIndex = (currentIndex - 1 + filteredImages.length) % filteredImages.length
     setSelectedImage(filteredImages[prevIndex])
+  }
+
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId)
+    setShowAll(false) // Reset pagination when category changes
   }
 
   return (
@@ -205,7 +215,7 @@ export function Gallery() {
           {galleryCategories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
+              onClick={() => handleCategoryChange(cat.id)}
               className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat.id
                 ? "bg-moss-700 text-white shadow-lg scale-105"
                 : "bg-white text-stone-600 hover:bg-stone-100 hover:text-stone-900 border border-stone-200"
@@ -218,14 +228,14 @@ export function Gallery() {
 
         {/* Masonry-style Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-          <AnimatePresence mode="popLayout">
-            {filteredImages.map((image, idx) => (
+          <AnimatePresence mode="popLayout" initial={false}>
+            {displayedImages.map((image, idx) => (
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 key={image.id}
                 className="break-inside-avoid"
               >
@@ -234,7 +244,6 @@ export function Gallery() {
                   onClick={() => setSelectedImage(image)}
                 >
                   <div className="relative w-full">
-                    {/* Aspect Ratio Mock using Paddington Bottom would be better but simple image works for columns */}
                     <Image
                       src={image.image}
                       alt={image.title}
@@ -261,6 +270,23 @@ export function Gallery() {
             ))}
           </AnimatePresence>
         </div>
+
+        {/* Show More Button */}
+        {!showAll && filteredImages.length > INITIAL_DISPLAY_LIMIT && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-center mt-12"
+          >
+            <Button
+              onClick={() => setShowAll(true)}
+              className="bg-white text-moss-700 hover:bg-moss-50 border-2 border-moss-200 hover:border-moss-300 px-10 py-6 rounded-2xl font-bold text-lg shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              Ver mais fotos
+              <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {/* Lightbox */}

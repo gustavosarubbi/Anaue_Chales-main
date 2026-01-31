@@ -35,16 +35,16 @@ export function PriceCalculator({
 
   if (!priceCalculation || !checkIn || !checkOut) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
+      <Card className="border-moss-100 rounded-3xl overflow-hidden shadow-sm">
+        <CardHeader className="bg-moss-50/50 pb-4">
+          <CardTitle className="flex items-center gap-2 text-moss-900 font-heading text-lg">
+            <Calculator className="h-5 w-5 text-moss-600" />
             Resumo de Preços
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Selecione as datas e número de hóspedes para ver o preço
+        <CardContent className="pt-6">
+          <p className="text-sm text-moss-500 font-light italic">
+            Selecione as datas para calcular o valor.
           </p>
         </CardContent>
       </Card>
@@ -52,83 +52,75 @@ export function PriceCalculator({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calculator className="h-5 w-5" />
+    <Card className="border-moss-100 rounded-3xl overflow-hidden shadow-sm">
+      <CardHeader className="bg-moss-50/50 pb-4">
+        <CardTitle className="flex items-center gap-2 text-moss-900 font-heading text-lg">
+          <Calculator className="h-5 w-5 text-moss-600" />
           Resumo de Preços
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">
-              {priceCalculation.totalNights} {priceCalculation.totalNights === 1 ? "noite" : "noites"} (valor para casal)
+      <CardContent className="pt-6 space-y-6">
+        <div className="space-y-3">
+          <div className="flex justify-between items-baseline">
+            <span className="text-sm text-moss-600 font-light">
+              {priceCalculation.totalNights} {priceCalculation.totalNights === 1 ? "noite" : "noites"} (Casal)
             </span>
-            <span className="font-medium">
-              R$ {priceCalculation.basePrice.toFixed(2)}
+            <span className="text-sm font-bold text-moss-900">
+              R$ {priceCalculation.basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </span>
           </div>
 
-          {priceCalculation.breakdown.nights.length > 0 && (
-            <div className="ml-4 space-y-1 text-xs text-muted-foreground">
-              {priceCalculation.breakdown.nights.map((night, index) => (
-                <div key={index} className="flex justify-between">
-                  <span>
-                    {new Date(night.date).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                    {night.isWeekend && " (fim de semana)"} (casal)
-                  </span>
-                  <span>R$ {night.price.toFixed(2)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
           {priceCalculation.guestPrice > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                Hóspedes extras ({guestCount - 2} x {priceCalculation.totalNights} noites)
+            <div className="flex justify-between items-baseline">
+              <span className="text-sm text-moss-600 font-light">
+                Hóspedes extras ({guestCount - 2})
               </span>
-              <span className="font-medium">
-                R$ {priceCalculation.guestPrice.toFixed(2)}
+              <span className="text-sm font-bold text-moss-900">
+                R$ {priceCalculation.guestPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
             </div>
           )}
 
           {priceCalculation.childrenPrice > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                Crianças ({childrenCount} x {priceCalculation.totalNights} noites)
+            <div className="flex justify-between items-baseline">
+              <span className="text-sm text-moss-600 font-light">
+                Crianças ({childrenCount})
               </span>
-              <span className="font-medium">
-                R$ {priceCalculation.childrenPrice.toFixed(2)}
+              <span className="text-sm font-bold text-moss-900">
+                R$ {priceCalculation.childrenPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
             </div>
           )}
         </div>
 
-        <Separator />
+        <Separator className="bg-moss-100 shadow-none" />
 
         <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold">Total</span>
-          <span className="text-2xl font-bold text-moss-900">
-            R$ {priceCalculation.totalPrice.toFixed(2)}
-          </span>
+          <span className="text-lg font-bold text-moss-950 font-heading">Total</span>
+          <div className="text-right">
+            <span className="text-2xl font-black text-moss-900 font-heading">
+              R$ {priceCalculation.totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
         </div>
 
-        <div className="rounded-lg bg-moss-50 p-3 text-xs text-moss-700">
-          <p>
-            <strong>Informações:</strong>
-          </p>
-          <ul className="mt-1 list-disc list-inside space-y-1">
-            <li>Finais de semana: R$ {unitPrices.weekend.toFixed(2)}/noite (valor para casal)</li>
-            <li>Dias úteis: R$ {unitPrices.weekday.toFixed(2)}/noite (valor para casal)</li>
-            <li>Crianças até 5 anos não pagam</li>
-            <li>Crianças 6-15 anos: R$ {PRICING.EXTRA_CHILD.toFixed(2)}/noite</li>
-            <li>Adultos extras: R$ {PRICING.EXTRA_ADULT.toFixed(2)}/noite</li>
+        <div className="rounded-2xl bg-moss-900/[0.02] border border-moss-100/50 p-4 space-y-2">
+          <div className="text-[10px] font-bold text-moss-900 uppercase tracking-widest flex items-center gap-2">
+            <div className="w-1 h-3 bg-moss-400 rounded-full" />
+            Tabela de Preços
+          </div>
+          <ul className="space-y-1.5">
+            {[
+              { label: "Dias úteis", value: `R$ ${unitPrices.weekday}/noite` },
+              { label: "Fim de semana", value: `R$ ${unitPrices.weekend}/noite` },
+              { label: "Adulto extra", value: `R$ ${PRICING.EXTRA_ADULT}/noite` },
+              { label: "Criança extra", value: `R$ ${PRICING.EXTRA_CHILD}/noite` },
+            ].map((item, i) => (
+              <li key={i} className="flex justify-between text-[11px] text-moss-600 font-light">
+                <span>{item.label}</span>
+                <span className="font-semibold">{item.value}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </CardContent>

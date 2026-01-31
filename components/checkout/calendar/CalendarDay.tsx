@@ -1,136 +1,142 @@
 "use client"
 
 import React from "react"
-import { ArrowRightCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CalendarDayProps } from "./types"
+import { isSameDay } from "date-fns"
 
-export function CalendarDay({ day, onClick, isSelected, isInRange, canClickWhenOccupied = false }: CalendarDayProps) {
+export function CalendarDay({
+  day,
+  onClick,
+  onHover,
+  isSelected,
+  isInRange,
+  isHoverRange,
+  hoverDate,
+  canClickWhenOccupied = false,
+  checkIn,
+  checkOut
+}: CalendarDayProps) {
+
   const handleClick = () => {
-    // Permitir clique se não estiver desabilitado e:
-    // - Não estiver ocupado, OU
-    // - Estiver ocupado mas pode ser clicado (dia seguinte ao check-in)
     if (day.status !== 'disabled' && (day.status !== 'occupied' || canClickWhenOccupied)) {
       onClick(day.date)
     }
   }
 
-  const getDayClasses = () => {
-    // Prioridade: check-in e check-out primeiro
-    const isCheckIn = day.status === 'check-in'
-    const isCheckOut = day.status === 'check-out'
-    
-    // Se for check-in ou check-out, aplicar estilo verde escuro diretamente
-    if (isCheckIn || isCheckOut) {
-      return cn(
-        "relative flex items-center justify-center",
-        "w-full h-full",
-        "text-sm",
-        "font-medium",
-        "rounded",
-        "transition-colors duration-150",
-        "cursor-pointer",
-        "select-none",
-        "bg-green-700 text-white z-10"
-      )
+  const handleMouseEnter = () => {
+    if (day.status !== 'disabled') {
+      onHover(day.date)
     }
-    
-    const baseClasses = cn(
-      "relative flex items-center justify-center",
-      "w-full h-full",
-      "text-sm",
-      "font-medium",
-      "rounded",
-      "transition-colors duration-150",
-      "cursor-pointer",
-      "select-none",
-      {
-        // Disponível - light green square
-        "bg-green-100 hover:bg-green-200 text-gray-900": 
-          day.status === 'available' && !isSelected && !isInRange,
-        
-        // Ocupado (mas pode ser clicável se for dia seguinte ao check-in)
-        "bg-gray-100 text-gray-400 opacity-50": 
-          day.status === 'occupied',
-        "cursor-not-allowed": 
-          day.status === 'occupied' && !canClickWhenOccupied,
-        "cursor-pointer": 
-          day.status === 'occupied' && canClickWhenOccupied,
-        
-        // Desabilitado (passado) - faded grey
-        "bg-gray-50 text-gray-300 cursor-not-allowed opacity-40": 
-          day.status === 'disabled',
-        
-        // Hoje (mas não selecionado) - trata como disponível
-        "bg-green-100 hover:bg-green-200 text-gray-900": 
-          day.status === 'today' && !isSelected && !isInRange,
-        
-        // No meio do período selecionado - light green
-        "bg-green-100 text-gray-900": 
-          isInRange && !isSelected,
-      }
-    )
+  }
 
-    return baseClasses
+  const isCheckIn = day.status === 'check-in'
+  const isCheckOut = day.status === 'check-out'
+  const isRange = isInRange && !isSelected
+  const isToday = day.status === 'today'
+  const isOccupied = day.status === 'occupied'
+  const isDisabled = day.status === 'disabled'
+
+  // Airbnb style:
+  // - Start/End dates are full circles with high contrast
+  // - Middle dates are rectangles with light contrast
+  // - Hover range is similar but even lighter or dashed
+
+  const getDayClasses = () => {
+    const baseClasses = "relative flex items-center justify-center w-full h-full text-sm font-bold transition-all duration-200 select-none z-10"
+
+    if (isCheckIn || isCheckOut) {
+      return cn(baseClasses, "text-white")
+    }
+
+    if (isRange) {
+      return cn(baseClasses, "text-moss-900")
+    }
+
+    if (isHoverRange) {
+      return cn(baseClasses, "text-moss-700")
+    }
+
+    if (isOccupied && !canClickWhenOccupied) {
+      return cn(baseClasses, "text-moss-200 cursor-not-allowed")
+    }
+
+    if (isDisabled) {
+      return cn(baseClasses, "text-moss-100 cursor-not-allowed")
+    }
+
+    return cn(baseClasses, "text-moss-900 hover:text-moss-950")
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={day.status === 'disabled' || (day.status === 'occupied' && !canClickWhenOccupied)}
-      className={getDayClasses()}
-      aria-label={`${day.date.toLocaleDateString('pt-BR')} - ${
-        day.status === 'check-in' ? `Check-in em ${day.date.toLocaleDateString('pt-BR')}` :
-        day.status === 'check-out' ? `Check-out em ${day.date.toLocaleDateString('pt-BR')}` :
-        day.status === 'available' ? 'Disponível' :
-        day.status === 'occupied' ? 'Ocupado' :
-        day.status === 'disabled' ? 'Indisponível' :
-        day.status === 'today' ? 'Hoje' :
-        day.status === 'range' ? 'No período selecionado' :
-        'Selecionado'
-      }`}
-      aria-disabled={day.status === 'disabled' || day.status === 'occupied'}
+    <div
+      className="relative w-full h-full group"
+      onMouseEnter={handleMouseEnter}
     >
-      {/* Padrão riscado para ocupado */}
-      {day.status === 'occupied' && (
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px)'
-          }}
-        />
+      {/* 
+        RANGE BACKGROUND SYSTEM
+        This creates the continuous "Capsule" look
+      */}
+
+      {/* Real Range Background (selected) */}
+      {isRange && (
+        <div className="absolute inset-y-1 inset-x-0 bg-moss-100/60 z-0" />
       )}
-      
-      {/* Número do dia */}
-      <span className="relative z-10">
-        {day.date.getDate()}
-      </span>
-      
-      {/* Badge Check-in - IN no canto superior direito */}
-      {day.status === 'check-in' && (
-        <div className="absolute top-0 right-0 z-20 text-white text-[8px] font-bold px-1 py-0.5">
-          IN
-        </div>
+
+      {/* Hover Range Background */}
+      {isHoverRange && (
+        <div className="absolute inset-y-1 inset-x-0 bg-moss-50/80 border-y border-moss-100/50 z-0" />
       )}
-      
-      {/* Badge Check-out - OUT no canto superior direito */}
-      {day.status === 'check-out' && (
-        <div className="absolute top-0 right-0 z-20 text-white text-[8px] font-bold px-1 py-0.5">
-          OUT
-        </div>
+
+      {/* Left/Right connectors for check-in/out */}
+      {isCheckIn && checkOut && (
+        <div className="absolute inset-y-1 left-1/2 right-0 bg-moss-100/60 z-0" />
       )}
-      
-      {/* Ícone Check-in - seta no canto superior esquerdo */}
-      {day.status === 'check-in' && (
-        <ArrowRightCircle className="absolute top-0 left-0 w-3 h-3 text-white/90 z-20" />
+      {isCheckOut && checkIn && (
+        <div className="absolute inset-y-1 right-1/2 left-0 bg-moss-100/60 z-0" />
       )}
-      
-      {/* Ícone Check-out - seta no canto superior esquerdo */}
-      {day.status === 'check-out' && (
-        <ArrowRightCircle className="absolute top-0 left-0 w-3 h-3 text-white/90 z-20" />
+
+      {/* Left/Right connectors for HOVER check-in/out */}
+      {isCheckIn && !checkOut && hoverDate && hoverDate > (checkIn as Date) && (
+        <div className="absolute inset-y-1 left-1/2 right-0 bg-moss-50/80 border-y border-moss-100/50 z-0" />
       )}
-    </button>
+      {hoverDate && isSameDay(day.date, hoverDate) && checkIn && !checkOut && hoverDate > (checkIn as Date) && (
+        <div className="absolute inset-y-1 right-1/2 left-0 bg-moss-50/80 border-y border-moss-100/50 z-0" />
+      )}
+
+      {/* CIRCLE FOR START/END/SELECTED/TODAY */}
+      {(isCheckIn || isCheckOut || isToday || (hoverDate && isSameDay(day.date, hoverDate))) && (
+        <div className={cn(
+          "absolute inset-1 rounded-full transition-transform duration-300 z-0",
+          {
+            "bg-moss-700 shadow-md scale-100": isCheckIn || isCheckOut,
+            "border-2 border-moss-400 bg-white": isToday && !isCheckIn && !isCheckOut && !isRange,
+            "bg-moss-200/50 border border-dashed border-moss-400": !isCheckIn && !isCheckOut && hoverDate && isSameDay(day.date, hoverDate)
+          }
+        )} />
+      )}
+
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={isDisabled || (isOccupied && !canClickWhenOccupied)}
+        className={cn(
+          getDayClasses(),
+          "w-full h-full rounded-full focus:outline-none focus:ring-2 focus:ring-moss-400 focus:ring-offset-2",
+          !isDisabled && !isOccupied && "hover:bg-moss-50/30"
+        )}
+      >
+        <span className="relative z-10">
+          {day.date.getDate()}
+        </span>
+
+        {/* Diagonal line for occupied dates */}
+        {isOccupied && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+            <div className="w-4 h-[1px] bg-moss-900 rotate-[35deg]" />
+          </div>
+        )}
+      </button>
+    </div>
   )
 }
-

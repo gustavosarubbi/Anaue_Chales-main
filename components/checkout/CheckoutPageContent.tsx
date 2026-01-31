@@ -189,110 +189,128 @@ export function CheckoutPageContent() {
     }
 
     return (
-        <div className="grid lg:grid-cols-3 gap-6 items-start max-w-full overflow-hidden">
-            <div className="lg:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-8 items-start w-full max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="lg:col-span-2 space-y-8">
                 <CheckoutProgressBar step={step} />
 
                 {step === "chalet" && (
-                    <div className="space-y-4 animate-fadeInUp">
-                        <div className="flex flex-col gap-1 mb-2">
-                            <h2 className="text-xl font-bold text-moss-900 font-heading">
+                    <div className="space-y-8 animate-fadeInUp pb-10">
+                        <div className="text-center lg:text-left">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading mb-2">
                                 Escolha seu Chalé
                             </h2>
-                            <p className="text-sm text-moss-700">
-                                Selecione uma das nossas opções exclusivas para começar.
+                            <p className="text-moss-600 font-light">
+                                Cada detalhe foi pensado para sua conexão com a natureza.
                             </p>
                         </div>
 
-                        <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="grid sm:grid-cols-2 gap-6 pb-4">
                             {/* Chalé Master */}
-                            <Card
+                            <div
                                 className={cn(
-                                    "cursor-pointer transition-all duration-300 border-2 overflow-hidden hover:shadow-xl group",
-                                    selectedChalet === "chale-anaue" ? "border-moss-600 bg-moss-50" : "border-moss-100 hover:border-moss-300"
+                                    "group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-500",
+                                    selectedChalet === "chale-anaue" ? "ring-2 ring-moss-600 shadow-2xl scale-[1.02]" : "ring-1 ring-moss-100 hover:ring-moss-300 hover:shadow-lg"
                                 )}
                                 onClick={() => setSelectedChalet("chale-anaue")}
                             >
-                                <div className="aspect-[16/10] overflow-hidden relative">
+                                <div className="aspect-[4/3] overflow-hidden relative">
                                     <img
-                                        src="/Chale 1/IMG_3174.jpg"
+                                        src="/Chale-1.jpg"
                                         alt="Chalé Master"
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                                        <h3 className="text-white font-heading text-xl font-bold tracking-tight">Chalé Master</h3>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-moss-900/90 via-moss-900/20 to-transparent" />
+
+                                    <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full px-3 py-1 border border-white/20">
+                                        <span className="text-[10px] text-white font-bold uppercase tracking-tighter">Vendido 1x hoje</span>
+                                    </div>
+
+                                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                                        <h3 className="font-heading text-2xl font-bold mb-1">Chalé Master</h3>
+                                        <p className="text-moss-100 text-xs font-light line-clamp-1">Deck privativo & Hidromassagem</p>
                                     </div>
                                 </div>
-                                <CardContent className="p-4 space-y-2">
-                                    <p className="text-xs text-moss-700 line-clamp-2">
-                                        Deck privativo com vista panorâmica, cama queen e jacuzzi.
-                                    </p>
-                                    <div className="flex items-center justify-between mt-4">
-                                        <span className="text-moss-900 font-bold">R$ {CHALET_PRICING['chale-anaue'].weekday},00 <small className="font-normal">/noite</small></span>
+                                <div className="p-6 bg-white space-y-4">
+                                    <div className="flex items-baseline justify-between">
+                                        <div>
+                                            <span className="text-2xl font-bold text-moss-900 font-heading">R$ {CHALET_PRICING['chale-anaue'].weekday}</span>
+                                            <span className="text-moss-500 text-xs ml-1">/noite</span>
+                                        </div>
                                         {selectedChalet === "chale-anaue" && (
-                                            <div className="bg-moss-600 text-white rounded-full p-1">
+                                            <div className="bg-moss-600 text-white rounded-full p-1.5 shadow-lg">
                                                 <CheckCircle2 className="w-4 h-4" />
                                             </div>
                                         )}
                                     </div>
-                                </CardContent>
-                            </Card>
+                                    <p className="text-sm text-moss-600 leading-relaxed font-light line-clamp-2">
+                                        O máximo luxo com vista definitiva para o rio e hidromassagem privativa.
+                                    </p>
+                                </div>
+                            </div>
 
                             {/* Chalé Camping Luxo */}
-                            <Card
+                            <div
                                 className={cn(
-                                    "cursor-pointer transition-all duration-300 border-2 overflow-hidden hover:shadow-xl group",
-                                    selectedChalet === "chale-2" ? "border-moss-600 bg-moss-50" : "border-moss-100 hover:border-moss-300"
+                                    "group relative cursor-pointer overflow-hidden rounded-2xl transition-all duration-500",
+                                    selectedChalet === "chale-2" ? "ring-2 ring-moss-600 shadow-2xl scale-[1.02]" : "ring-1 ring-moss-100 hover:ring-moss-300 hover:shadow-lg"
                                 )}
                                 onClick={() => setSelectedChalet("chale-2")}
                             >
-                                <div className="aspect-[16/10] overflow-hidden relative">
+                                <div className="aspect-[4/3] overflow-hidden relative">
                                     <img
                                         src="/Chale 2/IMG_3189.jpg"
                                         alt="Chalé Camping Luxo"
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                                        <h3 className="text-white font-heading text-xl font-bold tracking-tight">Camping Luxo</h3>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-moss-900/90 via-moss-900/20 to-transparent" />
+
+                                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                                        <h3 className="font-heading text-2xl font-bold mb-1">Camping Luxo</h3>
+                                        <p className="text-moss-100 text-xs font-light line-clamp-1">Experiência Modernista & Imersão</p>
                                     </div>
                                 </div>
-                                <CardContent className="p-4 space-y-2">
-                                    <p className="text-xs text-moss-700 line-clamp-2">
-                                        Experiência única de glamping com conforto de hotel no meio da natureza.
-                                    </p>
-                                    <div className="flex items-center justify-between mt-4">
-                                        <span className="text-moss-900 font-bold">R$ {CHALET_PRICING['chale-2'].weekday},00 <small className="font-normal">/noite</small></span>
+                                <div className="p-6 bg-white space-y-4">
+                                    <div className="flex items-baseline justify-between">
+                                        <div>
+                                            <span className="text-2xl font-bold text-moss-900 font-heading">R$ {CHALET_PRICING['chale-2'].weekday}</span>
+                                            <span className="text-moss-500 text-xs ml-1">/noite</span>
+                                        </div>
                                         {selectedChalet === "chale-2" && (
-                                            <div className="bg-moss-600 text-white rounded-full p-1">
+                                            <div className="bg-moss-600 text-white rounded-full p-1.5 shadow-lg">
                                                 <CheckCircle2 className="w-4 h-4" />
                                             </div>
                                         )}
                                     </div>
-                                </CardContent>
-                            </Card>
+                                    <p className="text-sm text-moss-600 leading-relaxed font-light line-clamp-2">
+                                        Arquitetura em A-frame integrada à floresta com todo conforto premium.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
-                        <Button
-                            className="w-full bg-moss-700 hover:bg-moss-800 h-12 text-lg font-bold shadow-lg"
-                            onClick={() => setStep("dates")}
-                        >
-                            Próximo Passo
-                        </Button>
+                        <div className="pt-4 flex justify-center lg:justify-start">
+                            <Button
+                                className="w-full sm:w-auto sm:px-12 bg-moss-700 hover:bg-moss-800 text-white h-14 text-lg font-bold shadow-xl hover-lift rounded-2xl transition-all duration-300"
+                                onClick={() => setStep("dates")}
+                            >
+                                Continuar para Datas
+                            </Button>
+                        </div>
                     </div>
                 )}
 
                 {step === "dates" && (
-                    <Card className="shadow-lg animate-fadeInUp border-moss-200 overflow-hidden">
-                        <CardContent className="pt-6 space-y-4">
-                            <div className="flex flex-col gap-1 mb-2">
-                                <h2 className="text-lg font-semibold text-moss-900 font-heading">
-                                    Datas da Estadia
-                                </h2>
-                                <p className="text-xs text-moss-700">
-                                    O valor total será calculado automaticamente conforme as datas selecionadas.
-                                </p>
-                            </div>
+                    <div className="space-y-8 animate-fadeInUp">
+                        <div className="text-center lg:text-left">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading mb-2">
+                                Escolha as Datas
+                            </h2>
+                            <p className="text-moss-600 font-light">
+                                Verifique a disponibilidade e selecione o período desejado.
+                            </p>
+                        </div>
 
+                        <div className="w-full">
                             <AvailabilityCalendar
                                 checkIn={checkIn}
                                 checkOut={checkOut}
@@ -301,35 +319,34 @@ export function CheckoutPageContent() {
                                 numberOfMonths={1}
                                 chaletId={selectedChalet}
                             />
+                        </div>
 
-                            <div className="pt-4 border-t border-moss-100 mt-2 space-y-3">
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setStep("chalet")}
-                                    className="w-full text-moss-600 h-10"
-                                >
-                                    Alterar Chalé
-                                </Button>
-                                <Button
-                                    onClick={handleContinueToForm}
-                                    className="w-full bg-green-600 hover:bg-green-700 h-12 shadow-lg transition-all duration-200 text-base font-bold"
-                                    size="lg"
-                                    disabled={availabilityLoading || isAvailable !== true}
-                                >
-                                    {availabilityLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Verificando disponibilidade...
-                                        </>
-                                    ) : isAvailable === false ? (
-                                        "Datas Indisponíveis"
-                                    ) : (
-                                        "Continuar Reserva"
-                                    )}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setStep("chalet")}
+                                className="w-full sm:w-1/3 border-2 border-moss-100 text-moss-700 h-14 rounded-2xl font-bold hover:bg-moss-50 hover:border-moss-200 transition-all duration-300"
+                            >
+                                Escolher outro Chalé
+                            </Button>
+                            <Button
+                                onClick={handleContinueToForm}
+                                className="w-full sm:w-2/3 bg-moss-700 hover:bg-moss-800 text-white h-14 shadow-xl hover-lift text-lg font-bold rounded-2xl transition-all duration-300"
+                                disabled={availabilityLoading || isAvailable !== true}
+                            >
+                                {availabilityLoading ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        <span>Verificando...</span>
+                                    </div>
+                                ) : isAvailable === false ? (
+                                    "Datas Indisponíveis"
+                                ) : (
+                                    "Continuar para Meus Dados"
+                                )}
+                            </Button>
+                        </div>
+                    </div>
                 )}
 
                 {step === "form" && checkIn && checkOut && (
@@ -354,11 +371,11 @@ export function CheckoutPageContent() {
                     <Card className="shadow-lg animate-fadeInUp border-moss-200">
                         <CardContent className="pt-12 pb-12 text-center space-y-6">
                             <div className="relative inline-block">
-                                <div className="absolute inset-0 bg-green-100 rounded-full blur-2xl opacity-50 animate-pulse" />
+                                <div className="absolute inset-0 bg-moss-100 rounded-full blur-2xl opacity-50 animate-pulse" />
                                 {step === "processing" ? (
                                     <Loader2 className="h-16 w-16 animate-spin text-moss-600 relative" />
                                 ) : (
-                                    <CheckCircle2 className="h-16 w-16 text-green-600 relative" />
+                                    <CheckCircle2 className="h-16 w-16 text-moss-600 relative" />
                                 )}
                             </div>
 

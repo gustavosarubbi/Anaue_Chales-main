@@ -65,7 +65,7 @@ export async function GET(request: Request) {
         const { data: reservations, error: dbError } = await supabase
           .from("reservations")
           .select("check_in, check_out")
-          .eq("status", "confirmed")
+          .in("status", ["confirmed", "pending"])
           .eq("chalet_id", chaletId)
 
         if (!dbError && reservations) {

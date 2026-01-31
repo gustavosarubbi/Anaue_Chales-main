@@ -17,7 +17,7 @@ export function Accommodations() {
       id: "chale-anaue",
       title: "Chalé Master",
       description: "O máximo conforto com banheira de hidromassagem e vista panorâmica para o Rio Tarumã.",
-      image: "/Chale 1/IMG_2024.jpg",
+      image: "/Chale-1.jpg",
       features: ["Hidromassagem", "Vista Rio", "Privacidade Total"],
       price: `A partir de R$ ${masterPrice}`,
       whatsappMessage: "Olá! Gostaria de saber mais sobre o Chalé Master.",
@@ -50,7 +50,7 @@ export function Accommodations() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto items-stretch">
           {accommodations.map((acc, index) => (
             <motion.div
               key={acc.id}
@@ -58,52 +58,55 @@ export function Accommodations() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.6 }}
+              className="h-full"
             >
-              <Card className="bg-moss-800/40 border-moss-700 overflow-hidden hover:shadow-2xl transition-all duration-500 group">
-                <div className="relative h-[400px] overflow-hidden">
+              <Card className="h-full flex flex-col bg-moss-800/40 border-moss-700 overflow-hidden hover:shadow-2xl transition-all duration-500 group">
+                <div className="relative h-[300px] sm:h-[350px] overflow-hidden">
                   <img
                     src={acc.image}
                     alt={acc.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-moss-900 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-moss-900/80 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                     <Badge className="bg-white/10 backdrop-blur-md border-white/20 text-white px-3 py-1">
                       <Star className="w-3 h-3 text-yellow-500 mr-1 fill-yellow-500" />
                       Premium
                     </Badge>
                     <div className="text-right">
-                      <p className="text-moss-300 text-xs uppercase tracking-widest mb-1">Apenas casal</p>
-                      <p className="text-white font-heading text-2xl font-bold">{acc.price}</p>
+                      <p className="text-moss-300 text-[10px] uppercase tracking-tighter mb-0.5">Apenas casal</p>
+                      <p className="text-white font-heading text-xl font-bold">{acc.price}</p>
                     </div>
                   </div>
                 </div>
 
-                <CardContent className="p-8">
-                  <CardTitle className="font-heading text-3xl text-white mb-4">{acc.title}</CardTitle>
-                  <p className="text-moss-200 mb-8 font-light leading-relaxed">
-                    {acc.description}
-                  </p>
+                <CardContent className="p-6 sm:p-8 flex-grow flex flex-col">
+                  <div className="flex-grow">
+                    <CardTitle className="font-heading text-2xl text-white mb-3">{acc.title}</CardTitle>
+                    <p className="text-moss-200 text-sm mb-6 font-light leading-relaxed">
+                      {acc.description}
+                    </p>
 
-                  <div className="flex flex-wrap gap-3 mb-10">
-                    {acc.features.map((feat) => (
-                      <div key={feat} className="flex items-center gap-2 bg-moss-900/40 rounded-full px-4 py-2 border border-moss-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-moss-400" />
-                        <span className="text-moss-100 text-sm font-medium">{feat}</span>
-                      </div>
-                    ))}
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {acc.features.map((feat) => (
+                        <div key={feat} className="flex items-center gap-1.5 bg-moss-900/40 rounded-full px-3 py-1.5 border border-moss-700">
+                          <div className="w-1 h-1 rounded-full bg-moss-400" />
+                          <span className="text-moss-100 text-[11px] font-medium uppercase tracking-wider">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-2 gap-3 mt-auto pt-4 border-t border-moss-700/50">
                     <Button
-                      className="bg-white text-moss-900 hover:bg-moss-50 h-14 rounded-xl font-bold text-lg transition-all duration-300"
+                      className="bg-white text-moss-900 hover:bg-moss-50 h-12 rounded-xl font-bold transition-all duration-300"
                       asChild
                     >
                       <Link href={acc.link}>Reservar Online</Link>
                     </Button>
                     <Button
                       variant="outline"
-                      className="border-moss-600 text-moss-200 hover:bg-moss-800 h-14 rounded-xl font-medium transition-all duration-300"
+                      className="border-moss-600 text-moss-200 hover:bg-moss-800 h-12 rounded-xl font-medium transition-all duration-300"
                       asChild
                     >
                       <a

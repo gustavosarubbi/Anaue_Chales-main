@@ -24,17 +24,28 @@ export interface CalendarMonthProps {
   availability: Record<string, 'booked'>
   checkIn?: Date
   checkOut?: Date
+  hoverDate?: Date | null
   onDateClick: (date: Date) => void
+  onHoverDate: (date: Date | null) => void
   minDate?: Date
   maxDate?: Date
   isLoading?: boolean
+  onPreviousMonth?: () => void
+  onNextMonth?: () => void
+  canGoPrevious?: boolean
+  canGoNext?: boolean
 }
 
 export interface CalendarDayProps {
   day: CalendarDayData
   onClick: (date: Date) => void
+  onHover: (date: Date | null) => void
   isSelected: boolean
   isInRange: boolean
+  isHoverRange?: boolean
+  hoverDate?: Date | null
   canClickWhenOccupied?: boolean
+  checkIn?: Date
+  checkOut?: Date
 }
 

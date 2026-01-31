@@ -9,7 +9,7 @@ export function Location() {
     <section id="localizacao" className="py-24 bg-gradient-to-br from-beige-50 to-moss-50 texture-waves relative">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 px-4">
+        <div className="text-center mb-16">
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">📍 Localização Privilegiada</Badge>
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6">No Coração do Tarumã</h2>
           <p className="text-lg text-moss-700 font-light max-w-2xl mx-auto leading-relaxed">
