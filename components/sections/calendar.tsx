@@ -161,7 +161,7 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
 
   return (
     <Card className="bg-white/80 backdrop-blur-md shadow-xl border-white/20 overflow-hidden">
-      <CardContent className="p-6 sm:p-8">
+      <CardContent className="p-4 sm:p-8">
         <div className="flex items-center justify-between mb-8 gap-4">
           <Button
             variant="outline"
@@ -212,7 +212,7 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
           </Button>
         </div>
 
-        <div className="px-1 sm:px-2">
+        <div className="px-2 sm:px-4">
           <div className="w-full">
             <div className="grid grid-cols-7 mb-4 gap-2">
               {WEEK_DAYS.map(d => (
@@ -230,7 +230,7 @@ function CalendarWidget({ onUpdate }: { onUpdate?: (date: Date) => void }) {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1 sm:gap-2">
                 {calendarDays.map((calendarDay, i) => {
                   if (!calendarDay.date) return <div key={i} className="aspect-square" />
 

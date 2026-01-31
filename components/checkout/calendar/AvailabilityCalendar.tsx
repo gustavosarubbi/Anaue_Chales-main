@@ -167,7 +167,7 @@ export function AvailabilityCalendar({
 
   return (
     <div className={cn(
-      "w-full space-y-2 sm:space-3",
+      "w-full space-y-2 sm:space-3 px-2 sm:px-0",
       "animate-fadeInUp"
     )}>
       {/* Loading overlay */}
@@ -194,7 +194,7 @@ export function AvailabilityCalendar({
       {/* Grid de meses - Responsivo */}
       {!isLoading && (
         <div className={cn(
-          "grid gap-3 sm:gap-4",
+          "grid gap-2 sm:gap-4",
           "grid-cols-1", // Mobile: 1 coluna
           numberOfMonths >= 2 && "sm:grid-cols-2", // Tablet: 2 colunas
           numberOfMonths >= 3 && "lg:grid-cols-3" // Desktop: 3 colunas se necessário

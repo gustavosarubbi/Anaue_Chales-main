@@ -37,8 +37,8 @@ export const SPECIAL_PACKAGES = {
 // Preços por tipo de chalé e tipo de dia
 export const CHALET_PRICING: Record<string, { weekday: number; weekend: number }> = {
   'chale-anaue': { // Chalé Master
-    weekday: 540,
-    weekend: 700,
+    weekday: 650,
+    weekend: 800,
   },
   'chale-2': { // Chalé Camping Luxo
     weekday: 550,

@@ -189,7 +189,7 @@ export function CheckoutPageContent() {
     }
 
     return (
-        <div className="grid lg:grid-cols-3 gap-6 items-start">
+        <div className="grid lg:grid-cols-3 gap-6 items-start max-w-full overflow-hidden">
             <div className="lg:col-span-2 space-y-6">
                 <CheckoutProgressBar step={step} />
 
@@ -213,14 +213,14 @@ export function CheckoutPageContent() {
                                 )}
                                 onClick={() => setSelectedChalet("chale-anaue")}
                             >
-                                <div className="h-40 overflow-hidden relative">
+                                <div className="aspect-[16/10] overflow-hidden relative">
                                     <img
                                         src="/Chale 1/IMG_3174.jpg"
                                         alt="Chalé Master"
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                        <h3 className="text-white font-bold text-lg">Chalé Master</h3>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
+                                        <h3 className="text-white font-heading text-xl font-bold tracking-tight">Chalé Master</h3>
                                     </div>
                                 </div>
                                 <CardContent className="p-4 space-y-2">
@@ -246,14 +246,14 @@ export function CheckoutPageContent() {
                                 )}
                                 onClick={() => setSelectedChalet("chale-2")}
                             >
-                                <div className="h-40 overflow-hidden relative">
+                                <div className="aspect-[16/10] overflow-hidden relative">
                                     <img
                                         src="/Chale 2/IMG_3189.jpg"
                                         alt="Chalé Camping Luxo"
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                        <h3 className="text-white font-bold text-lg">Camping Luxo</h3>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
+                                        <h3 className="text-white font-heading text-xl font-bold tracking-tight">Camping Luxo</h3>
                                     </div>
                                 </div>
                                 <CardContent className="p-4 space-y-2">
@@ -314,7 +314,7 @@ export function CheckoutPageContent() {
                                     onClick={handleContinueToForm}
                                     className="w-full bg-green-600 hover:bg-green-700 h-12 shadow-lg transition-all duration-200 text-base font-bold"
                                     size="lg"
-                                    disabled={availabilityLoading || isAvailable === false}
+                                    disabled={availabilityLoading || isAvailable !== true}
                                 >
                                     {availabilityLoading ? (
                                         <>

@@ -89,12 +89,12 @@ export function CheckoutProgressBar({ step }: CheckoutProgressBarProps) {
 
 function StepItem({ number, label, status, isLast = false }: { number: string, label: string, status: "complete" | "active" | "pending", isLast?: boolean }) {
     return (
-        <div className={`flex items-center gap-2 transition-all duration-300 ${status === "active" ? "text-moss-900 font-semibold scale-110" : "text-moss-400"}`}>
+        <div className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left transition-all duration-300 ${status === "active" ? "text-moss-900 font-semibold scale-105 sm:scale-110" : "text-moss-400"}`}>
             <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-semibold transition-all duration-300 shadow-md ${status === "complete" ? "bg-moss-200 text-moss-700" : status === "active" ? "bg-moss-600 text-white" : "bg-moss-100 text-moss-400"
                 }`}>
                 {status === "complete" ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" /> : number}
             </div>
-            <span className="hidden xs:inline">{label}</span>
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">{label}</span>
         </div>
     )
 }

@@ -27,7 +27,7 @@ export function CalendarLegend() {
 
   return (
     <div className={cn(
-      "flex items-center justify-center gap-4 sm:gap-6",
+      "flex flex-wrap items-center justify-center gap-3 sm:gap-6",
       "mt-3 sm:mt-4 pt-3 sm:pt-4",
       "border-t border-moss-200",
       "text-xs"
@@ -68,7 +68,7 @@ export function CalendarLegend() {
             )}
             <span className="relative z-10 text-xs font-medium">15</span>
           </div>
-          <span className="text-gray-700 font-medium whitespace-nowrap">
+          <span className="text-gray-700 font-medium">
             {item.label}
           </span>
         </div>
