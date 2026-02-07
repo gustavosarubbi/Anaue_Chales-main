@@ -1,7 +1,7 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Outfit } from "next/font/google"
-import "../styles/globals.css"
+import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({
@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 }
 
 import { ReCaptchaProvider } from "@/components/providers/recaptcha-provider"

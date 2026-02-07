@@ -37,11 +37,11 @@ export function ScrollToTop() {
             <TooltipTrigger asChild>
               <Button
                 onClick={scrollToTop}
-                className="fixed bottom-20 left-4 md:bottom-8 md:left-8 z-50 h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 animate-fadeInUp hover:scale-110 active:scale-95"
+                className="fixed bottom-6 left-4 md:bottom-8 md:left-8 z-50 h-12 w-12 md:h-14 md:w-14 rounded-full bg-moss-600 hover:bg-moss-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 animate-fadeInUp hover:scale-110 active:scale-95"
                 size="icon"
                 aria-label="Voltar ao topo"
               >
-                <ArrowUp className="h-6 w-6" />
+                <ArrowUp className="h-5 w-5 md:h-6 md:w-6" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-moss-800 text-white border-moss-700">
@@ -53,4 +53,3 @@ export function ScrollToTop() {
     </>
   )
 }
-

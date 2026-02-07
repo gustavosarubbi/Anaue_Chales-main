@@ -92,7 +92,7 @@ const item = {
 export function Features() {
   return (
     <section id="comodidades" className="py-24 bg-stone-50/50 texture-dots relative overflow-hidden">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">🛏️ Experiência Completa</Badge>

@@ -3,7 +3,6 @@ import { Features } from "@/components/sections/features"
 import { Accommodations } from "@/components/sections/accommodations"
 import { Gallery } from "@/components/sections/gallery"
 import { Calendar } from "@/components/sections/calendar"
-import { Location } from "@/components/sections/location"
 import { Pricing } from "@/components/sections/pricing"
 import { Contact } from "@/components/sections/contact"
 import { Footer } from "@/components/sections/footer"
@@ -36,11 +35,8 @@ export default function HomePage() {
         {/* Calendar Section */}
         <Calendar />
 
-        {/* Contact Section (Merged Channels) */}
+        {/* Contact & Location Section */}
         <Contact />
-
-        {/* Location Section */}
-        <Location />
 
         {/* Footer */}
         <Footer />

@@ -13,11 +13,18 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log('[PAYMENTS_CREATE] Usando InfinitePay para reserva:', reservationId)
+    // Validar e converter amount
+    const parsedAmount = parseFloat(amount.toString())
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      return NextResponse.json(
+        { success: false, error: 'Valor do pagamento inválido' },
+        { status: 400 }
+      )
+    }
 
     // Criar link de pagamento na InfinitePay
     const result = await createInfinitePayPayment({
-      amount: parseFloat(amount.toString()),
+      amount: parsedAmount,
       description: `Reserva Chalé - ${guestName} (${checkIn} a ${checkOut})`,
       orderId: reservationId,
       customer: {
@@ -25,8 +32,6 @@ export async function POST(request: Request) {
         email: guestEmail
       }
     })
-
-    console.log('[PAYMENTS_CREATE] Link InfinitePay gerado:', result.paymentId)
 
     return NextResponse.json({
       success: true,
@@ -38,12 +43,13 @@ export async function POST(request: Request) {
     console.error('[PAYMENTS_CREATE] Erro fatal InfinitePay:', {
       message: error?.message,
       name: error?.name,
+      stack: error?.stack,
     })
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Erro ao processar pagamento com InfinitePay. Por favor, verifique as credenciais.',
+        error: error?.message || 'Erro ao processar pagamento com InfinitePay. Por favor, verifique as credenciais.',
       },
       { status: 500 }
     )

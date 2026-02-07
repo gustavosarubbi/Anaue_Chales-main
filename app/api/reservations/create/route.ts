@@ -39,9 +39,8 @@ export async function POST(request: Request) {
     // 2. Verificação do reCAPTCHA (se configurado)
     if (ENV.RECAPTCHA_SECRET_KEY && ENV.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
       const host = request.headers.get('host') || ''
-      const isVercel = host.includes('vercel.app') || host.includes('anauejunglechales.com.br') || host.includes('anaue-chales')
       const isLocal = request.url.includes('localhost')
-      const isDev = process.env.NODE_ENV === 'development' || isLocal || isVercel
+      const isDev = process.env.NODE_ENV === 'development' || isLocal
 
       const isBypassToken = captchaToken?.startsWith('BYPASS_') || captchaToken?.startsWith('ERROR_') || captchaToken === 'MISSING_CLIENT_SIDE'
 

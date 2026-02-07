@@ -19,11 +19,11 @@ export function WhatsAppButton() {
         <TooltipTrigger asChild>
           <Button
             onClick={openWhatsApp}
-            className="fixed bottom-24 right-4 z-50 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 active:scale-95"
+            className="fixed bottom-6 right-4 md:bottom-8 md:right-8 z-50 h-12 w-12 md:h-14 md:w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
             size="icon"
             aria-label="Falar no WhatsApp"
           >
-            <MessageCircle className="h-6 w-6" />
+            <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left" className="bg-green-700 text-white border-green-800">
@@ -33,4 +33,3 @@ export function WhatsAppButton() {
     </TooltipProvider>
   )
 }
-

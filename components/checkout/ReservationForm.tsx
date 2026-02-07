@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -8,8 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Mail, Phone, Users, Baby, Loader2 } from "lucide-react"
+import { User, Mail, Phone, Users, Baby, Loader2, Shield, ArrowRight, Info } from "lucide-react"
 import { ENV } from "@/lib/utils/env"
 import { toast } from "sonner"
 
@@ -17,8 +16,8 @@ const reservationSchema = z.object({
   guestName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   guestEmail: z.string().email("Email inválido"),
   guestPhone: z.string().min(10, "Telefone deve ter pelo menos 10 dígitos"),
-  guestCount: z.number().min(1).max(10, "Máximo 10 adultos"),
-  childrenCount: z.number().min(0).max(10, "Máximo 10 crianças"),
+  guestCount: z.number({ invalid_type_error: "Informe um número válido" }).min(1, "Mínimo 1 adulto").max(10, "Máximo 10 adultos"),
+  childrenCount: z.number({ invalid_type_error: "Informe um número válido" }).min(0, "Mínimo 0").max(10, "Máximo 10 crianças"),
   captchaToken: z.string().optional(),
 })
 
@@ -26,12 +25,32 @@ export type ReservationFormData = z.infer<typeof reservationSchema>
 
 interface ReservationFormProps {
   onSubmit: (data: ReservationFormData) => void
+  onFormChange?: (data: { guestCount: number; childrenCount: number }) => void
   isLoading?: boolean
   initialData?: Partial<ReservationFormData>
+  /** ID do form para permitir submit externo */
+  formId?: string
+  /** Se true, esconde o botão de submit interno (para renderizar externamente) */
+  hideSubmitButton?: boolean
 }
 
-export function ReservationForm({ onSubmit, isLoading = false, initialData }: ReservationFormProps) {
-  const { executeRecaptcha } = useGoogleReCaptcha()
+export function ReservationForm({
+  onSubmit,
+  onFormChange,
+  isLoading = false,
+  initialData,
+  formId = "reservation-form",
+  hideSubmitButton = false,
+}: ReservationFormProps) {
+  // Usar try-catch para evitar erro se o provider não estiver disponível
+  let executeRecaptcha: ((action: string) => Promise<string>) | undefined
+  try {
+    const recaptchaHook = useGoogleReCaptcha()
+    executeRecaptcha = recaptchaHook?.executeRecaptcha
+  } catch (error) {
+    // Provider não disponível - isso é OK, o backend vai tratar
+    console.warn('[ReservationForm] ReCAPTCHA provider não disponível, continuando sem validação client-side')
+  }
   const [isCaptchaLoading, setIsCaptchaLoading] = useState(false)
 
   const {
@@ -50,7 +69,29 @@ export function ReservationForm({ onSubmit, isLoading = false, initialData }: Re
     },
   })
 
+  // Observar mudanças em guestCount e childrenCount para atualizar o resumo em tempo real
+  const watchedGuestCount = watch("guestCount")
+  const watchedChildrenCount = watch("childrenCount")
+
+  useEffect(() => {
+    if (onFormChange) {
+      const gc = typeof watchedGuestCount === "number" && !isNaN(watchedGuestCount) ? watchedGuestCount : 2
+      const cc = typeof watchedChildrenCount === "number" && !isNaN(watchedChildrenCount) ? watchedChildrenCount : 0
+      onFormChange({ guestCount: gc, childrenCount: cc })
+    }
+  }, [watchedGuestCount, watchedChildrenCount, onFormChange])
+
   const onFormSubmit = async (data: ReservationFormData) => {
+    console.log('[ReservationForm] Form válido, prosseguindo com submit...', data)
+
+    // Se não há chave reCAPTCHA configurada, prossegue sem token
+    const hasRecaptchaKey = !!ENV.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    
+    if (!hasRecaptchaKey) {
+      onSubmit({ ...data, captchaToken: undefined })
+      return
+    }
+
     setIsCaptchaLoading(true)
 
     if (!executeRecaptcha) {
@@ -79,154 +120,194 @@ export function ReservationForm({ onSubmit, isLoading = false, initialData }: Re
     }
   }
 
+  const onFormInvalid = (fieldErrors: any) => {
+    console.warn('[ReservationForm] Validação falhou:', fieldErrors)
+    const firstError = Object.values(fieldErrors)[0] as any
+    if (firstError?.message) {
+      toast.error(firstError.message)
+    } else {
+      toast.error("Por favor, preencha todos os campos corretamente.")
+    }
+  }
+
   return (
     <div className="animate-fadeInUp space-y-8">
       <div className="text-center lg:text-left">
-        <h2 className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading mb-2">Seus Dados</h2>
-        <p className="text-moss-600 font-light">Quase lá! Só precisamos de algumas informações para confirmar sua estadia.</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading mb-2 tracking-tight">Seus Dados</h2>
+        <p className="text-moss-500 font-light text-sm sm:text-base">Quase lá! Só precisamos de algumas informações para confirmar sua estadia.</p>
       </div>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-        <div className="grid sm:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="guestName" className="text-xs font-bold uppercase tracking-widest text-moss-900">
-              Nome Completo
-            </Label>
-            <div className="relative group">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-moss-400 transition-colors group-focus-within:text-moss-600" />
-              <Input
-                id="guestName"
-                {...register("guestName")}
-                placeholder="Ex: João Silva"
-                className="pl-11 h-14 rounded-2xl border-moss-100 focus:border-moss-500 focus:ring-moss-500 transition-all"
-                disabled={isLoading || isCaptchaLoading}
-              />
+      <form id={formId} onSubmit={handleSubmit(onFormSubmit, onFormInvalid)} className="space-y-8 bg-white/90 backdrop-blur-sm p-6 sm:p-8 rounded-3xl border border-moss-100/50 shadow-lg shadow-moss-900/5">
+        {/* Informações pessoais */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="p-1.5 bg-moss-50 rounded-lg border border-moss-100">
+              <User className="h-3.5 w-3.5 text-moss-600" />
             </div>
-            {errors.guestName && (
-              <p className="text-xs text-red-500 font-medium">{errors.guestName.message}</p>
-            )}
+            <span className="text-xs font-bold uppercase tracking-widest text-moss-800">Informações Pessoais</span>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="guestEmail" className="text-xs font-bold uppercase tracking-widest text-moss-900">
-              E-mail
-            </Label>
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-moss-400 transition-colors group-focus-within:text-moss-600" />
-              <Input
-                id="guestEmail"
-                type="email"
-                {...register("guestEmail")}
-                placeholder="joao@exemplo.com"
-                className="pl-11 h-14 rounded-2xl border-moss-100 focus:border-moss-500 focus:ring-moss-500 transition-all"
-                disabled={isLoading || isCaptchaLoading}
-              />
-            </div>
-            {errors.guestEmail && (
-              <p className="text-xs text-red-500 font-medium">{errors.guestEmail.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="guestPhone" className="text-xs font-bold uppercase tracking-widest text-moss-900">
-              WhatsApp / Celular
-            </Label>
-            <div className="relative group">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-moss-400 transition-colors group-focus-within:text-moss-600" />
-              <Input
-                id="guestPhone"
-                type="tel"
-                {...register("guestPhone")}
-                placeholder="(92) 99999-9999"
-                className="pl-11 h-14 rounded-2xl border-moss-100 focus:border-moss-500 focus:ring-moss-500 transition-all"
-                disabled={isLoading || isCaptchaLoading}
-              />
-            </div>
-            {errors.guestPhone && (
-              <p className="text-xs text-red-500 font-medium">{errors.guestPhone.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="guestCount" className="text-xs font-bold uppercase tracking-widest text-moss-900">
-                Adultos
+              <Label htmlFor="guestName" className="text-xs font-bold uppercase tracking-widest text-moss-600 ml-1">
+                Nome Completo
               </Label>
               <div className="relative group">
-                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-moss-400" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-moss-300 transition-colors group-focus-within:text-moss-600" />
                 <Input
-                  id="guestCount"
-                  type="number"
-                  min={1}
-                  max={10}
-                  {...register("guestCount", { valueAsNumber: true })}
-                  className="pl-11 h-14 rounded-2xl border-moss-100 focus:border-moss-500 focus:ring-moss-500 transition-all"
+                  id="guestName"
+                  {...register("guestName")}
+                  placeholder="Ex: João Silva"
+                  className="pl-12 h-13 sm:h-14 rounded-2xl border-moss-100 bg-moss-50/30 focus:bg-white focus:border-moss-500 focus:ring-4 focus:ring-moss-100 transition-all text-sm sm:text-base"
                   disabled={isLoading || isCaptchaLoading}
                 />
               </div>
+              {errors.guestName && (
+                <p className="text-xs text-red-500 font-medium ml-1 animate-fadeInUp">{errors.guestName.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="childrenCount" className="text-xs font-bold uppercase tracking-widest text-moss-900">
-                Crianças
+              <Label htmlFor="guestEmail" className="text-xs font-bold uppercase tracking-widest text-moss-600 ml-1">
+                E-mail
               </Label>
               <div className="relative group">
-                <Baby className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-moss-400" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-moss-300 transition-colors group-focus-within:text-moss-600" />
                 <Input
-                  id="childrenCount"
-                  type="number"
-                  min={0}
-                  max={10}
-                  {...register("childrenCount", { valueAsNumber: true })}
-                  className="pl-11 h-14 rounded-2xl border-moss-100 focus:border-moss-500 focus:ring-moss-500 transition-all"
+                  id="guestEmail"
+                  type="email"
+                  {...register("guestEmail")}
+                  placeholder="joao@exemplo.com"
+                  className="pl-12 h-13 sm:h-14 rounded-2xl border-moss-100 bg-moss-50/30 focus:bg-white focus:border-moss-500 focus:ring-4 focus:ring-moss-100 transition-all text-sm sm:text-base"
                   disabled={isLoading || isCaptchaLoading}
                 />
+              </div>
+              {errors.guestEmail && (
+                <p className="text-xs text-red-500 font-medium ml-1 animate-fadeInUp">{errors.guestEmail.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guestPhone" className="text-xs font-bold uppercase tracking-widest text-moss-600 ml-1">
+                WhatsApp / Celular
+              </Label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-moss-300 transition-colors group-focus-within:text-moss-600" />
+                <Input
+                  id="guestPhone"
+                  type="tel"
+                  {...register("guestPhone")}
+                  placeholder="(92) 99999-9999"
+                  className="pl-12 h-13 sm:h-14 rounded-2xl border-moss-100 bg-moss-50/30 focus:bg-white focus:border-moss-500 focus:ring-4 focus:ring-moss-100 transition-all text-sm sm:text-base"
+                  disabled={isLoading || isCaptchaLoading}
+                />
+              </div>
+              {errors.guestPhone && (
+                <p className="text-xs text-red-500 font-medium ml-1 animate-fadeInUp">{errors.guestPhone.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="guestCount" className="text-xs font-bold uppercase tracking-widest text-moss-600 ml-1">
+                  Adultos
+                </Label>
+                <div className="relative group">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-moss-300 transition-colors group-focus-within:text-moss-600" />
+                  <Input
+                    id="guestCount"
+                    type="number"
+                    min={1}
+                    max={10}
+                    {...register("guestCount", { valueAsNumber: true })}
+                    className="pl-12 h-13 sm:h-14 rounded-2xl border-moss-100 bg-moss-50/30 focus:bg-white focus:border-moss-500 focus:ring-4 focus:ring-moss-100 transition-all text-sm sm:text-base"
+                    disabled={isLoading || isCaptchaLoading}
+                  />
+                </div>
+                {errors.guestCount && (
+                  <p className="text-xs text-red-500 font-medium ml-1 animate-fadeInUp">{errors.guestCount.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="childrenCount" className="text-xs font-bold uppercase tracking-widest text-moss-600 ml-1">
+                  Crianças
+                </Label>
+                <div className="relative group">
+                  <Baby className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-moss-300 transition-colors group-focus-within:text-moss-600" />
+                  <Input
+                    id="childrenCount"
+                    type="number"
+                    min={0}
+                    max={10}
+                    {...register("childrenCount", { valueAsNumber: true })}
+                    className="pl-12 h-13 sm:h-14 rounded-2xl border-moss-100 bg-moss-50/30 focus:bg-white focus:border-moss-500 focus:ring-4 focus:ring-moss-100 transition-all text-sm sm:text-base"
+                    disabled={isLoading || isCaptchaLoading}
+                  />
+                </div>
+                {errors.childrenCount && (
+                  <p className="text-xs text-red-500 font-medium ml-1 animate-fadeInUp">{errors.childrenCount.message}</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-3xl bg-moss-900/[0.02] border border-moss-100/50 p-6 sm:p-8 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-moss-900 flex items-center gap-2">
-            <span className="w-1 h-3 bg-moss-500 rounded-full block" />
+        {/* Políticas da Casa */}
+        <div className="rounded-2xl bg-moss-50/50 border border-moss-100/50 p-5 sm:p-6 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-moss-800 flex items-center gap-2.5">
+            <div className="p-1.5 bg-white rounded-lg border border-moss-100 shadow-sm">
+              <Info className="w-3.5 h-3.5 text-moss-500" />
+            </div>
             Políticas da Casa
           </h4>
-          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
             {[
               "Valores base para 2 adultos",
               "Crianças até 5 anos: Cortesia",
               "Crianças 6-15 anos: R$ 100/noite",
               "Adultos extras: R$ 150/noite"
             ].map((policy, i) => (
-              <li key={i} className="flex items-center gap-2 text-xs text-moss-600 font-light">
-                <div className="w-1 h-1 rounded-full bg-moss-400" />
+              <li key={i} className="flex items-center gap-2.5 text-xs text-moss-500 font-medium">
+                <div className="w-1 h-1 rounded-full bg-moss-400 shrink-0" />
                 {policy}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <Button
-            type="submit"
-            className="w-full sm:w-auto sm:px-12 bg-moss-700 hover:bg-moss-800 text-white h-14 text-lg font-bold shadow-xl hover-lift rounded-2xl transition-all duration-300"
-            disabled={isLoading || isCaptchaLoading}
-          >
-            {isLoading || isCaptchaLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>{isCaptchaLoading ? "Validando segurança..." : "Processando..."}</span>
-              </div>
-            ) : "Confirmar e Pagar"}
-          </Button>
-          <p className="text-[10px] text-moss-400 text-center px-4 leading-tight">
-            Este site é protegido pelo reCAPTCHA e a
-            <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="underline hover:text-moss-600 mx-1">Política de Privacidade</a>
-            e os
-            <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="underline hover:text-moss-600 mx-1">Termos de Serviço</a>
-            do Google se aplicam.
-          </p>
-        </div>
+        {/* Submit - visível apenas no desktop ou se não está escondido */}
+        {!hideSubmitButton && (
+          <div className="flex flex-col gap-4">
+            <Button
+              type="submit"
+              className="w-full sm:w-auto sm:px-12 bg-moss-700 hover:bg-moss-800 text-white h-14 text-base sm:text-lg font-bold shadow-xl hover:shadow-2xl hover:-translate-y-0.5 rounded-2xl transition-all duration-300"
+              disabled={isLoading || isCaptchaLoading}
+            >
+              {isLoading || isCaptchaLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>{isCaptchaLoading ? "Validando segurança..." : "Processando..."}</span>
+                </div>
+              ) : (
+                <>
+                  Confirmar e Pagar
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </>
+              )}
+            </Button>
+            <div className="flex items-center justify-center gap-2 text-moss-400">
+              <Shield className="h-3.5 w-3.5" />
+              <p className="text-[10px] leading-tight">
+                Pagamento seguro protegido pelo reCAPTCHA.{" "}
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="underline hover:text-moss-600 transition-colors">Privacidade</a>
+                {" e "}
+                <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="underline hover:text-moss-600 transition-colors">Termos</a>
+                {" do Google."}
+              </p>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   )

@@ -8,7 +8,9 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react']
-  }
+  },
+  // Configuração para permitir requisições cross-origin em desenvolvimento
+  allowedDevOrigins: ['10.10.24.104']
 }
 
 export default nextConfig

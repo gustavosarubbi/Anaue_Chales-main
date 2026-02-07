@@ -1,10 +1,19 @@
 {
-    "css.validate": false,
-    "scss.validate": false,
-    "files.associations": {
-        "*.css": "tailwindcss"
-    },
-    "editor.quickSuggestions": {
-        "strings": true
-    }
+  "tailwindCSS.includeLanguages": {
+    "css": "css"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "files.associations": {
+    "**/app/globals.css": "tailwindcss",
+    "**/styles/globals.css": "tailwindcss"
+  },
+  "css.customData": [".vscode/css_custom_data.json"],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "css.validate": false,
+  "tailwindCSS.validate": true
 }

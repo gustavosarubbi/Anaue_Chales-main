@@ -41,7 +41,7 @@ export function Accommodations() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-moss-800 rounded-full blur-[120px] -z-0 opacity-50" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-moss-800 rounded-full blur-[120px] -z-0 opacity-50" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <Badge className="mb-4 bg-moss-500/20 text-moss-300 border-moss-500/30">🏨 Nossas Opções</Badge>
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-white mb-6">Escolha Seu Refúgio</h2>

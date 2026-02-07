@@ -196,7 +196,7 @@ export function Gallery() {
 
   return (
     <section id="galeria" className="py-24 bg-stone-50">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="text-center mb-16 space-y-4">
           <Badge variant="outline" className="border-moss-600 text-moss-700 px-4 py-1 text-sm tracking-wide bg-moss-50">

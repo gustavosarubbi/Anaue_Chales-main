@@ -1,14 +1,27 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { ENV } from '@/lib/utils/env'
 
 export async function POST(request: Request) {
     try {
+        const webhookSecret = ENV.INFINITEPAY_WEBHOOK_SECRET
+        if (webhookSecret) {
+            const providedSecret = request.headers.get('x-webhook-secret') || ''
+            if (providedSecret !== webhookSecret) {
+                return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+            }
+        }
+
         const body = await request.json()
-        console.log('[INFINITEPAY_WEBHOOK] Notificação recebida:', JSON.stringify(body))
 
         // InfinitePay Webhook v2 structure
         // Geralmente contém status como 'confirmed', 'paid', 'approved'
         const { state, external_id, id } = body
+        console.log('[INFINITEPAY_WEBHOOK] Notificação recebida:', {
+            external_id,
+            state,
+            id,
+        })
 
         if (!external_id) {
             return NextResponse.json({ success: false, error: 'External ID não encontrado' }, { status: 400 })

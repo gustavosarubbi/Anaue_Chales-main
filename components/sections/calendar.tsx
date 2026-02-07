@@ -154,7 +154,7 @@ function CalendarWidget({
   }
 
   const getDayClasses = (calendarDay: CalendarDay, isPast: boolean, isBookedDate: boolean, isTodayDate: boolean) => {
-    const baseClasses = "text-sm rounded-lg flex items-center justify-center transition-all duration-200 font-medium relative min-h-[40px] sm:min-h-[44px]"
+    const baseClasses = "text-xs sm:text-sm rounded-lg flex items-center justify-center transition-all duration-200 font-medium relative min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
 
     if (!calendarDay.isCurrentMonth) return `${baseClasses} opacity-20 text-moss-900`
     if (isPast) return `${baseClasses} bg-gray-50 text-gray-400 cursor-not-allowed`
@@ -165,25 +165,25 @@ function CalendarWidget({
   }
 
   return (
-    <Card className="bg-white/80 backdrop-blur-md shadow-xl border-white/20 overflow-hidden">
-      <CardContent className="p-4 sm:p-8">
-        <div className="flex items-center justify-between mb-8 gap-4">
+    <Card className="bg-white/80 backdrop-blur-md shadow-xl border-white/20 w-full mx-auto">
+      <CardContent className="p-2.5 sm:p-4 md:p-6 lg:p-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8 gap-1.5 sm:gap-2 md:gap-4">
           <Button
             variant="outline"
             size="icon"
             onClick={() => navigateMonth("prev")}
-            className="h-9 w-9 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
+            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
 
-          <div className="flex gap-2 flex-1 justify-center items-center">
+          <div className="flex gap-1 sm:gap-1.5 md:gap-2 flex-1 justify-center items-center min-w-0">
             <Select
               value={currentDate.getMonth().toString()}
               onValueChange={(value) => handleMonthChange(parseInt(value))}
             >
-              <SelectTrigger className="w-[130px] h-9 text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg">
-                <SelectValue>{MONTH_NAMES[currentDate.getMonth()]}</SelectValue>
+              <SelectTrigger className="w-full max-w-[100px] sm:max-w-[120px] md:max-w-[130px] h-8 sm:h-9 text-[11px] sm:text-xs md:text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg flex-shrink-1">
+                <SelectValue className="truncate">{MONTH_NAMES[currentDate.getMonth()]}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
                 {MONTH_NAMES.map((month, index) => (
@@ -196,7 +196,7 @@ function CalendarWidget({
               value={currentDate.getFullYear().toString()}
               onValueChange={(value) => handleYearChange(parseInt(value))}
             >
-              <SelectTrigger className="w-[90px] h-9 text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg">
+              <SelectTrigger className="w-full max-w-[70px] sm:max-w-[80px] md:max-w-[90px] h-8 sm:h-9 text-[11px] sm:text-xs md:text-sm font-heading font-bold border-moss-200 bg-white/50 text-moss-900 rounded-lg flex-shrink-1">
                 <SelectValue>{currentDate.getFullYear()}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
@@ -211,17 +211,17 @@ function CalendarWidget({
             variant="outline"
             size="icon"
             onClick={() => navigateMonth("next")}
-            className="h-9 w-9 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
+            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </div>
 
-        <div className="px-2 sm:px-4">
+        <div className="w-full">
           <div className="w-full">
-            <div className="grid grid-cols-7 mb-4 gap-2">
+            <div className="grid grid-cols-7 mb-2 sm:mb-3 md:mb-4 gap-0.5 sm:gap-1 md:gap-2 w-full">
               {WEEK_DAYS.map(d => (
-                <div key={d} className="text-xs text-moss-500 font-bold uppercase tracking-wider text-center py-1">
+                <div key={d} className="text-[10px] sm:text-xs text-moss-500 font-bold uppercase tracking-wider text-center py-1 truncate min-w-0">
                   {d}
                 </div>
               ))}
@@ -235,9 +235,9 @@ function CalendarWidget({
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-7 gap-1 sm:gap-2">
+              <div className="grid grid-cols-7 gap-0.5 sm:gap-1 md:gap-2 w-full">
                 {calendarDays.map((calendarDay, i) => {
-                  if (!calendarDay.date) return <div key={i} className="aspect-square" />
+                  if (!calendarDay.date) return <div key={i} className="aspect-square min-w-0 w-full" />
 
                   const { day, date } = calendarDay
                   const isPast = isPastDate(date)
@@ -247,12 +247,12 @@ function CalendarWidget({
                   return (
                     <div
                       key={i}
-                      className={getDayClasses(calendarDay, isPast, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')}
+                      className={`${getDayClasses(calendarDay, isPast, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')} min-w-0 max-w-full`}
                     >
-                      {day}
+                      <span className="text-[11px] sm:text-xs md:text-sm">{day}</span>
                       {isBookedDate && !isPast && (
                         <div className="absolute inset-0 flex items-center justify-center bg-red-100/50 rounded-lg">
-                          <X className="h-4 w-4 text-red-600" />
+                          <X className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
                         </div>
                       )}
                     </div>
@@ -274,14 +274,14 @@ function Sidebar({ chaletId }: { chaletId: string }) {
 
   return (
     <Card className="bg-white/90 backdrop-blur-sm border-moss-100 shadow-xl overflow-hidden sticky top-24">
-      <CardHeader className="bg-moss-50/50 border-b border-moss-100 pb-4">
-        <CardTitle className="text-base font-heading font-bold text-moss-900 flex items-center gap-2">
+      <CardHeader className="bg-moss-50/50 border-b border-moss-100 pb-3 sm:pb-4 px-4 sm:px-6">
+        <CardTitle className="text-sm sm:text-base font-heading font-bold text-moss-900 flex items-center gap-2">
           <CalendarIcon className="h-4 w-4 text-moss-600" />
           Legenda & Reservas
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-4 sm:space-y-6 pt-4 sm:pt-6 px-4 sm:px-6 pb-4 sm:pb-6">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2 p-2 rounded-lg bg-moss-50/50">
             <div className="w-3 h-3 rounded-full bg-white border border-moss-200"></div>
@@ -372,10 +372,10 @@ export function Calendar() {
   }
 
   return (
-    <section id="calendario" className="py-24 bg-stone-50 relative overflow-hidden">
+    <section id="calendario" className="py-12 sm:py-16 md:py-24 bg-stone-50 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-moss-50/50 pointer-events-none" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -392,11 +392,11 @@ export function Calendar() {
             Verifique as das disponíveis em tempo real e garanta sua reserva de forma simples e segura.
           </p>
 
-          <div className="flex justify-center mb-4">
-            <div className="inline-flex p-1 bg-moss-100/50 rounded-2xl border border-moss-100 shadow-inner">
+          <div className="flex justify-center mb-4 px-2">
+            <div className="inline-flex p-1 bg-moss-100/50 rounded-2xl border border-moss-100 shadow-inner w-full max-w-fit">
               <button
                 onClick={() => setSelectedChalet('chale-anaue')}
-                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${selectedChalet === 'chale-anaue'
+                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap ${selectedChalet === 'chale-anaue'
                     ? 'bg-white text-moss-900 shadow-md'
                     : 'text-moss-600 hover:text-moss-800'
                   }`}
@@ -405,7 +405,7 @@ export function Calendar() {
               </button>
               <button
                 onClick={() => setSelectedChalet('chale-2')}
-                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${selectedChalet === 'chale-2'
+                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap ${selectedChalet === 'chale-2'
                     ? 'bg-white text-moss-900 shadow-md'
                     : 'text-moss-600 hover:text-moss-800'
                   }`}
@@ -423,13 +423,13 @@ export function Calendar() {
           )}
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-12 max-w-6xl mx-auto">
           <motion.div
             key={selectedChalet}
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 min-w-0"
           >
             <CalendarWidget onUpdate={handleUpdate} chaletId={selectedChalet} />
           </motion.div>
@@ -439,7 +439,7 @@ export function Calendar() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="lg:col-span-1"
+            className="lg:col-span-1 min-w-0"
           >
             <Sidebar chaletId={selectedChalet} />
           </motion.div>

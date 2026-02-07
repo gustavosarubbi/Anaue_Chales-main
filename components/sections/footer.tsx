@@ -19,9 +19,12 @@ import {
   ArrowUp
 } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 
 export function Footer() {
+  const pathname = usePathname()
+  const isCheckout = pathname === "/checkout"
   const currentYear = new Date().getFullYear()
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -39,13 +42,17 @@ export function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-moss-900/30 blur-[120px] rounded-full pointer-events-none -z-0" />
 
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 py-20 relative z-10">
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12 lg:gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-1 space-y-6">
             <Link href="/" className="flex items-center space-x-3 group">
-              <div className="bg-moss-900/50 p-2.5 rounded-xl border border-moss-800 transition-colors group-hover:border-moss-700">
-                <TreePine className="h-8 w-8 text-beige-300" />
+              <div className="relative w-12 h-12 overflow-hidden rounded-full border-2 border-white/10 bg-white group-hover:border-white/30 transition-colors">
+                <img 
+                  src="/anaue-logo.png" 
+                  alt="Anauê Jungle Chalés" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h3 className="font-heading font-bold text-2xl text-white leading-tight">Anauê Jungle</h3>
@@ -193,7 +200,7 @@ export function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-moss-900 bg-moss-950 relative z-10">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
               <p className="text-moss-400 text-sm">
@@ -221,24 +228,26 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Floating Calendar Button */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1, type: "spring" }}
-        className="fixed bottom-6 right-4 z-50 hidden md:block"
-      >
-        <Button
-          size="icon"
-          className="h-14 w-14 rounded-full bg-moss-600 hover:bg-moss-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 border-4 border-white/10 hover:border-white/20 active:scale-95 group"
-          asChild
+      {/* Floating Calendar Button — hidden on checkout page */}
+      {!isCheckout && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 1, type: "spring" }}
+          className="fixed bottom-24 right-4 md:bottom-[6.5rem] md:right-8 z-50"
         >
-          <Link href="/checkout">
-            <Calendar className="h-6 w-6 group-hover:scale-110 transition-transform" />
-            <span className="sr-only">Explorar Disponibilidade</span>
-          </Link>
-        </Button>
-      </motion.div>
+          <Button
+            size="icon"
+            className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-moss-600 hover:bg-moss-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 border-4 border-white/10 hover:border-white/20 active:scale-95 group"
+            asChild
+          >
+            <Link href="/checkout">
+              <Calendar className="h-5 w-5 md:h-6 md:w-6 group-hover:scale-110 transition-transform" />
+              <span className="sr-only">Explorar Disponibilidade</span>
+            </Link>
+          </Button>
+        </motion.div>
+      )}
     </footer>
   )
 }

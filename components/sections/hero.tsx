@@ -21,7 +21,7 @@ export function Hero() {
     { name: "Comodidades", href: "#comodidades" },
     { name: "Galeria", href: "#galeria" },
     { name: "Disponibilidade", href: "#calendario" },
-    { name: "Localização", href: "#localizacao" },
+    { name: "Localização", href: "#contato" },
     { name: "Preços", href: "#pricing" },
     { name: "Contato", href: "#contato" },
   ]
@@ -68,7 +68,7 @@ export function Hero() {
           : "bg-transparent border-white/10 py-3"
           }`}
       >
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Brand */}
             <Link href="#inicio" className="flex items-center space-x-3 group" onClick={() => scrollToSection("#inicio")}>
@@ -134,7 +134,7 @@ export function Hero() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-moss-900 lg:hidden pt-24 px-6 flex flex-col"
+            className="fixed inset-0 z-40 bg-moss-900 lg:hidden pt-24 px-4 sm:px-6 flex flex-col"
           >
             <nav className="flex flex-col gap-4">
               {navigationItems.map((item, idx) => (
@@ -178,10 +178,11 @@ export function Hero() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg mb-6 border border-white/20 backdrop-blur-sm"
+                  className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg mb-6 border border-white/20 backdrop-blur-sm"
                 >
-                  <span className="text-lg">🎭</span>
-                  {carnaval.name}: 13 a 17 de Fev
+                  <span className="text-base sm:text-lg md:text-xl flex-shrink-0">🎭</span>
+                  <span className="whitespace-nowrap">Pacote Carnaval: 13 a 17 de Fev</span>
+                  <span className="text-base sm:text-lg md:text-xl flex-shrink-0">🎭</span>
                 </motion.div>
                 <div className="block">
                   <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
@@ -254,10 +255,10 @@ export function Hero() {
                 {/* Decorative blob behind card */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-moss-500 to-beige-400 rounded-2xl blur opacity-30 animate-pulse-slow"></div>
 
-                <Card className="relative bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl text-white overflow-hidden">
+                <Card className="relative bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl text-white overflow-hidden mb-4 sm:mb-6 md:mb-8">
                   <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
-                  <CardContent className="p-8 space-y-6">
+                  <CardContent className="p-8 space-y-6 pb-8">
                     <div className="text-center space-y-2">
                       <h3 className="font-heading text-2xl font-bold">Reserva Rápida</h3>
                       <p className="text-moss-200 text-sm">Garanta seu descanso na natureza</p>

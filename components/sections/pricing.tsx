@@ -17,7 +17,7 @@ export function Pricing() {
     <section id="pricing" className="py-24 bg-white texture-lines relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[800px] bg-moss-50/50 rounded-full blur-[100px] -z-10" />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">💰 Investimento</Badge>

@@ -7,7 +7,7 @@ import Link from "next/link"
 export function Location() {
   return (
     <section id="localizacao" className="py-24 bg-gradient-to-br from-beige-50 to-moss-50 texture-waves relative">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">📍 Localização Privilegiada</Badge>

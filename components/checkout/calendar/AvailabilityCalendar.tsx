@@ -1,15 +1,56 @@
 "use client"
 
 import React, { useState, useMemo, useCallback } from "react"
-import { addMonths, subMonths, startOfMonth, isSameDay, format } from "date-fns"
-import { ptBR } from "date-fns/locale/pt-BR"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { useAvailability } from "@/hooks/useAvailability"
-import { CalendarMonth } from "./CalendarMonth"
 import { CalendarLegend } from "./CalendarLegend"
-import { AvailabilityCalendarProps } from "./types"
-import { Loader2 } from "lucide-react"
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 
+interface AvailabilityCalendarProps {
+  checkIn?: Date
+  checkOut?: Date
+  onDatesChange: (checkIn: Date | undefined, checkOut: Date | undefined) => void
+  disabledDates?: Date[]
+  minDate?: Date
+  maxDate?: Date
+  numberOfMonths?: number
+  chaletId?: string
+}
+
+const MONTH_NAMES = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+]
+const WEEK_DAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"]
+
+// ---------- helpers ----------
+function toKey(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+function sameDay(a: Date | undefined, b: Date) {
+  if (!a) return false
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
+function isBeforeDay(a: Date, b: Date) {
+  return toKey(a) < toKey(b)
+}
+
+function isBetween(date: Date, start: Date, end: Date) {
+  const k = toKey(date)
+  return k > toKey(start) && k < toKey(end)
+}
+
+interface CalendarDay {
+  day: number
+  date: Date
+  isCurrentMonth: boolean
+}
+
+// ---------- component ----------
 export function AvailabilityCalendar({
   checkIn,
   checkOut,
@@ -18,229 +59,316 @@ export function AvailabilityCalendar({
   minDate = new Date(),
   maxDate,
   numberOfMonths = 1,
-  chaletId = 'chale-anaue',
+  chaletId = "chale-anaue",
 }: AvailabilityCalendarProps) {
   const { availability, isLoading } = useAvailability(chaletId)
-  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(minDate))
-  const [hoverDate, setHoverDate] = useState<Date | null>(null)
+  const [viewDate, setViewDate] = useState(() => new Date())
 
-  // Calcular maxDate padrão (2 anos a partir de hoje)
-  const defaultMaxDate = useMemo(() => {
+  // Build a Set of disabled date keys for O(1) lookup
+  const disabledKeys = useMemo(() => {
+    const keys = new Set<string>()
+    // from availability API
+    Object.entries(availability).forEach(([dateStr, status]) => {
+      if (status) keys.add(dateStr)
+    })
+    // from props
+    disabledDates.forEach((d) => keys.add(toKey(d)))
+    return keys
+  }, [availability, disabledDates])
+
+  const effectiveMaxDate = useMemo(() => {
     if (maxDate) return maxDate
-    const date = new Date()
-    date.setFullYear(date.getFullYear() + 2)
-    return date
+    const d = new Date()
+    d.setFullYear(d.getFullYear() + 2)
+    return d
   }, [maxDate])
 
-  // Calcular meses a exibir
-  const monthsToDisplay = useMemo(() => {
-    const months = []
-    for (let i = 0; i < numberOfMonths; i++) {
-      const month = addMonths(currentMonth, i)
-      months.push(month)
-    }
-    return months
-  }, [currentMonth, numberOfMonths])
+  // Build the grid of days for the current view month
+  const calendarDays = useMemo<CalendarDay[]>(() => {
+    const year = viewDate.getFullYear()
+    const month = viewDate.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const daysInMonth = lastDay.getDate()
+    const startDow = firstDay.getDay() // 0=Sun
 
-  const handleDateClick = useCallback((date: Date) => {
-    // Normalizar data para evitar problemas de timezone
-    const normalizedDate = new Date(date)
-    normalizedDate.setHours(0, 0, 0, 0)
+    const days: CalendarDay[] = []
 
-    // Verificar se a data está desabilitada
-    if (disabledDates.some((d) => isSameDay(d, normalizedDate))) {
-      return
-    }
-
-    // Verificar se é passado
-    if (normalizedDate < minDate) {
-      return
+    // Previous month fill
+    const prevMonth = new Date(year, month, 0)
+    const prevMonthDays = prevMonth.getDate()
+    for (let i = startDow - 1; i >= 0; i--) {
+      const day = prevMonthDays - i
+      days.push({ day, date: new Date(year, month - 1, day), isCurrentMonth: false })
     }
 
-    const dateStr = format(normalizedDate, "yyyy-MM-dd")
+    // Current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push({ day, date: new Date(year, month, day), isCurrentMonth: true })
+    }
 
-    // Lógica de seleção
-    if (!checkIn || (checkIn && checkOut)) {
-      // Se já tem check-in e check-out, e clicar no check-in novamente, deselecionar
-      if (checkIn && checkOut && isSameDay(normalizedDate, checkIn)) {
-        onDatesChange(undefined, undefined)
-        return
-      }
-      // Se já tem check-in e check-out, e clicar no check-out novamente, deselecionar check-out
-      if (checkIn && checkOut && isSameDay(normalizedDate, checkOut)) {
-        onDatesChange(checkIn, undefined)
-        return
-      }
-      // Nova seleção: definir check-in (só se não estiver ocupada)
-      if (availability[dateStr]) {
-        return
-      }
-      onDatesChange(normalizedDate, undefined)
-    } else if (checkIn && !checkOut) {
-      // Se clicar no mesmo dia do check-in, deselecionar
-      if (isSameDay(normalizedDate, checkIn)) {
-        onDatesChange(undefined, undefined)
-        return
-      }
-      // Selecionar check-out
-      if (normalizedDate <= checkIn) {
-        // Se a data selecionada é antes ou igual ao check-in, definir novo check-in (só se não estiver ocupada)
-        if (availability[dateStr]) {
-          return
-        }
-        onDatesChange(normalizedDate, undefined)
+    // Next month fill (always 6 rows = 42 cells)
+    const remaining = 42 - days.length
+    for (let day = 1; day <= remaining; day++) {
+      days.push({ day, date: new Date(year, month + 1, day), isCurrentMonth: false })
+    }
+
+    return days
+  }, [viewDate])
+
+  // Navigation
+  const goToPrev = useCallback(() => {
+    setViewDate((prev) => {
+      const d = new Date(prev)
+      d.setMonth(d.getMonth() - 1)
+      return d
+    })
+  }, [])
+
+  const goToNext = useCallback(() => {
+    setViewDate((prev) => {
+      const d = new Date(prev)
+      d.setMonth(d.getMonth() + 1)
+      return d
+    })
+  }, [])
+
+  // Date helpers
+  const todayKey = useMemo(() => toKey(new Date()), [])
+
+  const isDayDisabled = useCallback(
+    (date: Date) => {
+      if (isBeforeDay(date, minDate) && toKey(date) !== toKey(minDate)) return true
+      if (isBeforeDay(effectiveMaxDate, date)) return true
+      return disabledKeys.has(toKey(date))
+    },
+    [minDate, effectiveMaxDate, disabledKeys]
+  )
+
+  const isPast = useCallback(
+    (date: Date) => {
+      return toKey(date) < todayKey
+    },
+    [todayKey]
+  )
+
+  // Click handler – range selection logic
+  const handleDayClick = useCallback(
+    (date: Date) => {
+      if (isDayDisabled(date) || isPast(date)) return
+      if (!date) return
+
+      if (!checkIn || (checkIn && checkOut)) {
+        // Start new selection
+        onDatesChange(date, undefined)
       } else {
-        // Calcular o dia seguinte ao check-in
-        const nextDay = new Date(checkIn)
-        nextDay.setDate(nextDay.getDate() + 1)
-        const isNextDay = isSameDay(normalizedDate, nextDay)
-
-        // Se for o dia seguinte ao check-in, permitir mesmo que esteja ocupado
-        if (isNextDay) {
-          onDatesChange(checkIn, normalizedDate)
-          return
-        }
-
-        // Para outros dias, verificar se há no máximo 1 dia ocupado consecutivo
-        let current = new Date(checkIn)
-        current.setDate(current.getDate() + 1)
-
-        let consecutiveOccupied = 0
-        let maxConsecutiveOccupied = 0
-        let hasOccupiedDays = false
-
-        // Verificar apenas os dias entre check-in e check-out (excluindo o check-out)
-        while (current < normalizedDate) {
-          const checkDateStr = format(current, "yyyy-MM-dd")
-          if (availability[checkDateStr]) {
-            hasOccupiedDays = true
-            consecutiveOccupied++
-            maxConsecutiveOccupied = Math.max(maxConsecutiveOccupied, consecutiveOccupied)
-          } else {
-            consecutiveOccupied = 0
-          }
-          current.setDate(current.getDate() + 1)
-        }
-
-        // Permitir se não houver dias ocupados OU se houver no máximo 1 dia ocupado consecutivo
-        if (!hasOccupiedDays || maxConsecutiveOccupied <= 1) {
-          // Permitir check-out mesmo que o próprio dia esteja ocupado
-          onDatesChange(checkIn, normalizedDate)
+        // We have checkIn but no checkOut
+        if (sameDay(checkIn, date)) {
+          // Clicked same day – reset
+          onDatesChange(undefined, undefined)
+        } else if (isBeforeDay(date, checkIn)) {
+          // Clicked before checkIn – restart with this as checkIn
+          onDatesChange(date, undefined)
         } else {
-          // Se há mais de 1 dia ocupado consecutivo, definir novo check-in (só se não estiver ocupada)
-          if (availability[dateStr]) {
-            return
+          // Valid checkout
+          // Check if any disabled date falls between checkIn and date
+          const key = toKey(date)
+          const ciKey = toKey(checkIn)
+          let hasBlockedInBetween = false
+          for (const dk of disabledKeys) {
+            if (dk > ciKey && dk < key) {
+              hasBlockedInBetween = true
+              break
+            }
           }
-          onDatesChange(normalizedDate, undefined)
+          if (hasBlockedInBetween) {
+            // Restart with clicked date
+            onDatesChange(date, undefined)
+          } else {
+            onDatesChange(checkIn, date)
+          }
         }
       }
-    }
-  }, [checkIn, checkOut, onDatesChange, availability, disabledDates, minDate])
+    },
+    [checkIn, checkOut, onDatesChange, isDayDisabled, isPast, disabledKeys]
+  )
 
-  const handlePreviousMonth = useCallback(() => {
-    const newMonth = subMonths(currentMonth, 1)
-    const minMonth = startOfMonth(minDate)
-    if (newMonth >= minMonth) {
-      setCurrentMonth(newMonth)
-    }
-  }, [currentMonth, minDate])
+  // Determine visual state of each day
+  const getDayState = useCallback(
+    (date: Date, isCurrentMonth: boolean) => {
+      const key = toKey(date)
+      const past = isPast(date)
+      const disabled = isDayDisabled(date)
+      const isToday = key === todayKey
+      const isCheckIn = sameDay(checkIn, date)
+      const isCheckOut = sameDay(checkOut, date)
+      const inRange =
+        checkIn && checkOut && isCurrentMonth && isBetween(date, checkIn, checkOut)
+      const isOccupied = disabledKeys.has(key) && !past
 
-  const handleNextMonth = useCallback(() => {
-    const newMonth = addMonths(currentMonth, 1)
-    const maxMonth = startOfMonth(defaultMaxDate)
-    if (newMonth <= maxMonth) {
-      setCurrentMonth(newMonth)
-    }
-  }, [currentMonth, defaultMaxDate])
-
-  const canGoPrevious = useMemo(() => {
-    const minMonth = startOfMonth(minDate)
-    return currentMonth > minMonth
-  }, [currentMonth, minDate])
-
-  const canGoNext = useMemo(() => {
-    const maxMonth = startOfMonth(defaultMaxDate)
-    const lastDisplayedMonth = addMonths(currentMonth, numberOfMonths - 1)
-    return lastDisplayedMonth < maxMonth
-  }, [currentMonth, defaultMaxDate, numberOfMonths])
-
+      return { past, disabled, isToday, isCheckIn, isCheckOut, inRange, isOccupied, isCurrentMonth }
+    },
+    [checkIn, checkOut, todayKey, isPast, isDayDisabled, disabledKeys]
+  )
 
   return (
-    <div
-      className={cn(
-        "relative w-full space-y-6 px-1 sm:px-0",
-        "animate-fadeInUp"
-      )}
-      onMouseLeave={() => setHoverDate(null)}
-    >
+    <div className="relative w-full flex flex-col items-center gap-5">
       {/* Loading overlay */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-moss-600 opacity-50" />
-            <p className="text-xs font-medium text-moss-600 uppercase tracking-widest">Sincronizando Disponibilidade...</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm rounded-2xl">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-7 w-7 animate-spin text-moss-600" />
+            <p className="text-[11px] font-semibold text-moss-500 uppercase tracking-widest">
+              Carregando disponibilidade…
+            </p>
           </div>
         </div>
       )}
 
-      {/* Navegação de meses */}
+      {/* Calendar card */}
+      <div className="w-full bg-white rounded-2xl border border-stone-200/80 shadow-sm overflow-hidden">
+        {/* Header – month navigation */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-stone-100">
+          <button
+            type="button"
+            onClick={goToPrev}
+            aria-label="Mês anterior"
+            className="p-2 rounded-full text-moss-500 hover:text-moss-800 hover:bg-moss-50 transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
 
+          <h3 className="text-base sm:text-lg font-semibold text-moss-900 capitalize select-none font-heading">
+            {MONTH_NAMES[viewDate.getMonth()]} {viewDate.getFullYear()}
+          </h3>
 
-      {/* Grid de meses - Responsivo */}
-      {!isLoading && (
-        <div className={cn(
-          "grid gap-4 lg:gap-12 justify-center",
-          "grid-cols-1",
-          numberOfMonths >= 2 && "md:grid-cols-2",
-          numberOfMonths >= 3 && "lg:grid-cols-3"
-        )}>
-          {monthsToDisplay.map((month, index) => (
-            <div key={format(month, "yyyy-MM")} className="w-full">
-              <CalendarMonth
-                month={month}
-                availability={availability}
-                checkIn={checkIn}
-                checkOut={checkOut}
-                hoverDate={hoverDate}
-                onDateClick={handleDateClick}
-                onHoverDate={setHoverDate}
-                minDate={minDate}
-                maxDate={defaultMaxDate}
-                isLoading={false}
-                // Navigation Logic
-                onPreviousMonth={index === 0 ? handlePreviousMonth : undefined}
-                onNextMonth={index === monthsToDisplay.length - 1 ? handleNextMonth : undefined}
-                canGoPrevious={index === 0 ? canGoPrevious : undefined}
-                canGoNext={index === monthsToDisplay.length - 1 ? canGoNext : undefined}
-              />
+          <button
+            type="button"
+            onClick={goToNext}
+            aria-label="Próximo mês"
+            className="p-2 rounded-full text-moss-500 hover:text-moss-800 hover:bg-moss-50 transition-colors"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Weekday headers */}
+        <div className="grid grid-cols-7 px-2 sm:px-4 pt-3 pb-1">
+          {WEEK_DAYS.map((wd) => (
+            <div
+              key={wd}
+              className="text-center text-[11px] sm:text-xs font-semibold text-moss-400 uppercase tracking-wide select-none"
+            >
+              {wd}
             </div>
           ))}
         </div>
-      )}
 
-      {/* Legenda e Info */}
-      {!isLoading && (
-        <div className="space-y-6 pt-4">
-          <CalendarLegend />
+        {/* Days grid */}
+        <div className="grid grid-cols-7 gap-y-1 px-2 sm:px-4 pb-4 pt-1">
+          {calendarDays.map((cd, i) => {
+            const state = getDayState(cd.date, cd.isCurrentMonth)
 
-          <div className={cn(
-            "text-center py-6 bg-moss-50/50 rounded-2xl border border-moss-100/50",
-            "mx-auto max-w-md sm:max-w-none px-4"
-          )}>
-            <p className="text-[10px] sm:text-xs font-bold text-moss-900 uppercase tracking-widest mb-1.5">
-              Status da Seleção
-            </p>
-            <p className="text-xs sm:text-sm text-moss-700 font-light">
-              {checkIn && checkOut
-                ? <span className="text-moss-950 font-medium">{format(checkIn, "dd/MM", { locale: ptBR })} — {format(checkOut, "dd/MM", { locale: ptBR })}</span>
-                : checkIn
-                  ? <span>Check-in: <strong className="text-moss-900">{format(checkIn, "dd/MM", { locale: ptBR })}</strong>. Selecione o checkout.</span>
-                  : "👆 Toque em uma data para iniciar sua reserva"}
-            </p>
-          </div>
+            // Outside-month days: render invisible placeholder to keep grid alignment
+            if (!cd.isCurrentMonth) {
+              return (
+                <div key={i} className="flex items-center justify-center aspect-square p-0.5">
+                  <span className="text-[11px] sm:text-sm text-stone-200 select-none">{cd.day}</span>
+                </div>
+              )
+            }
+
+            const isSelected = state.isCheckIn || state.isCheckOut
+            const interactive = !state.past && !state.disabled
+
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "flex items-center justify-center aspect-square p-0.5 relative",
+                  // Range background band
+                  state.inRange && "bg-moss-50"
+                )}
+              >
+                {/* Range edge rounding helpers */}
+                {state.isCheckIn && checkOut && (
+                  <div className="absolute inset-y-0 right-0 w-1/2 bg-moss-50" />
+                )}
+                {state.isCheckOut && checkIn && (
+                  <div className="absolute inset-y-0 left-0 w-1/2 bg-moss-50" />
+                )}
+
+                <div
+                  onClick={() => interactive && handleDayClick(cd.date)}
+                  role={interactive ? "button" : undefined}
+                  tabIndex={interactive ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if (interactive && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault()
+                      handleDayClick(cd.date)
+                    }
+                  }}
+                  className={cn(
+                    "relative z-10 w-full h-full max-w-[40px] max-h-[40px] sm:max-w-[44px] sm:max-h-[44px] mx-auto",
+                    "flex items-center justify-center rounded-full text-sm sm:text-[15px] font-medium",
+                    "transition-all duration-150 select-none",
+
+                    // Default – available
+                    interactive && !isSelected && !state.isOccupied && !state.isToday &&
+                      "text-moss-800 hover:bg-moss-100 cursor-pointer",
+
+                    // Today
+                    state.isToday && !isSelected &&
+                      "text-moss-900 font-bold ring-2 ring-moss-300 ring-inset",
+
+                    // Past
+                    state.past &&
+                      "text-stone-300 cursor-default",
+
+                    // Occupied (booked)
+                    state.isOccupied && !state.past &&
+                      "text-red-300 line-through decoration-red-300/70 cursor-not-allowed",
+
+                    // Selected (check-in or check-out)
+                    isSelected &&
+                      "bg-moss-700 text-white font-semibold shadow-md cursor-pointer",
+
+                    // In range
+                    state.inRange && !isSelected && !state.isOccupied &&
+                      "text-moss-800",
+                  )}
+                >
+                  {cd.day}
+                </div>
+              </div>
+            )
+          })}
         </div>
-      )}
+      </div>
+
+      {/* Legend */}
+      <CalendarLegend />
+
+      {/* Selection status */}
+      <div className="w-full text-center py-4 px-4 bg-stone-50 rounded-xl border border-stone-100">
+        <p className="text-xs sm:text-sm text-moss-600">
+          {checkIn && checkOut ? (
+            <span className="text-moss-900 font-medium">
+              {format(checkIn, "dd 'de' MMM", { locale: ptBR })} — {format(checkOut, "dd 'de' MMM", { locale: ptBR })}
+              <span className="text-moss-500 font-normal ml-1.5">
+                ({Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))} noite{Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) > 1 ? "s" : ""})
+              </span>
+            </span>
+          ) : checkIn ? (
+            <span>
+              Check-in: <strong className="text-moss-900">{format(checkIn, "dd 'de' MMM", { locale: ptBR })}</strong>
+              <span className="text-moss-400 mx-1">→</span> Selecione o check-out
+            </span>
+          ) : (
+            <span className="text-moss-400">Toque em uma data para selecionar o check-in</span>
+          )}
+        </p>
+      </div>
     </div>
   )
 }
-
