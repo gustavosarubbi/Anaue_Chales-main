@@ -110,7 +110,7 @@ export function Accommodations() {
                       asChild
                     >
                       <a
-                        href={`https://wa.me/5592984534442?text=${encodeURIComponent(acc.whatsappMessage)}`}
+                        href={`https://wa.me/559294197052?text=${encodeURIComponent(acc.whatsappMessage)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
