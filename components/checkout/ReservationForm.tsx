@@ -295,7 +295,7 @@ export function ReservationForm({
                 htmlFor="terms"
                 className="text-sm font-medium leading-relaxed text-moss-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Li e concordo com os <a href="/#pricing" target="_blank" className="underline text-moss-900 hover:text-moss-700">Termos de Uso e Política de Cancelamento</a>.
+                Li e concordo com os <a href="/#politica-cancelamento" target="_blank" className="underline text-moss-900 hover:text-moss-700">Termos de Uso e Política de Cancelamento</a>.
               </Label>
               <p className="text-[11px] text-moss-500 text-muted-foreground">
                 Ao continuar, você declara estar ciente das regras de hospedagem, horários e políticas de reembolso.

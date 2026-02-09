@@ -235,6 +235,7 @@ export function Pricing() {
 
         {/* Política de Cancelamento e Reagendamento */}
         <motion.div
+          id="politica-cancelamento"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
