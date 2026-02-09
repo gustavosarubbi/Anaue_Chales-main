@@ -319,21 +319,29 @@ export function Pricing() {
                       <div className="w-12 h-12 rounded-full bg-moss-100 flex items-center justify-center flex-shrink-0">
                         <div className="w-4 h-4 rounded-full bg-moss-500" />
                       </div>
-                      <p className="text-lg text-moss-900 font-bold">Permitido com 72h de antecedência</p>
+                      <p className="text-lg text-moss-900 font-bold">Taxa de R$ 100,00</p>
                     </div>
                     
                     <p className="text-sm text-moss-600 leading-relaxed mb-6 pl-16">
-                      Para reagendar sua reserva sem custo adicional, é necessário solicitar com antecedência mínima. Caso contrário, será cobrada uma taxa administrativa.
+                      O reagendamento é permitido sempre mediante taxa de R$ 100,00, desde que solicitado com <strong>no mínimo 72h de antecedência</strong> do check-in.
                     </p>
 
                     <div className="mt-auto pl-16">
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-moss-100/50 rounded-lg border border-moss-200/50">
-                        <span className="text-xs text-moss-600 font-medium uppercase tracking-wide">Taxa de Reagendamento:</span>
-                        <strong className="text-moss-900">R$ 100,00</strong>
+                        <span className="text-xs text-moss-600 font-medium uppercase tracking-wide">Prazo Mínimo:</span>
+                        <strong className="text-moss-900">72h antes</strong>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Aviso Legal / Disclaimer */}
+              <div className="mt-8 pt-6 border-t border-moss-50 text-center">
+                <p className="text-[10px] text-moss-400 max-w-2xl mx-auto leading-normal">
+                  * De acordo com o Código de Defesa do Consumidor (Art. 49), o prazo de reflexão de 7 dias é garantido para compras online. 
+                  Ao realizar a reserva, você declara estar ciente e de acordo com as políticas de cancelamento e reagendamento acima descritas.
+                </p>
               </div>
             </CardContent>
           </Card>

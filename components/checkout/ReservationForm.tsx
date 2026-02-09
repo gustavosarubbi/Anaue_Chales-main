@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { User, Mail, Phone, Users, Baby, Loader2, Shield, ArrowRight, Info } from "lucide-react"
 import { ENV } from "@/lib/utils/env"
 import { toast } from "sonner"
@@ -19,6 +20,9 @@ const reservationSchema = z.object({
   guestCount: z.number({ invalid_type_error: "Informe um número válido" }).min(1, "Mínimo 1 adulto").max(10, "Máximo 10 adultos"),
   childrenCount: z.number({ invalid_type_error: "Informe um número válido" }).min(0, "Mínimo 0").max(10, "Máximo 10 crianças"),
   captchaToken: z.string().optional(),
+  termsAccepted: z.literal(true, {
+    errorMap: () => ({ message: "Você precisa aceitar os termos e condições para continuar." }),
+  }),
 })
 
 export type ReservationFormData = z.infer<typeof reservationSchema>
@@ -274,6 +278,33 @@ export function ReservationForm({
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Termos e Condições Checkbox */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start space-x-2">
+            <Checkbox 
+              id="terms" 
+              className="mt-1"
+              onCheckedChange={(checked) => {
+                setValue("termsAccepted", checked === true ? true : undefined, { shouldValidate: true })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <Label
+                htmlFor="terms"
+                className="text-sm font-medium leading-relaxed text-moss-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Li e concordo com os <a href="/#pricing" target="_blank" className="underline text-moss-900 hover:text-moss-700">Termos de Uso e Política de Cancelamento</a>.
+              </Label>
+              <p className="text-[11px] text-moss-500 text-muted-foreground">
+                Ao continuar, você declara estar ciente das regras de hospedagem, horários e políticas de reembolso.
+              </p>
+            </div>
+          </div>
+          {errors.termsAccepted && (
+            <p className="text-xs text-red-500 font-medium ml-7 animate-fadeInUp">{errors.termsAccepted.message}</p>
+          )}
         </div>
 
         {/* Submit - visível apenas no desktop ou se não está escondido */}
