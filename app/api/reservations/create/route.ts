@@ -16,6 +16,9 @@ const reservationSchema = z.object({
   childrenCount: z.number().min(0).max(10).optional(),
   chaletId: z.string().optional(),
   captchaToken: z.string().optional(),
+  termsAccepted: z.literal(true, {
+    errorMap: () => ({ message: "O aceite dos termos é obrigatório." }),
+  }),
 })
 
 export async function POST(request: Request) {
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount, chaletId, captchaToken } = result.data
+    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount, chaletId, captchaToken, termsAccepted } = result.data
 
     // 2. Verificação do reCAPTCHA (se configurado)
     if (ENV.RECAPTCHA_SECRET_KEY && ENV.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
@@ -174,6 +177,7 @@ export async function POST(request: Request) {
         status: 'pending',
         chalet_id: chaletId || 'chale-anaue',
         expires_at: expiresAt,
+        terms_accepted: termsAccepted,
       })
       .select()
       .single()
