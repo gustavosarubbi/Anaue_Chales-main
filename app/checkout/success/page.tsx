@@ -1,62 +1,123 @@
 "use client"
 
 import { Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Home, Calendar, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Footer } from "@/components/sections/footer"
 import { WhatsAppButton } from "@/components/ui/whatsapp-button"
 
+/**
+ * Página de sucesso após pagamento na InfinitePay.
+ * 
+ * A InfinitePay redireciona para cá com os seguintes parâmetros:
+ * - order_nsu: ID do pedido (nosso reservation ID)
+ * - transaction_nsu: ID da transação
+ * - slug: Código da fatura InfinitePay
+ * - capture_method: "credit_card" ou "pix"
+ * - receipt_url: Link do comprovante
+ * 
+ * Ao carregar, confirma a reserva automaticamente no Supabase.
+ */
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const [status, setStatus] = useState<string | null>(null)
-  const [paymentId, setPaymentId] = useState<string | null>(null)
+  const [confirmed, setConfirmed] = useState(false)
+  const [confirming, setConfirming] = useState(true)
+  const hasAttempted = useRef(false)
 
   useEffect(() => {
-    const statusParam = searchParams.get("status")
-    const paymentIdParam = searchParams.get("payment_id")
-    const externalReference = searchParams.get("external_reference")
+    if (hasAttempted.current) return
+    hasAttempted.current = true
 
-    if (statusParam) {
-      setStatus(statusParam)
+    // Parâmetros enviados pela InfinitePay no redirect
+    const orderNsu = searchParams.get("order_nsu")
+    // Fallback para parâmetro customizado (caso use URL direta/fallback)
+    const reservationId = searchParams.get("reservation_id")
+    // Outros parâmetros da InfinitePay
+    const transactionNsu = searchParams.get("transaction_nsu")
+    const slug = searchParams.get("slug")
+    const captureMethod = searchParams.get("capture_method")
+    const receiptUrl = searchParams.get("receipt_url")
+
+    // O ID da reserva pode vir como order_nsu (API oficial) ou reservation_id (fallback)
+    const effectiveId = orderNsu || reservationId
+
+    console.log('[SUCCESS] Parâmetros recebidos:', {
+      order_nsu: orderNsu,
+      reservation_id: reservationId,
+      transaction_nsu: transactionNsu,
+      slug,
+      capture_method: captureMethod,
+      receipt_url: receiptUrl,
+    })
+
+    if (!effectiveId) {
+      console.log('[SUCCESS] Nenhum ID de reserva nos parâmetros — exibindo sucesso genérico')
+      setConfirming(false)
+      setConfirmed(true)
+      return
     }
 
-    if (paymentIdParam) {
-      setPaymentId(paymentIdParam)
-    }
+    console.log('[SUCCESS] Confirmando reserva:', effectiveId)
 
-    // Verificar status do pagamento
-    if (externalReference) {
-      fetch(`/api/payments/webhook?external_reference=${externalReference}&payment_id=${paymentIdParam || ""}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.reservation) {
-            setStatus(data.reservation.payment_status || statusParam || "approved")
-          }
-        })
-        .catch((error) => {
-          console.error("Erro ao verificar status:", error)
-        })
-    }
+    // 1. Primeiro, verificar status do pagamento na InfinitePay (opcional, double-check)
+    // 2. Confirmar a reserva no nosso banco
+    fetch('/api/reservations/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reservationId: effectiveId,
+        transactionNsu,
+        slug,
+        captureMethod,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('[SUCCESS] Resposta da confirmação:', data)
+        setConfirmed(true)
+      })
+      .catch(err => {
+        console.error('[SUCCESS] Erro na confirmação (pagamento já foi realizado):', err)
+        setConfirmed(true)
+      })
+      .finally(() => {
+        setConfirming(false)
+      })
   }, [searchParams])
+
+  if (confirming) {
+    return (
+      <Card className="shadow-xl shadow-moss-900/5 border-white/40 bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden relative">
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-300 via-green-400 to-emerald-400 animate-pulse" />
+        <CardContent className="pt-20 pb-20">
+          <div className="flex flex-col items-center justify-center space-y-5">
+            <div className="inline-flex items-center justify-center p-4 bg-green-50 rounded-full border border-green-100">
+              <Loader2 className="h-10 w-10 animate-spin text-green-600" />
+            </div>
+            <div className="space-y-2 text-center">
+              <p className="text-moss-900 font-heading font-bold text-xl">Confirmando pagamento...</p>
+              <p className="text-moss-500 text-sm font-light">Estamos registrando sua reserva no sistema</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="shadow-xl shadow-green-900/10 animate-fadeInUp border-green-100/50 bg-white/90 backdrop-blur-md rounded-3xl overflow-hidden relative">
-      {/* Barra colorida no topo */}
       <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-400 via-green-500 to-emerald-500" />
 
       <CardContent className="pt-16 pb-16 px-6 sm:px-10 text-center space-y-8">
-        {/* Icone com glow */}
         <div className="inline-flex items-center justify-center p-6 bg-green-50 rounded-full shadow-inner border border-green-100 relative group">
           <div className="absolute inset-0 bg-green-200/20 rounded-full animate-ping opacity-20 duration-1000" />
           <CheckCircle2 className="h-16 w-16 text-green-600 relative z-10 drop-shadow-sm" />
         </div>
 
-        {/* Titulo e descricao */}
         <div className="space-y-3">
           <h1 className="text-3xl sm:text-4xl font-bold text-moss-900 font-heading tracking-tight">
             Reserva Confirmada!
@@ -67,17 +128,20 @@ function CheckoutSuccessContent() {
           </p>
         </div>
 
-        {/* Payment ID */}
-        {paymentId && (
+        {/* Comprovante (se InfinitePay enviou) */}
+        {searchParams.get("receipt_url") && (
           <div className="rounded-2xl bg-moss-50/50 border border-moss-100/50 p-5 max-w-sm mx-auto">
-            <p className="text-[10px] font-bold text-moss-400 uppercase tracking-widest mb-2">
-              ID do Pagamento
-            </p>
-            <p className="text-sm text-moss-800 font-mono font-semibold break-all">{paymentId}</p>
+            <a
+              href={searchParams.get("receipt_url")!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-moss-700 underline underline-offset-2 decoration-moss-300 hover:text-moss-900 font-medium"
+            >
+              📄 Ver comprovante de pagamento
+            </a>
           </div>
         )}
 
-        {/* Botoes */}
         <div className="pt-2 space-y-3 max-w-sm mx-auto">
           <Button
             asChild
