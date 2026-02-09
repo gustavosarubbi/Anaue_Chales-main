@@ -58,14 +58,16 @@ export async function GET(request: Request) {
       bookedDates[date] = "booked"
     })
 
-    // 3. Buscar reservas confirmadas no Supabase
+    // 3. Buscar reservas confirmadas e pendentes no Supabase
     try {
       const supabase = createServerClient()
       if (supabase) {
         const now = new Date().toISOString()
+        // Incluir reservas confirmadas OU pendentes com expires_at ainda válido
+        // Isso inclui reservas com cartão de crédito que foram estendidas para 24h
         const { data: reservations, error: dbError } = await supabase
           .from("reservations")
-          .select("check_in, check_out, status, expires_at")
+          .select("check_in, check_out, status, expires_at, payment_status")
           .eq("chalet_id", chaletId)
           .or(`status.eq.confirmed,and(status.eq.pending,expires_at.gt.${now})`)
 

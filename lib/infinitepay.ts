@@ -101,10 +101,18 @@ export async function createInfinitePayPayment(data: InfinitePayPaymentData) {
         })
 
         const responseText = await response.text()
-        console.log('[INFINITEPAY] Resposta da API:', response.status, responseText)
+        console.log('[INFINITEPAY] Resposta da API (status:', response.status, '):', responseText.substring(0, 200))
 
         if (!response.ok) {
-            throw new Error(`Erro na API InfinitePay (${response.status}): ${responseText}`)
+            // Tentar extrair mensagem de erro se for JSON
+            let errorMessage = `Erro na API InfinitePay (${response.status})`
+            try {
+                const errorJson = JSON.parse(responseText)
+                errorMessage = errorJson.message || errorJson.error || errorMessage
+            } catch {
+                errorMessage = `${errorMessage}: ${responseText.substring(0, 100)}`
+            }
+            throw new Error(errorMessage)
         }
 
         // A API retorna o link de checkout
@@ -113,16 +121,34 @@ export async function createInfinitePayPayment(data: InfinitePayPaymentData) {
 
         try {
             const jsonResponse = JSON.parse(responseText)
-            // Tentar extrair URL de diferentes formatos de resposta
-            checkoutUrl = jsonResponse.url || jsonResponse.checkout_url || jsonResponse.link || responseText
-        } catch {
-            // Se não for JSON, a resposta é a URL diretamente
-            checkoutUrl = responseText.trim()
+            // Tentar extrair URL de diferentes formatos de resposta possíveis
+            checkoutUrl = jsonResponse.url || 
+                         jsonResponse.checkout_url || 
+                         jsonResponse.link || 
+                         jsonResponse.checkout_link ||
+                         jsonResponse.payment_url ||
+                         jsonResponse.data?.url ||
+                         jsonResponse.data?.checkout_url ||
+                         jsonResponse.data?.link ||
+                         null
+            
+            // Se ainda não encontrou, verificar se a resposta é uma URL válida
+            if (!checkoutUrl && typeof jsonResponse === 'string' && jsonResponse.startsWith('http')) {
+                checkoutUrl = jsonResponse
+            }
+        } catch (parseError) {
+            // Se não for JSON, a resposta pode ser a URL diretamente
+            const trimmedText = responseText.trim()
+            if (trimmedText.startsWith('http')) {
+                checkoutUrl = trimmedText
+            } else {
+                throw new Error(`Formato de resposta inesperado da API InfinitePay: ${trimmedText.substring(0, 100)}`)
+            }
         }
 
         // Validar que temos uma URL válida
         if (!checkoutUrl || !checkoutUrl.startsWith('http')) {
-            throw new Error(`URL de checkout inválida recebida: ${checkoutUrl}`)
+            throw new Error(`URL de checkout inválida recebida da API: ${checkoutUrl || 'null'}`)
         }
 
         console.log('[INFINITEPAY] Link de pagamento criado:', checkoutUrl)
@@ -133,17 +159,15 @@ export async function createInfinitePayPayment(data: InfinitePayPaymentData) {
             url: checkoutUrl,
         }
     } catch (error: any) {
-        console.error('[INFINITEPAY] Erro ao criar link de pagamento:', error.message)
+        console.error('[INFINITEPAY] Erro ao criar link de pagamento:', {
+            message: error.message,
+            stack: error.stack,
+            orderId: sanitizedOrderId,
+        })
 
-        // Fallback: montar URL manualmente (método legado, caso a API falhe)
-        console.warn('[INFINITEPAY] Tentando método de URL direta como fallback...')
-        const fallbackUrl = buildFallbackCheckoutUrl(tag, sanitizedOrderId, priceInCents, sanitizedDescription, baseUrl)
-
-        return {
-            success: true,
-            paymentId: `link_${sanitizedOrderId}`,
-            url: fallbackUrl,
-        }
+        // Não usar fallback legado - o novo checkout inteligente requer API oficial
+        // Se a API falhar, é melhor retornar erro do que usar método que pode não funcionar
+        throw new Error(`Falha ao criar link de pagamento: ${error.message}. Por favor, tente novamente.`)
     }
 }
 

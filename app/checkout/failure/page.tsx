@@ -13,6 +13,13 @@ function CheckoutFailureContent() {
   const searchParams = useSearchParams()
   const status = searchParams.get("status")
   const paymentId = searchParams.get("payment_id")
+  const orderNsu = searchParams.get("order_nsu")
+  const reservationId = searchParams.get("reservation_id")
+  const errorMessage = searchParams.get("error") || searchParams.get("error_message")
+
+  // Se temos um order_nsu ou reservation_id, podemos tentar verificar o status
+  // para ver se o pagamento foi processado mesmo assim (caso de race condition)
+  const effectiveId = orderNsu || reservationId
 
   return (
     <Card className="shadow-xl shadow-red-900/10 animate-fadeInUp border-red-100/50 bg-white/90 backdrop-blur-md rounded-3xl overflow-hidden relative">
@@ -37,6 +44,14 @@ function CheckoutFailureContent() {
 
         {/* Status e Payment ID */}
         <div className="space-y-3 max-w-sm mx-auto">
+          {errorMessage && (
+            <div className="rounded-2xl bg-red-50/50 border border-red-100/50 p-5">
+              <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">
+                Erro
+              </p>
+              <p className="text-sm text-red-700 font-semibold">{errorMessage}</p>
+            </div>
+          )}
           {status && (
             <div className="rounded-2xl bg-red-50/50 border border-red-100/50 p-5">
               <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">
@@ -51,6 +66,14 @@ function CheckoutFailureContent() {
                 ID do Pagamento
               </p>
               <p className="text-sm text-moss-800 font-mono font-semibold break-all">{paymentId}</p>
+            </div>
+          )}
+          {effectiveId && (
+            <div className="rounded-2xl bg-amber-50/50 border border-amber-100/50 p-5">
+              <p className="text-xs text-amber-800/80 leading-relaxed">
+                Se o pagamento foi processado, você receberá confirmação por e-mail. 
+                Caso contrário, pode tentar novamente.
+              </p>
             </div>
           )}
         </div>

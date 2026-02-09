@@ -75,13 +75,28 @@ function CheckoutSuccessContent() {
         captureMethod,
       }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        const data = await res.json()
         console.log('[SUCCESS] Resposta da confirmação:', data)
-        setConfirmed(true)
+        
+        if (!res.ok) {
+          // Se a reserva já estava confirmada, ainda é sucesso
+          if (data.message?.includes('já') || data.message?.includes('already')) {
+            console.log('[SUCCESS] Reserva já estava confirmada (idempotência)')
+            setConfirmed(true)
+          } else {
+            // Outro erro - logar mas ainda mostrar sucesso (pagamento foi feito)
+            console.error('[SUCCESS] Erro na confirmação:', data.error || data.message)
+            setConfirmed(true)
+          }
+        } else {
+          setConfirmed(true)
+        }
       })
       .catch(err => {
         console.error('[SUCCESS] Erro na confirmação (pagamento já foi realizado):', err)
+        // Mesmo com erro, mostrar sucesso pois o pagamento foi feito
+        // O webhook vai confirmar depois se necessário
         setConfirmed(true)
       })
       .finally(() => {

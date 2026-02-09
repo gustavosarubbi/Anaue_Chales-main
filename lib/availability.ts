@@ -74,9 +74,11 @@ export async function checkReservationAvailability(
             const requestedCheckOut = checkOutDate.toISOString().split('T')[0]
 
             const now = new Date().toISOString()
+            // Incluir reservas confirmadas OU pendentes com expires_at ainda válido
+            // Isso inclui reservas com cartão de crédito que foram estendidas para 24h
             const { data: reservations, error: dbError } = await supabase
                 .from('reservations')
-                .select('check_in, check_out, status, expires_at')
+                .select('check_in, check_out, status, expires_at, payment_status')
                 .eq('chalet_id', chaletId)
                 .lt('check_in', requestedCheckOut)
                 .gt('check_out', requestedCheckIn)
