@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, CreditCard, Smartphone, MessageCircle } from "lucide-react"
+import { CreditCard, Smartphone, MessageCircle, AlertTriangle, RefreshCw, ShieldCheck, Info, ArrowRight, LogIn, LogOut } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
@@ -14,191 +14,325 @@ export function Pricing() {
   const carnaval = SPECIAL_PACKAGES.carnaval
 
   return (
-    <section id="pricing" className="py-24 bg-white texture-lines relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[800px] bg-moss-50/50 rounded-full blur-[100px] -z-10" />
+    <section id="pricing" className="py-24 relative overflow-hidden">
+      {/* Background limpo e elegante */}
+      <div className="absolute inset-0 bg-gradient-to-b from-stone-50 via-white to-moss-50/20" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-moss-100/30 rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/4" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-beige-100/40 rounded-full blur-[120px] translate-x-1/4 translate-y-1/4" />
 
-      <div className="container mx-auto px-4 sm:px-6 md:px-8">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+
         {/* Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200">💰 Investimento</Badge>
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-6">Preços e Horários</h2>
-          <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto">
-            Tarifas por pernoite para casal. Selecione o chalé no momento da reserva para ver os valores específicos.
-          </p>
-
-          {/* Observação especial para Carnaval */}
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-8"
-          >
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100 p-6 rounded-2xl shadow-sm inline-block text-left relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/20 rounded-full blur-xl" />
-              <div className="flex items-start gap-4 relative z-10">
-                <div className="bg-purple-100 p-2 rounded-full">
-                  <MessageCircle className="h-6 w-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-heading font-bold text-purple-900 text-lg mb-1">{carnaval.name}</p>
-                  <div className="text-purple-800">
-                    <p className="mb-1 text-sm font-medium">13 a 17 de Fevereiro</p>
-                    <p className="mb-1">
-                      Diárias de <strong className="text-xl">R$ {carnaval.price.toFixed(2)}</strong> para o período de folia.
-                    </p>
-                    <p>
-                      Dia 18/02 por <strong className="text-lg">R$ {carnaval.latePrice.toFixed(2)}</strong>.
-                    </p>
-                    <span className="block mt-2 font-medium text-sm bg-purple-200/50 px-2 py-1 rounded inline-block text-purple-900">Consulte disponibilidade via WhatsApp!</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto mb-16">
-          {/* Master Chalet Pricing */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <Card className="h-full border-moss-200 bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
-              <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-moss-400 to-moss-600" />
-              <div className="absolute top-6 right-6">
-                <Badge className="bg-moss-600 text-white shadow-lg text-xs px-3 py-1">Master</Badge>
-              </div>
-              <CardHeader className="pt-10 pb-2 px-8">
-                <CardTitle className="flex items-center gap-3 text-moss-900 font-heading text-2xl">
-                  Chalé Master
-                </CardTitle>
-                <p className="text-sm text-moss-500 mt-2 font-medium uppercase tracking-wide">Privacidade e Hidromassagem</p>
-              </CardHeader>
-              <CardContent className="px-8 pb-8 flex flex-col flex-grow">
-                <div className="space-y-4 mb-6 mt-4">
-                  <div className="flex justify-between items-end border-b border-moss-50 pb-2">
-                    <span className="text-moss-600 font-medium text-sm">Seg a Qui</span>
-                    <span className="text-3xl font-bold text-moss-900">R$ {masterPricing.weekday}</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-moss-50 pb-2">
-                    <span className="text-moss-600 font-medium text-sm">Fins de Sem/Feriados</span>
-                    <span className="text-3xl font-bold text-moss-900">R$ {masterPricing.weekend}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mb-8 flex-grow">
-                  <div className="flex items-start gap-3">
-                    <Smartphone className="h-5 w-5 text-moss-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-moss-800">Pagamento Instantâneo</p>
-                      <p className="text-xs text-moss-500">Via Pix ou Cartão de Crédito</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CreditCard className="h-5 w-5 text-moss-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-moss-800">Sincronizado</p>
-                      <p className="text-xs text-moss-500">Airbnb & Booking.com</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white h-12 text-lg rounded-xl shadow-md transition-all duration-200" asChild>
-                  <Link href="/checkout?chalet=chale-anaue">
-                    Reservar Chalé Master
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Camping Luxo Pricing */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <Card className="h-full border-stone-200 bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col">
-              <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-stone-300 to-stone-400" />
-              <div className="absolute top-6 right-6">
-                <Badge className="bg-stone-600 text-white shadow-lg text-xs px-3 py-1">Camping Luxo</Badge>
-              </div>
-              <CardHeader className="pt-10 pb-2 px-8">
-                <CardTitle className="flex items-center gap-3 text-moss-900 font-heading text-2xl">
-                  Camping Luxo
-                </CardTitle>
-                <p className="text-sm text-stone-500 mt-2 font-medium uppercase tracking-wide">Design Moderno e Imersão</p>
-              </CardHeader>
-              <CardContent className="px-8 pb-8 flex flex-col flex-grow">
-                <div className="space-y-4 mb-6 mt-4">
-                  <div className="flex justify-between items-end border-b border-stone-50 pb-2">
-                    <span className="text-stone-600 font-medium text-sm">Seg a Qui</span>
-                    <span className="text-3xl font-bold text-moss-900">R$ {campingPricing.weekday}</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-stone-50 pb-2">
-                    <span className="text-stone-600 font-medium text-sm">Fins de Sem/Feriados</span>
-                    <span className="text-3xl font-bold text-moss-900">R$ {campingPricing.weekend}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mb-8 flex-grow">
-                  <div className="flex items-start gap-3">
-                    <Smartphone className="h-5 w-5 text-stone-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-stone-800">Pagamento Facilitado</p>
-                      <p className="text-xs text-stone-500">Via Pix rápido e seguro</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CreditCard className="h-5 w-5 text-stone-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-stone-800">InfinitePay</p>
-                      <p className="text-xs text-stone-500">Cartão de Crédito e Parcelamento</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full border-moss-200 text-moss-700 hover:bg-moss-50 h-12 text-lg rounded-xl transition-all duration-200"
-                  asChild
-                >
-                  <Link href="/checkout?chalet=chale-2">
-                    Reservar Camping Luxo
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Schedule Info */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
+          className="text-center mb-14 max-w-3xl mx-auto"
         >
-          <Card className="bg-white border-dashed border-2 border-moss-200 shadow-none max-w-4xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-center text-moss-900 flex items-center justify-center gap-2 font-heading text-xl">
-                <Clock className="h-5 w-5" />
-                Horários de Check-in e Check-out
+          <Badge className="mb-4 bg-moss-100 text-moss-800 hover:bg-moss-200 border-moss-200">💰 Investimento</Badge>
+          <h2 className="font-heading text-4xl md:text-5xl font-bold text-moss-900 mb-4">Tarifas & Horários</h2>
+          <p className="text-lg text-moss-600 font-light max-w-2xl mx-auto leading-relaxed">
+            Valores por pernoite para casal. Selecione o chalé para ver os valores específicos.
+          </p>
+        </motion.div>
+
+        {/* Carnaval Banner — full width, integrado */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-5xl mx-auto mb-10"
+        >
+          <div className="relative bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-5 sm:p-6 shadow-lg shadow-purple-500/15 overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-xl translate-y-1/2 -translate-x-1/4" />
+
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="bg-white/15 backdrop-blur-sm p-2.5 rounded-xl">
+                  <MessageCircle className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-heading font-bold text-white text-lg leading-tight">{carnaval.name}</p>
+                  <p className="text-purple-100 text-xs font-medium">13 a 17 de Fevereiro</p>
+                </div>
+              </div>
+
+              <div className="h-px sm:h-10 sm:w-px w-full bg-white/20 flex-shrink-0" />
+
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-white flex-grow">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-purple-200 font-medium">Diária</p>
+                  <p className="text-2xl font-bold font-heading">R$ {carnaval.price.toFixed(0)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-purple-200 font-medium">Dia 18/02</p>
+                  <p className="text-xl font-bold font-heading">R$ {carnaval.latePrice.toFixed(0)}</p>
+                </div>
+              </div>
+
+              <Badge className="bg-white/15 backdrop-blur-sm text-white border-white/20 text-xs px-3 py-1.5 font-medium whitespace-nowrap flex-shrink-0">
+                Consulte via WhatsApp
+              </Badge>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto mb-8">
+
+          {/* Chalé Master */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="h-full"
+          >
+            <Card className="h-full border-none bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-lg shadow-moss-900/5 ring-1 ring-moss-100">
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-moss-400 via-moss-500 to-moss-600" />
+
+              <CardContent className="p-6 sm:p-8 flex flex-col flex-grow">
+                {/* Header do card */}
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <Badge className="bg-moss-600 text-white shadow-sm text-xs px-3 py-1 font-semibold mb-2">Master</Badge>
+                    <h3 className="font-heading text-2xl font-bold text-moss-900">Chalé Master</h3>
+                    <p className="text-xs text-moss-500 mt-0.5 font-medium">Exclusividade e Hidromassagem</p>
+                  </div>
+                </div>
+
+                {/* Preços */}
+                <div className="bg-moss-50/50 rounded-2xl p-5 mb-5 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-moss-600 text-sm">Seg a Qui</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading">R$ {masterPricing.weekday}</span>
+                  </div>
+                  <div className="h-px bg-moss-200/50" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-moss-600 text-sm">Fins de Sem / Feriados</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading">R$ {masterPricing.weekend}</span>
+                  </div>
+                </div>
+
+                {/* Horários */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="flex items-center gap-2.5 bg-moss-50/70 rounded-xl px-3 sm:px-4 py-3 border border-moss-100/80">
+                    <LogIn className="h-4 w-4 text-moss-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-moss-400 uppercase tracking-wider font-semibold">Check-in</p>
+                      <p className="text-lg font-bold text-moss-800 font-heading leading-tight">14:00</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 bg-moss-50/70 rounded-xl px-3 sm:px-4 py-3 border border-moss-100/80">
+                    <LogOut className="h-4 w-4 text-moss-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-moss-400 uppercase tracking-wider font-semibold">Check-out</p>
+                      <p className="text-lg font-bold text-moss-800 font-heading leading-tight">11:00</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-auto">
+                  <Button className="w-full bg-moss-600 hover:bg-moss-700 text-white h-13 sm:h-14 text-base rounded-2xl shadow-lg shadow-moss-600/20 hover:shadow-xl hover:shadow-moss-600/30 transition-all duration-300 font-bold group" asChild>
+                    <Link href="/checkout?chalet=chale-anaue">
+                      Reservar Chalé Master
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Camping Luxo */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="h-full"
+          >
+            <Card className="h-full border-none bg-white relative overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col shadow-lg shadow-stone-900/5 ring-1 ring-stone-100">
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-stone-300 via-stone-400 to-stone-500" />
+
+              <CardContent className="p-6 sm:p-8 flex flex-col flex-grow">
+                {/* Header do card */}
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <Badge className="bg-stone-600 text-white shadow-sm text-xs px-3 py-1 font-semibold mb-2">Camping Luxo</Badge>
+                    <h3 className="font-heading text-2xl font-bold text-moss-900">Camping Luxo</h3>
+                    <p className="text-xs text-stone-500 mt-0.5 font-medium">Design Moderno e Imersão</p>
+                  </div>
+                </div>
+
+                {/* Preços */}
+                <div className="bg-stone-50/50 rounded-2xl p-5 mb-5 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 text-sm">Seg a Qui</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading">R$ {campingPricing.weekday}</span>
+                  </div>
+                  <div className="h-px bg-stone-200/50" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 text-sm">Fins de Sem / Feriados</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-moss-900 font-heading">R$ {campingPricing.weekend}</span>
+                  </div>
+                </div>
+
+                {/* Horários */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="flex items-center gap-2.5 bg-stone-50/70 rounded-xl px-3 sm:px-4 py-3 border border-stone-100/80">
+                    <LogIn className="h-4 w-4 text-stone-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-stone-400 uppercase tracking-wider font-semibold">Check-in</p>
+                      <p className="text-lg font-bold text-stone-800 font-heading leading-tight">15:00</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 bg-stone-50/70 rounded-xl px-3 sm:px-4 py-3 border border-stone-100/80">
+                    <LogOut className="h-4 w-4 text-stone-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-stone-400 uppercase tracking-wider font-semibold">Check-out</p>
+                      <p className="text-lg font-bold text-stone-800 font-heading leading-tight">12:00</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-auto">
+                  <Button
+                    className="w-full bg-stone-700 hover:bg-stone-800 text-white h-13 sm:h-14 text-base rounded-2xl shadow-lg shadow-stone-700/20 hover:shadow-xl hover:shadow-stone-700/30 transition-all duration-300 font-bold group"
+                    asChild
+                  >
+                    <Link href="/checkout?chalet=chale-2">
+                      Reservar Camping Luxo
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Formas de pagamento — nota unificada abaixo dos cards */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20 max-w-5xl mx-auto"
+        >
+          <div className="flex items-center gap-2 text-sm text-moss-500">
+            <Smartphone className="h-4 w-4" />
+            <span>Pix</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-moss-300" />
+          <div className="flex items-center gap-2 text-sm text-moss-500">
+            <CreditCard className="h-4 w-4" />
+            <span>Cartão de Crédito</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-moss-300" />
+          <span className="text-sm text-moss-400 font-light">Pagamento seguro via InfinitePay</span>
+        </motion.div>
+
+        {/* Política de Cancelamento e Reagendamento */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15, duration: 0.6 }}
+        >
+          <Card className="bg-white/80 backdrop-blur-sm border-none shadow-xl shadow-moss-900/5 ring-1 ring-moss-100 max-w-5xl mx-auto overflow-hidden">
+            <CardHeader className="border-b border-moss-50 bg-gradient-to-r from-moss-50/40 to-beige-50/40 px-6 sm:px-8 py-5">
+              <CardTitle className="text-center text-moss-900 flex items-center justify-center gap-3 font-heading text-lg sm:text-xl">
+                <div className="w-9 h-9 rounded-xl bg-moss-100 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="h-4 w-4 text-moss-600" />
+                </div>
+                Política de Cancelamento e Reagendamento
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-8 text-center px-4 md:px-12">
-                <div className="p-4 rounded-xl hover:bg-moss-50 transition-colors">
-                  <div className="text-3xl font-bold text-moss-800 mb-1">14:00</div>
-                  <p className="text-moss-600 font-medium uppercase text-xs tracking-wider">Check-in</p>
+            <CardContent className="p-6 sm:p-8">
+              {/* Aviso de exclusividade */}
+              <div className="flex items-start gap-3 bg-gradient-to-r from-moss-50/60 to-beige-50/30 border border-moss-100 rounded-xl p-4 mb-7">
+                <div className="w-7 h-7 rounded-lg bg-moss-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Info className="h-3.5 w-3.5 text-moss-600" />
                 </div>
-                <div className="p-4 rounded-xl hover:bg-moss-50 transition-colors">
-                  <div className="text-3xl font-bold text-moss-800 mb-1">11:00</div>
-                  <p className="text-moss-600 font-medium uppercase text-xs tracking-wider">Check-out</p>
+                <p className="text-sm text-moss-700 leading-relaxed">
+                  O valor pago garante a <strong className="text-moss-900">exclusividade da reserva</strong>. O chalé deixa de ser ofertado a outros hóspedes a partir da confirmação do pagamento.
+                </p>
+              </div>
+
+              {/* Layout Grid: Cancelamento (esq) e Reagendamento (dir) */}
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Cancelamento - Lista vertical */}
+                <div>
+                  <h4 className="font-heading font-semibold text-moss-900 text-base mb-4 flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                    </div>
+                    Cancelamento
+                  </h4>
+                  <div className="space-y-3">
+                    {/* Card 100% */}
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-green-50/60 border border-green-100/70 hover:border-green-200 transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-green-900 font-semibold mb-0.5">Reembolso integral (100%)</p>
+                        <p className="text-xs text-green-700 leading-relaxed">Até 7 dias após pagamento + 72h antes do check-in.</p>
+                      </div>
+                    </div>
+                    
+                    {/* Card 50% */}
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-amber-50/60 border border-amber-100/70 hover:border-amber-200 transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-3 h-3 rounded-full bg-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-amber-900 font-semibold mb-0.5">Reembolso parcial (50%)</p>
+                        <p className="text-xs text-amber-700 leading-relaxed">Mínimo de 10 dias antes do check-in, respeitando 72h.</p>
+                      </div>
+                    </div>
+
+                    {/* Card 0% */}
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-red-50/60 border border-red-100/70 hover:border-red-200 transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-red-900 font-semibold mb-0.5">Sem reembolso (0%)</p>
+                        <p className="text-xs text-red-700 leading-relaxed">Menos de 72h do check-in, independente da data da compra.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reagendamento - Coluna lateral com altura preenchida */}
+                <div className="flex flex-col h-full">
+                  <h4 className="font-heading font-semibold text-moss-900 text-base mb-4 flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-moss-50 flex items-center justify-center">
+                      <RefreshCw className="h-3.5 w-3.5 text-moss-600" />
+                    </div>
+                    Reagendamento
+                  </h4>
+                  <div className="flex-grow flex flex-col justify-center p-6 rounded-xl bg-gradient-to-br from-moss-50/60 to-beige-50/20 border border-moss-100 hover:border-moss-200 transition-colors">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-moss-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-moss-500" />
+                      </div>
+                      <p className="text-lg text-moss-900 font-bold">Permitido com 72h de antecedência</p>
+                    </div>
+                    
+                    <p className="text-sm text-moss-600 leading-relaxed mb-6 pl-16">
+                      Para reagendar sua reserva sem custo adicional, é necessário solicitar com antecedência mínima. Caso contrário, será cobrada uma taxa administrativa.
+                    </p>
+
+                    <div className="mt-auto pl-16">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-moss-100/50 rounded-lg border border-moss-200/50">
+                        <span className="text-xs text-moss-600 font-medium uppercase tracking-wide">Taxa de Reagendamento:</span>
+                        <strong className="text-moss-900">R$ 100,00</strong>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

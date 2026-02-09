@@ -145,16 +145,34 @@ export function Footer() {
                   <Clock className="h-4 w-4 text-beige-300" />
                   Horários
                 </h5>
-                <ul className="space-y-3 text-sm text-moss-300">
-                  <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
-                    <span>Check-in</span>
-                    <span className="text-white font-medium font-mono">14:00</span>
-                  </li>
-                  <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
-                    <span>Check-out</span>
-                    <span className="text-white font-medium font-mono">11:00</span>
-                  </li>
-                </ul>
+                <div className="space-y-4 text-sm text-moss-300">
+                  <div>
+                    <p className="text-beige-300 font-medium text-xs uppercase tracking-wider mb-2">Chalé Master</p>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                        <span>Check-in</span>
+                        <span className="text-white font-medium font-mono">14:00</span>
+                      </li>
+                      <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                        <span>Check-out</span>
+                        <span className="text-white font-medium font-mono">11:00</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-beige-300 font-medium text-xs uppercase tracking-wider mb-2">Camping Luxo</p>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                        <span>Check-in</span>
+                        <span className="text-white font-medium font-mono">15:00</span>
+                      </li>
+                      <li className="flex justify-between items-center bg-moss-900/30 px-3 py-2 rounded-lg">
+                        <span>Check-out</span>
+                        <span className="text-white font-medium font-mono">12:00</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

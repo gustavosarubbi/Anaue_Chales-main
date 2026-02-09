@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Ban, Zap, Droplets } from "lucide-react"
+import { Coffee, Home, Flame, Wine, ShoppingCart, Shield, Wifi, Users, Waves, Ban, Zap, Droplets, LifeBuoy } from "lucide-react"
 import { motion } from "framer-motion"
 
 const features = [
@@ -71,6 +71,12 @@ const features = [
     title: "Banheira de Hidromassagem",
     description: "Banheira relaxante com hidromassagem para momentos de total relaxamento e bem-estar",
     highlight: true,
+  },
+  {
+    icon: LifeBuoy,
+    title: "Aluguel de Bóias",
+    description: "Bóias disponíveis para diversão no rio por R$ 20 cada",
+    highlight: false,
   },
 ]
 

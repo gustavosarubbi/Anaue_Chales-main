@@ -18,7 +18,7 @@ export function Accommodations() {
       title: "Chalé Master",
       description: "O máximo conforto com banheira de hidromassagem e vista panorâmica para o Rio Tarumã.",
       image: "/Chale-1.jpg",
-      features: ["Hidromassagem", "Vista Rio", "Privacidade Total"],
+      features: ["Hidromassagem", "Vista Rio", "Exclusividade Total"],
       price: `A partir de R$ ${masterPrice}`,
       whatsappMessage: "Olá! Gostaria de saber mais sobre o Chalé Master.",
       link: "/checkout?chalet=chale-anaue"
