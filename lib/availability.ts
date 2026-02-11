@@ -74,8 +74,9 @@ export async function checkReservationAvailability(
             const requestedCheckOut = checkOutDate.toISOString().split('T')[0]
 
             const now = new Date().toISOString()
-            // Incluir reservas confirmadas OU pendentes com expires_at ainda válido
-            // Isso inclui reservas com cartão de crédito que foram estendidas para 24h
+            // IMPORTANTE: Só bloquear reservas pending se forem cartão de crédito
+            // Reservas pending sem payment_status ou com PIX não devem bloquear
+            // Isso evita que testes ou reservas não pagas bloqueiem o calendário
             const { data: reservations, error: dbError } = await supabase
                 .from('reservations')
                 .select('check_in, check_out, status, expires_at, payment_status')
@@ -86,6 +87,20 @@ export async function checkReservationAvailability(
 
             if (!dbError && reservations) {
                 reservations.forEach((reservation) => {
+                    // Filtrar: só bloquear pending se for cartão de crédito
+                    if (reservation.status === 'pending') {
+                        const paymentStatus = (reservation.payment_status || '').toLowerCase()
+                        const isCreditCard = paymentStatus.includes('credit_card') || 
+                                           paymentStatus.includes('creditcard') ||
+                                           paymentStatus.includes('cartão') ||
+                                           paymentStatus.includes('cartao')
+                        
+                        // Se não for cartão de crédito, não bloquear
+                        if (!isCreditCard) {
+                            return
+                        }
+                    }
+
                     const start = new Date(reservation.check_in)
                     start.setHours(0, 0, 0, 0)
                     const end = new Date(reservation.check_out)
@@ -100,31 +115,52 @@ export async function checkReservationAvailability(
             }
         }
 
-        const requestedDates = getDatesBetween(checkInDate, checkOutDate)
-
+        // IMPORTANTE: Tolerância de 1 dia no checkout
+        // Permitir checkout em dia bloqueado se o check-in e dias de estadia estiverem livres
+        // Exemplos permitidos:
+        // - Check-in dia 25 (livre) + Check-out dia 26 (bloqueado) → PERMITIDO
+        // - Check-in dia 17 (livre) + Check-out dia 18 (bloqueado) → PERMITIDO
+        // - Check-in dia 16 + Check-out dia 18 (dia 17 livre, dia 18 bloqueado) → PERMITIDO
+        
+        const checkInStr = `${checkInDate.getFullYear()}-${String(checkInDate.getMonth() + 1).padStart(2, '0')}-${String(checkInDate.getDate()).padStart(2, '0')}`
+        const checkOutStr = `${checkOutDate.getFullYear()}-${String(checkOutDate.getMonth() + 1).padStart(2, '0')}-${String(checkOutDate.getDate()).padStart(2, '0')}`
+        
+        // Verificar se check-in está bloqueado (não permitir check-in em dia ocupado)
+        const checkInIsBooked = allCheckInDates.has(checkInStr) || allBookedDates.has(checkInStr)
+        
         // Check-in e check-out no mesmo dia
         if (checkInDate.getTime() === checkOutDate.getTime()) {
-            const dateStr = requestedDates[0]
-            const isBooked = allCheckInDates.has(dateStr) || allBookedDates.has(dateStr)
             return {
                 success: true,
                 data: {
-                    available: !isBooked,
-                    conflictingDates: isBooked ? [dateStr] : [],
-                    requestedDates,
+                    available: !checkInIsBooked,
+                    conflictingDates: checkInIsBooked ? [checkInStr] : [],
+                    requestedDates: [checkInStr],
                     allBookedDates: Array.from(allBookedDates),
                 }
             }
         }
 
-        const conflictingDates = requestedDates.filter((date) => allBookedDates.has(date))
+        // Para períodos maiores, verificar apenas as datas de estadia (excluindo o check-out)
+        // O check-out pode ser em um dia bloqueado (tolerância de 1 dia)
+        // getDatesBetween já exclui automaticamente o check-out
+        const stayDates = getDatesBetween(checkInDate, checkOutDate)
+        const conflictingDates = stayDates.filter((date) => allBookedDates.has(date))
+        
+        // Também verificar se há check-in conflitante nas datas de estadia
+        const conflictingCheckIns = stayDates.filter((date) => allCheckInDates.has(date))
+
+        // Disponível se:
+        // 1. Check-in não está bloqueado
+        // 2. Todas as datas de estadia (exceto check-out) estão livres
+        const isAvailable = !checkInIsBooked && conflictingDates.length === 0 && conflictingCheckIns.length === 0
 
         return {
             success: true,
             data: {
-                available: conflictingDates.length === 0,
-                conflictingDates,
-                requestedDates,
+                available: isAvailable,
+                conflictingDates: checkInIsBooked ? [checkInStr] : [...conflictingDates, ...conflictingCheckIns],
+                requestedDates: getDatesBetween(checkInDate, checkOutDate),
                 allBookedDates: Array.from(allBookedDates),
             }
         }

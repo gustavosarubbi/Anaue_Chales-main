@@ -114,11 +114,18 @@ export async function POST(request: Request) {
             refund_amount, // Valor reembolsado (se houver)
         } = body
 
+        // Detectar método de pagamento ANTES de buscar a reserva (para log melhor)
+        const captureMethodLower = capture_method ? capture_method.toLowerCase() : null
+        const isCreditCard = captureMethodLower === 'credit_card' || 
+                            captureMethodLower === 'creditcard' ||
+                            captureMethodLower === 'card'
+        
         // Log completo para debug
         console.log('[INFINITEPAY_WEBHOOK] Notificação recebida:', {
             order_nsu,
             invoice_slug,
             capture_method: capture_method || 'não informado',
+            isCreditCard: isCreditCard ? 'SIM' : 'NÃO',
             amount,
             paid_amount: paid_amount ?? 'não informado',
             transaction_nsu,
@@ -242,57 +249,75 @@ export async function POST(request: Request) {
         const paidAmountNum = typeof paid_amount === 'number' ? paid_amount : (paid_amount ? parseFloat(paid_amount) : 0)
         const amountNum = typeof amount === 'number' ? amount : (amount ? parseFloat(amount) : 0)
         const isPaid = paidAmountNum > 0
-        
-        // Detectar método de pagamento
-        const captureMethodLower = capture_method ? capture_method.toLowerCase() : null
-        const isCreditCard = captureMethodLower === 'credit_card' || 
-                            captureMethodLower === 'creditcard' ||
-                            captureMethodLower === 'card'
 
-        // IMPORTANTE: Se for cartão de crédito e ainda não foi pago (paid_amount = 0),
-        // significa que o cliente FEZ o pagamento mas ainda está aguardando confirmação (~1 dia)
-        // Nesse caso, devemos BLOQUEAR o calendário
-        if (!isPaid && isCreditCard && reservation.status === 'pending') {
-            // Pagamento com cartão de crédito feito mas ainda não confirmado
-            // Bloquear calendário por 24h aguardando confirmação
+        // IMPORTANTE: Se for cartão de crédito, BLOQUEAR o calendário imediatamente
+        // Isso acontece quando:
+        // 1. Cliente escolhe cartão de crédito e faz o pagamento (paid_amount = 0, aguardando confirmação)
+        // 2. Pedido criado com cartão de crédito (mesmo antes do pagamento ser feito)
+        // O bloqueio garante que as datas não sejam reservadas por outra pessoa
+        if (isCreditCard && reservation.status === 'pending') {
+            // Bloquear calendário por 24h quando detectar cartão de crédito
             const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
             
-            console.log('[INFINITEPAY_WEBHOOK] 🔒 Pagamento com cartão de crédito detectado - bloqueando calendário aguardando confirmação:', {
-                reservationId,
-                capture_method: captureMethodLower,
-                amount: amountNum,
-                paid_amount: paidAmountNum,
-                message: 'Cliente pagou com cartão de crédito, aguardando confirmação (~1 dia)',
-            })
-
-            const { error: updateError } = await supabase
-                .from('reservations')
-                .update({
-                    expires_at: newExpiresAt,
-                    payment_status: `pending_credit_card_awaiting_confirmation`,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('id', reservationId)
-
-            if (updateError) {
-                console.error('[INFINITEPAY_WEBHOOK] Erro ao bloquear calendário:', {
-                    error: updateError,
+            // Verificar se já está bloqueado (para evitar atualizações desnecessárias)
+            const currentExpiresAt = new Date(reservation.expires_at)
+            const now = new Date()
+            const isAlreadyBlocked = currentExpiresAt > now && 
+                                    reservation.payment_status?.includes('credit_card')
+            
+            if (!isAlreadyBlocked) {
+                console.log('[INFINITEPAY_WEBHOOK] 🔒 Cartão de crédito detectado - bloqueando calendário:', {
                     reservationId,
+                    capture_method: captureMethodLower,
+                    amount: amountNum,
+                    paid_amount: paidAmountNum,
+                    isPaid,
+                    message: isPaid 
+                        ? 'Pagamento confirmado, mas bloqueando por segurança' 
+                        : 'Pagamento com cartão de crédito - bloqueando aguardando confirmação (~1 dia)',
                 })
+
+                const { error: updateError } = await supabase
+                    .from('reservations')
+                    .update({
+                        expires_at: newExpiresAt,
+                        payment_status: isPaid 
+                            ? `paid_credit_card` 
+                            : `pending_credit_card_awaiting_confirmation`,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq('id', reservationId)
+
+                if (updateError) {
+                    console.error('[INFINITEPAY_WEBHOOK] Erro ao bloquear calendário:', {
+                        error: updateError,
+                        reservationId,
+                    })
+                } else {
+                    console.log('[INFINITEPAY_WEBHOOK] ✅ Calendário bloqueado por 24h (cartão de crédito):', {
+                        reservationId,
+                        expiresAt: newExpiresAt,
+                        isPaid,
+                    })
+                }
             } else {
-                console.log('[INFINITEPAY_WEBHOOK] ✅ Calendário bloqueado por 24h (cartão de crédito aguardando confirmação):', {
+                console.log('[INFINITEPAY_WEBHOOK] Calendário já está bloqueado para cartão de crédito:', {
                     reservationId,
-                    expiresAt: newExpiresAt,
+                    currentExpiresAt: reservation.expires_at,
                 })
             }
 
-            return NextResponse.json({ 
-                success: true, 
-                message: 'Pagamento com cartão de crédito detectado - calendário bloqueado aguardando confirmação',
-                blocked: true,
-                expiresAt: newExpiresAt,
-                processingTime: Date.now() - startTime,
-            })
+            // Se não está pago ainda, retornar aqui (não confirmar)
+            if (!isPaid) {
+                return NextResponse.json({ 
+                    success: true, 
+                    message: 'Cartão de crédito detectado - calendário bloqueado aguardando confirmação',
+                    blocked: true,
+                    expiresAt: newExpiresAt,
+                    processingTime: Date.now() - startTime,
+                })
+            }
+            // Se está pago, continuar para confirmar a reserva abaixo
         }
 
         if (isPaid) {

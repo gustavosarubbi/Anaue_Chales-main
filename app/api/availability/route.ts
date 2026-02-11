@@ -63,8 +63,9 @@ export async function GET(request: Request) {
       const supabase = createServerClient()
       if (supabase) {
         const now = new Date().toISOString()
-        // Incluir reservas confirmadas OU pendentes com expires_at ainda válido
-        // Isso inclui reservas com cartão de crédito que foram estendidas para 24h
+        // IMPORTANTE: Só bloquear reservas pending se forem cartão de crédito
+        // Reservas pending sem payment_status ou com PIX não devem bloquear
+        // Isso evita que testes ou reservas não pagas bloqueiem o calendário
         const { data: reservations, error: dbError } = await supabase
           .from("reservations")
           .select("check_in, check_out, status, expires_at, payment_status")
@@ -73,6 +74,20 @@ export async function GET(request: Request) {
 
         if (!dbError && reservations) {
           reservations.forEach((reservation) => {
+            // Filtrar: só bloquear pending se for cartão de crédito
+            if (reservation.status === 'pending') {
+              const paymentStatus = (reservation.payment_status || '').toLowerCase()
+              const isCreditCard = paymentStatus.includes('credit_card') || 
+                                 paymentStatus.includes('creditcard') ||
+                                 paymentStatus.includes('cartão') ||
+                                 paymentStatus.includes('cartao')
+              
+              // Se não for cartão de crédito, não bloquear
+              if (!isCreditCard) {
+                return
+              }
+            }
+
             const start = new Date(reservation.check_in)
             start.setHours(0, 0, 0, 0)
             const end = new Date(reservation.check_out)
