@@ -62,8 +62,30 @@ async function channexRequest<T>(
 }
 
 /**
+ * Busca restrições (stop_sell) do Channex para o rate plan.
+ * Datas com stop_sell = true devem aparecer fechadas no site (sync com Booking/Airbnb).
+ */
+async function getChannexStopSellDates(
+  config: ChannexConfig,
+  dateFrom: string,
+  dateTo: string
+): Promise<Record<string, boolean>> {
+  const path = `/restrictions?filter[property_id]=${config.propertyId}&filter[date][gte]=${dateFrom}&filter[date][lte]=${dateTo}&filter[restrictions]=stop_sell`
+  const result = await channexRequest<Record<string, Record<string, { stop_sell?: boolean | number }>>>(config, path, { method: 'GET' })
+  if (result.errors || !result.data?.[config.ratePlanId]) return {}
+  const byDate = result.data[config.ratePlanId]
+  const out: Record<string, boolean> = {}
+  for (const [date, obj] of Object.entries(byDate)) {
+    const v = obj?.stop_sell
+    if (v === true || v === 1) out[date] = true
+  }
+  return out
+}
+
+/**
  * Busca disponibilidade do calendário mestre (Channex) para um room type e período.
- * Retorna mapa data -> quantidade disponível (0 = bloqueado/ocupado).
+ * Considera tanto availability <= 0 quanto stop_sell = true como datas bloqueadas,
+ * para refletir corretamente o que está fechado no Booking/Airbnb.
  */
 export async function getChannexAvailability(
   dateFrom: string,
@@ -73,20 +95,29 @@ export async function getChannexAvailability(
   if (!config) {
     return { success: false, error: 'Channex não configurado' }
   }
-  const path = `/availability?filter[property_id]=${config.propertyId}&filter[date][gte]=${dateFrom}&filter[date][lte]=${dateTo}`
-  const result = await channexRequest<Record<string, Record<string, number>>>(config, path, { method: 'GET' })
-  if (result.errors) {
-    return { success: false, error: (result.errors as { title?: string }).title || 'Erro ao buscar disponibilidade' }
+
+  const [availabilityRes, stopSellDates] = await Promise.all([
+    channexRequest<Record<string, Record<string, number>>>(config, `/availability?filter[property_id]=${config.propertyId}&filter[date][gte]=${dateFrom}&filter[date][lte]=${dateTo}`, { method: 'GET' }),
+    getChannexStopSellDates(config, dateFrom, dateTo),
+  ])
+
+  if (availabilityRes.errors) {
+    return { success: false, error: (availabilityRes.errors as { title?: string }).title || 'Erro ao buscar disponibilidade' }
   }
-  const data = result.data
-  if (!data || !data[config.roomTypeId]) {
-    return { success: true, bookedDates: {} }
-  }
-  const byDate = data[config.roomTypeId]
+
   const bookedDates: Record<string, boolean> = {}
-  for (const [date, availability] of Object.entries(byDate)) {
-    if (availability <= 0) bookedDates[date] = true
+
+  const data = availabilityRes.data
+  if (data?.[config.roomTypeId]) {
+    for (const [date, availability] of Object.entries(data[config.roomTypeId])) {
+      if (availability <= 0) bookedDates[date] = true
+    }
   }
+
+  for (const date of Object.keys(stopSellDates)) {
+    bookedDates[date] = true
+  }
+
   return { success: true, bookedDates }
 }
 
