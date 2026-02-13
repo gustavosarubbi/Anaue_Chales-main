@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { checkInfinitePayPaymentStatus } from '@/lib/infinitepay'
+import { syncReservationToChannex } from '@/lib/channex-sync'
 
 /**
  * Endpoint para confirmar uma reserva após pagamento via InfinitePay.
@@ -110,6 +111,16 @@ export async function POST(request: Request) {
         }
 
         console.log('[RESERVATIONS_CONFIRM] ✅ Reserva confirmada:', reservationId, paymentStatusLabel)
+
+        // Sincronizar com Channex (fechar datas no Airbnb/Booking)
+        try {
+            const channexResult = await syncReservationToChannex(supabase, reservationId)
+            if (!channexResult.synced && channexResult.error) {
+                console.warn('[RESERVATIONS_CONFIRM] Channex sync falhou (reserva já confirmada):', channexResult.error)
+            }
+        } catch (e) {
+            console.warn('[RESERVATIONS_CONFIRM] Erro ao sincronizar Channex:', e)
+        }
 
         return NextResponse.json({
             success: true,

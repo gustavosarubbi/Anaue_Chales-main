@@ -336,7 +336,7 @@ export function CheckoutPageContent() {
                                     {/* Feature pills */}
                                     <div className="flex flex-wrap gap-2">
                                         {[
-                                            { icon: Bath, text: "Hidromassagem" },
+                                            { icon: Bath, text: "Jacuzzi" },
                                             { icon: Waves, text: "Deck privativo" },
                                             { icon: Wifi, text: "Wi-Fi" },
                                         ].map((feat, i) => (
@@ -349,7 +349,7 @@ export function CheckoutPageContent() {
 
                                     {/* Description */}
                                     <p className="text-[13px] text-moss-500 leading-relaxed">
-                                        O máximo luxo com vista definitiva para o rio e hidromassagem privativa.
+                                        O máximo luxo com vista definitiva para o rio e Jacuzzi privativo.
                                     </p>
 
                                     {/* Price + Select */}
@@ -438,6 +438,7 @@ export function CheckoutPageContent() {
                                     {/* Feature pills */}
                                     <div className="flex flex-wrap gap-2">
                                         {[
+                                            { icon: Bath, text: "Jacuzzi" },
                                             { icon: TreePine, text: "Imerso na floresta" },
                                             { icon: Waves, text: "Beira do rio" },
                                             { icon: Wifi, text: "Wi-Fi" },
@@ -451,7 +452,7 @@ export function CheckoutPageContent() {
 
                                     {/* Description */}
                                     <p className="text-[13px] text-moss-500 leading-relaxed">
-                                        Arquitetura em A-frame integrada à floresta com todo conforto premium.
+                                        Arquitetura em A-frame integrada à floresta com Jacuzzi e todo conforto premium.
                                     </p>
 
                                     {/* Price + Select */}

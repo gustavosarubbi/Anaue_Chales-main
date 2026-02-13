@@ -44,6 +44,16 @@ function isBetween(date: Date, start: Date, end: Date) {
   return k > toKey(start) && k < toKey(end)
 }
 
+function isAfterDay(a: Date, b: Date) {
+  return toKey(a) > toKey(b)
+}
+
+function addDays(d: Date, n: number): Date {
+  const r = new Date(d)
+  r.setDate(r.getDate() + n)
+  return r
+}
+
 interface CalendarDay {
   day: number
   date: Date
@@ -152,11 +162,27 @@ export function AvailabilityCalendar({
     [todayKey]
   )
 
-  // Click handler – range selection logic
+  // Dias após o check-in que podem ser escolhidos como check-out (apenas para estilo visual; bloqueados não são clicáveis)
+  const canBeCheckOutOnly = useCallback(
+    (date: Date) => {
+      return !!(checkIn && !checkOut && isAfterDay(date, checkIn))
+    },
+    [checkIn, checkOut]
+  )
+
+  // Dia seguinte ao check-in: única exceção que pode ser clicada como check-out mesmo "ocupado" (é a data de saída)
+  const recommendedCheckOutDate = checkIn && !checkOut ? addDays(checkIn, 1) : null
+  const isRecommendedCheckOutDay = useCallback(
+    (date: Date) => recommendedCheckOutDate ? sameDay(date, recommendedCheckOutDate) : false,
+    [checkIn, checkOut]
+  )
+
+  // Click handler – bloqueados não são clicáveis, exceto quando podem ser check-out (qualquer dia após check-in; a data de saída não precisa estar livre)
   const handleDayClick = useCallback(
     (date: Date) => {
-      if (isDayDisabled(date) || isPast(date)) return
+      if (isPast(date)) return
       if (!date) return
+      if (isDayDisabled(date) && !canBeCheckOutOnly(date)) return
 
       if (!checkIn || (checkIn && checkOut)) {
         // Start new selection
@@ -190,7 +216,7 @@ export function AvailabilityCalendar({
         }
       }
     },
-    [checkIn, checkOut, onDatesChange, isDayDisabled, isPast, disabledKeys]
+    [checkIn, checkOut, onDatesChange, isDayDisabled, isPast, disabledKeys, canBeCheckOutOnly]
   )
 
   // Determine visual state of each day
@@ -279,7 +305,10 @@ export function AvailabilityCalendar({
             }
 
             const isSelected = state.isCheckIn || state.isCheckOut
-            const interactive = !state.past && !state.disabled
+            const canBeCheckOut = canBeCheckOutOnly(cd.date)
+            const isRecommendedCheckOut = isRecommendedCheckOutDay(cd.date)
+            // Interativo: não bloqueados OU qualquer dia após check-in (pode ser escolhido como check-out, mesmo ocupado)
+            const interactive = !state.past && (!state.disabled || canBeCheckOut)
 
             return (
               <div
@@ -313,9 +342,18 @@ export function AvailabilityCalendar({
                     "flex items-center justify-center rounded-full text-sm sm:text-[15px] font-medium",
                     "transition-all duration-150 select-none",
 
-                    // Default – available
-                    interactive && !isSelected && !state.isOccupied && !state.isToday &&
-                      "text-moss-800 hover:bg-moss-100 cursor-pointer",
+                    // Disponível (destaque): dias não bloqueados; ou o dia seguinte ao check-in (mesmo que a API marque ocupado – é a data de saída)
+                    interactive && !isSelected && !state.isToday && (!state.isOccupied || isRecommendedCheckOut) &&
+                      (!(checkIn && !checkOut) || isRecommendedCheckOut) &&
+                      "text-moss-800 hover:bg-moss-100 cursor-pointer no-underline decoration-none",
+
+                    // Dia seguinte ao check-in quando ocupado: aspecto igual a disponível (sem riscado, anel discreto de “check-out sugerido”)
+                    isRecommendedCheckOut && state.isOccupied && !isSelected && !state.past &&
+                      "ring-2 ring-moss-400/60 ring-inset",
+
+                    // Escolhendo check-out: outros dias disponíveis após check-in (não o dia seguinte) ficam neutros, mas clicáveis
+                    checkIn && !checkOut && canBeCheckOut && !isRecommendedCheckOut && !state.isOccupied && !isSelected &&
+                      "text-stone-400 hover:bg-stone-50 cursor-pointer",
 
                     // Today
                     state.isToday && !isSelected &&
@@ -325,13 +363,17 @@ export function AvailabilityCalendar({
                     state.past &&
                       "text-stone-300 cursor-default",
 
-                    // Occupied (booked)
-                    state.isOccupied && !state.past &&
-                      "text-red-300 line-through decoration-red-300/70 cursor-not-allowed",
+                    // Bloqueado/ocupado – vermelho e riscado; exceto dia seguinte ao check-in ou o dia já escolhido como check-out
+                    state.isOccupied && !state.past && !isRecommendedCheckOut && !state.isCheckOut &&
+                      "text-red-400 line-through decoration-red-400 font-medium",
+                    state.isOccupied && !state.past && !isRecommendedCheckOut && !state.isCheckOut && !canBeCheckOut &&
+                      "cursor-not-allowed",
+                    state.isOccupied && !state.past && !isRecommendedCheckOut && !state.isCheckOut && canBeCheckOut &&
+                      "cursor-pointer hover:bg-red-50/80 hover:ring-2 hover:ring-red-200",
 
-                    // Selected (check-in or check-out)
-                    isSelected &&
-                      "bg-moss-700 text-white font-semibold shadow-md cursor-pointer",
+                    // Selecionado – dias disponíveis ou o dia de check-out (mesmo que a API marque ocupado; inclui quando já está selecionado)
+                    isSelected && (!state.isOccupied || isRecommendedCheckOut || state.isCheckOut) &&
+                      "bg-moss-700 text-white font-semibold shadow-md cursor-pointer no-underline decoration-none",
 
                     // In range
                     state.inRange && !isSelected && !state.isOccupied &&

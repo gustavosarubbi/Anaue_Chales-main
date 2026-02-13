@@ -34,6 +34,12 @@ export const ENV = {
     NEXT_PUBLIC_RECAPTCHA_SITE_KEY: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || getEnv('NEXT_PUBLIC_RECAPTCHA_SITE_KEY'),
     RECAPTCHA_SECRET_KEY: getEnv('RECAPTCHA_SECRET_KEY'),
     BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || getEnv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000'),
+    // Channex (calendário mestre + sync Airbnb/Booking)
+    CHANNEX_API_KEY: getEnv('CHANNEX_API_KEY'),
+    CHANNEX_API_BASE_URL: getEnv('CHANNEX_API_BASE_URL', 'https://app.channex.io'),
+    CHANNEX_PROPERTY_ID: getEnv('CHANNEX_PROPERTY_ID'),
+    CHANNEX_ROOM_TYPE_ID: getEnv('CHANNEX_ROOM_TYPE_ID'),
+    CHANNEX_RATE_PLAN_ID: getEnv('CHANNEX_RATE_PLAN_ID'),
 }
 
 

@@ -68,8 +68,8 @@ const features = [
   },
   {
     icon: Droplets,
-    title: "Banheira de Hidromassagem",
-    description: "Banheira relaxante com hidromassagem para momentos de total relaxamento e bem-estar",
+    title: "Jacuzzi",
+    description: "Banheira relaxante com Jacuzzi para momentos de total relaxamento e bem-estar",
     highlight: true,
   },
   {

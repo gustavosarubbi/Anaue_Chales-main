@@ -16,9 +16,9 @@ export function Accommodations() {
     {
       id: "chale-anaue",
       title: "Chalé Master",
-      description: "O máximo conforto com banheira de hidromassagem e vista panorâmica para o Rio Tarumã.",
+      description: "O máximo conforto com Jacuzzi e vista panorâmica para o Rio Tarumã.",
       image: "/Chale-1.jpg",
-      features: ["Hidromassagem", "Vista Rio", "Exclusividade Total"],
+      features: ["Jacuzzi", "Vista Rio", "Exclusividade Total"],
       price: `A partir de R$ ${masterPrice}`,
       whatsappMessage: "Olá! Gostaria de saber mais sobre o Chalé Master.",
       link: "/checkout?chalet=chale-anaue"
@@ -26,9 +26,9 @@ export function Accommodations() {
     {
       id: "chale-2",
       title: "Chalé Camping Luxo",
-      description: "Uma experiência moderna de imersão na natureza com design industrial e todo conforto necessário.",
+      description: "Uma experiência moderna de imersão na natureza com Jacuzzi, design industrial e todo conforto necessário.",
       image: "/Chale 2/IMG_3189.jpg",
-      features: ["Design Moderno", "Imersão Natureza", "Conforto Premium"],
+      features: ["Jacuzzi", "Design Moderno", "Imersão Natureza"],
       price: `A partir de R$ ${campingPrice}`,
       whatsappMessage: "Olá! Gostaria de saber mais sobre o Chalé Camping Luxo.",
       link: "/checkout?chalet=chale-2"

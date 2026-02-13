@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { syncReservationToChannex } from '@/lib/channex-sync'
 
 /**
  * Webhook da InfinitePay - chamado automaticamente quando um pedido é criado ou pagamento é aprovado.
@@ -393,6 +394,16 @@ export async function POST(request: Request) {
                 receipt_url: receipt_url || 'não fornecido',
                 processingTime: Date.now() - startTime,
             })
+
+            // Sincronizar com Channex (fechar datas no Airbnb/Booking)
+            try {
+                const channexResult = await syncReservationToChannex(supabase, reservationId)
+                if (!channexResult.synced && channexResult.error) {
+                    console.warn('[INFINITEPAY_WEBHOOK] Channex sync falhou:', channexResult.error)
+                }
+            } catch (e) {
+                console.warn('[INFINITEPAY_WEBHOOK] Erro ao sincronizar Channex:', e)
+            }
 
             return NextResponse.json({ 
                 success: true, 

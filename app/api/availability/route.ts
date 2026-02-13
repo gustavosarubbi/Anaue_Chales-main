@@ -3,6 +3,7 @@ import { createServerClient } from "@/lib/supabase"
 import { fetchICalData } from "@/lib/utils/ical-parser"
 import { getDatesBetween } from "@/lib/utils/reservation"
 import { MANUAL_BOOKED_DATES } from "@/lib/data/availability"
+import { getChannexConfig, getChannexAvailability } from "@/lib/channex"
 
 export async function GET(request: Request) {
   try {
@@ -24,9 +25,27 @@ export async function GET(request: Request) {
     const bookedDates: Record<string, string> = {}
     const syncResults: any[] = []
 
-    // 1. Sincronização externa (apenas se houver URL configurada)
+    // 0. Calendário mestre Channex (sincroniza Airbnb/Booking) – apenas chalé Master
+    const channexConfig = getChannexConfig()
+    if (channexConfig && chaletId === 'chale-anaue') {
+      const today = new Date()
+      const end = new Date(today)
+      end.setFullYear(end.getFullYear() + 1)
+      const dateFrom = today.toISOString().slice(0, 10)
+      const dateTo = end.toISOString().slice(0, 10)
+      const channexResult = await getChannexAvailability(dateFrom, dateTo)
+      if (channexResult.success && channexResult.bookedDates) {
+        Object.keys(channexResult.bookedDates).forEach((date) => {
+          bookedDates[date] = "booked"
+        })
+        syncResults.push({ source: "Channex (master)", count: Object.keys(channexResult.bookedDates).length })
+      }
+    }
+
+    // 1. Sincronização iCal (só quando Channex NÃO está configurado – senão o calendário vem do Channex/Airbnb via API)
+    const useChannexAsMaster = channexConfig && chaletId === 'chale-anaue'
     const chaletCalendars = CALENDARS[chaletId]
-    if (chaletCalendars) {
+    if (chaletCalendars && !useChannexAsMaster) {
       const calendarTasks = []
       if (chaletCalendars.airbnb) calendarTasks.push(fetchICalData(chaletCalendars.airbnb, "Airbnb", 3, 10000))
       if (chaletCalendars.booking) calendarTasks.push(fetchICalData(chaletCalendars.booking, "Booking.com", 3, 10000))
@@ -99,6 +118,20 @@ export async function GET(request: Request) {
             })
           })
         }
+
+        // 4. Datas bloqueadas no Supabase (fechamento/manutenção)
+        const { data: blockedRows, error: blockedError } = await supabase
+          .from("blocked_dates")
+          .select("date")
+          .eq("chalet_id", chaletId)
+
+        if (!blockedError && blockedRows) {
+          blockedRows.forEach((row) => {
+            const d = row.date
+            const dateStr = typeof d === "string" ? d.split("T")[0] : d
+            if (dateStr) bookedDates[dateStr] = "booked"
+          })
+        }
       }
     } catch (dbError) {
       console.error("Erro ao buscar reservas do Supabase:", dbError)
@@ -109,7 +142,7 @@ export async function GET(request: Request) {
       availability: bookedDates,
       lastUpdated: new Date().toISOString(),
       syncInfo: syncResults,
-      source: syncResults.length > 0 ? "Hybrid (External + Manual + DB)" : "Manual + DB"
+      source: syncResults.length > 0 ? "Hybrid (Channex + External + Manual + DB)" : "Manual + DB"
     })
   } catch (error) {
     console.error("Erro ao processar disponibilidade:", error)

@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase'
 import { getDatesBetween } from '@/lib/utils/reservation'
 import { fetchICalData } from '@/lib/utils/ical-parser'
 import { MANUAL_BOOKED_DATES } from '@/lib/data/availability'
+import { getChannexConfig, getChannexAvailability } from '@/lib/channex'
 
 export interface AvailabilityResult {
     available: boolean
@@ -26,7 +27,22 @@ export async function checkReservationAvailability(
         const allBookedDates: Set<string> = new Set()
         const allCheckInDates: Set<string> = new Set()
 
-        // 1. Sincronização externa condicional
+        // 0. Calendário mestre Channex (chalé Master)
+        const channexConfig = getChannexConfig()
+        if (channexConfig && chaletId === 'chale-anaue') {
+            const today = new Date()
+            const end = new Date(today)
+            end.setFullYear(end.getFullYear() + 1)
+            const dateFrom = today.toISOString().slice(0, 10)
+            const dateTo = end.toISOString().slice(0, 10)
+            const channexResult = await getChannexAvailability(dateFrom, dateTo)
+            if (channexResult.success && channexResult.bookedDates) {
+                Object.keys(channexResult.bookedDates).forEach((date) => allBookedDates.add(date))
+            }
+        }
+
+        // 1. Sincronização iCal (só quando Channex NÃO está configurado – senão o calendário vem do Channex/Airbnb via API)
+        const useChannexAsMaster = channexConfig && chaletId === 'chale-anaue'
         const CALENDARS: Record<string, { airbnb?: string; booking?: string }> = {
             'chale-anaue': {
                 airbnb: 'https://www.airbnb.com.br/calendar/ical/1457198661856129067.ics?s=64254c8251f4f54cf8b4c3ae58363ea5',
@@ -39,7 +55,7 @@ export async function checkReservationAvailability(
         }
 
         const chaletCalendars = CALENDARS[chaletId]
-        if (chaletCalendars) {
+        if (chaletCalendars && !useChannexAsMaster) {
             const calendarTasks = []
             if (chaletCalendars.airbnb) calendarTasks.push(fetchICalData(chaletCalendars.airbnb, 'Airbnb', 2, 5000))
             if (chaletCalendars.booking) calendarTasks.push(fetchICalData(chaletCalendars.booking, 'Booking.com', 2, 5000))
@@ -111,6 +127,20 @@ export async function checkReservationAvailability(
 
                     const dates = getDatesBetween(start, end)
                     dates.forEach((date) => allBookedDates.add(date))
+                })
+            }
+
+            // 4. Datas bloqueadas no Supabase (fechamento/manutenção)
+            const { data: blockedRows, error: blockedError } = await supabase
+                .from('blocked_dates')
+                .select('date')
+                .eq('chalet_id', chaletId)
+
+            if (!blockedError && blockedRows) {
+                blockedRows.forEach((row) => {
+                    const d = row.date
+                    const dateStr = typeof d === 'string' ? d.split('T')[0] : d
+                    if (dateStr) allBookedDates.add(dateStr)
                 })
             }
         }

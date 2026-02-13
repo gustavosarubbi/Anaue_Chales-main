@@ -40,9 +40,9 @@ export const CHALET_PRICING: Record<string, { weekday: number; weekend: number }
     weekday: 650,
     weekend: 800,
   },
-  'chale-2': { // Chalé Camping Luxo
-    weekday: 550,
-    weekend: 700,
+  'chale-2': { // Chalé Camping Luxo (mesmo preço do Chalé Master)
+    weekday: 650,
+    weekend: 800,
   }
 }
 
