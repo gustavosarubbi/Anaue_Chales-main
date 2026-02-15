@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Chamar API de sync
+        id: sync
         run: |
           URL="${{ secrets.SYNC_API_URL }}"
           SECRET="${{ secrets.CRON_SECRET }}"
@@ -23,7 +24,20 @@ jobs:
             exit 1
           fi
           if [ -n "$SECRET" ]; then
-            curl -sf -X POST -H "x-cron-secret: $SECRET" "$URL"
+            RESP=$(curl -s -w "\n%{http_code}" -X POST -H "x-cron-secret: $SECRET" "$URL")
           else
-            curl -sf -X POST "$URL"
+            RESP=$(curl -s -w "\n%{http_code}" -X POST "$URL")
+          fi
+          HTTP_CODE=$(echo "$RESP" | tail -n1)
+          BODY=$(echo "$RESP" | sed '$d')
+          echo "HTTP $HTTP_CODE"
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Sync falhou (HTTP $HTTP_CODE). Verifique CRON_SECRET na Vercel e no GitHub, e variáveis BEDS24_* e SUPABASE_* na Vercel."
+            exit 1
+          fi
+          # Falha o job se a API retornar success: false (ex.: timeout, Beds24 erro)
+          if echo "$BODY" | grep -qE '"success"[[:space:]]*:[[:space:]]*false'; then
+            echo "::error::Sync retornou success: false. Veja 'Response' acima para detalhes (errors, timeout)."
+            exit 1
           fi

@@ -38,3 +38,9 @@ Configure em `.env.local` (veja `.env.example`):
     - `CRON_SECRET` (opcional) = mesmo valor da variável `CRON_SECRET` na Vercel; se definir, a rota só aceita requests com header `x-cron-secret`.
     - Com GitHub CLI: `gh secret set SYNC_API_URL` e `gh secret set CRON_SECRET` (e na Vercel defina `CRON_SECRET` igual).
   - **Webhook Supabase (instantâneo)**: em **Supabase > Database > Webhooks**, crie um webhook na tabela `blocked_dates`, eventos Insert/Update/Delete, URL `https://seu-dominio.vercel.app/api/webhooks/supabase-db`. Opcional: defina `BEDS24_SYNC_WEBHOOK_SECRET` e use no webhook como header `Authorization: Bearer <secret>`.
+
+### Se o sync falhar (emails do GitHub / “sincronização falhando”)
+
+1. **HTTP 401** – O `CRON_SECRET` no GitHub deve ser **igual** ao da Vercel (Settings → Environment Variables). Se na Vercel existir `CRON_SECRET`, crie o secret no GitHub com o mesmo valor.
+2. **HTTP 504 / timeout** – Na Vercel Hobby o limite é 10s. O projeto usa throttle menor (800 ms) em ambiente Vercel para caber nesse tempo. Se ainda der timeout, confira no GitHub Actions a aba do workflow “Sync Beds24” e veja o corpo da resposta.
+3. **success: false** – A resposta da API traz `errors` no JSON. Confira na Vercel que existem `BEDS24_API_KEY`, `BEDS24_PROP_KEY`, `BEDS24_ROOM_ID` e as variáveis do Supabase (`SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`).
