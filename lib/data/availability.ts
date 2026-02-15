@@ -2,7 +2,7 @@
  * Disponibilidade manual para os chalés
  * Formato: Record<chaletId, string[]> onde string é "YYYY-MM-DD"
  */
-// Fevereiro 2026 todo fechado no Master (fallback caso Channex/Booking não devolva stop_sell)
+// Fevereiro 2026 todo fechado no Master (fallback caso Beds24/Booking não devolva bloqueio)
 const MASTER_FEB_2026 = [
     '2026-02-01', '2026-02-02', '2026-02-03', '2026-02-04', '2026-02-05', '2026-02-06', '2026-02-07',
     '2026-02-08', '2026-02-09', '2026-02-10', '2026-02-11', '2026-02-12', '2026-02-13', '2026-02-14',

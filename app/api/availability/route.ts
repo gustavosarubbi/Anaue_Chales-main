@@ -3,7 +3,7 @@ import { createServerClient } from "@/lib/supabase"
 import { fetchICalData } from "@/lib/utils/ical-parser"
 import { getDatesBetween } from "@/lib/utils/reservation"
 import { MANUAL_BOOKED_DATES } from "@/lib/data/availability"
-import { getChannexConfig, getChannexAvailability } from "@/lib/channex"
+import { getBeds24Config, getBeds24Availability } from "@/lib/beds24"
 
 export async function GET(request: Request) {
   try {
@@ -25,27 +25,27 @@ export async function GET(request: Request) {
     const bookedDates: Record<string, string> = {}
     const syncResults: any[] = []
 
-    // 0. Calendário mestre Channex (sincroniza Airbnb/Booking) – apenas chalé Master
-    const channexConfig = getChannexConfig()
-    if (channexConfig && chaletId === 'chale-anaue') {
+    // 0. Calendário mestre Beds24 (sincroniza Airbnb/Booking) – apenas chalé Master
+    const beds24Config = getBeds24Config()
+    if (beds24Config && chaletId === 'chale-anaue') {
       const today = new Date()
       const end = new Date(today)
       end.setFullYear(end.getFullYear() + 1)
       const dateFrom = today.toISOString().slice(0, 10)
       const dateTo = end.toISOString().slice(0, 10)
-      const channexResult = await getChannexAvailability(dateFrom, dateTo)
-      if (channexResult.success && channexResult.bookedDates) {
-        Object.keys(channexResult.bookedDates).forEach((date) => {
+      const beds24Result = await getBeds24Availability(dateFrom, dateTo)
+      if (beds24Result.success && beds24Result.bookedDates) {
+        Object.keys(beds24Result.bookedDates).forEach((date) => {
           bookedDates[date] = "booked"
         })
-        syncResults.push({ source: "Channex (master)", count: Object.keys(channexResult.bookedDates).length })
+        syncResults.push({ source: "Beds24 (master)", count: Object.keys(beds24Result.bookedDates).length })
       }
     }
 
-    // 1. Sincronização iCal (só quando Channex NÃO está configurado – senão o calendário vem do Channex/Airbnb via API)
-    const useChannexAsMaster = channexConfig && chaletId === 'chale-anaue'
+    // 1. Sincronização iCal (só quando Beds24 NÃO está configurado – senão o calendário vem do Beds24/Airbnb via API)
+    const useBeds24AsMaster = beds24Config && chaletId === 'chale-anaue'
     const chaletCalendars = CALENDARS[chaletId]
-    if (chaletCalendars && !useChannexAsMaster) {
+    if (chaletCalendars && !useBeds24AsMaster) {
       const calendarTasks = []
       if (chaletCalendars.airbnb) calendarTasks.push(fetchICalData(chaletCalendars.airbnb, "Airbnb", 3, 10000))
       if (chaletCalendars.booking) calendarTasks.push(fetchICalData(chaletCalendars.booking, "Booking.com", 3, 10000))
@@ -142,7 +142,7 @@ export async function GET(request: Request) {
       availability: bookedDates,
       lastUpdated: new Date().toISOString(),
       syncInfo: syncResults,
-      source: syncResults.length > 0 ? "Hybrid (Channex + External + Manual + DB)" : "Manual + DB"
+      source: syncResults.length > 0 ? "Hybrid (Beds24 + External + Manual + DB)" : "Manual + DB"
     })
   } catch (error) {
     console.error("Erro ao processar disponibilidade:", error)

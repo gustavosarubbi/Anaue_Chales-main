@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { checkInfinitePayPaymentStatus } from '@/lib/infinitepay'
-import { syncReservationToChannex } from '@/lib/channex-sync'
+import { syncReservationToBeds24 } from '@/lib/beds24-sync'
 
 /**
  * Endpoint para confirmar uma reserva após pagamento via InfinitePay.
@@ -112,14 +112,14 @@ export async function POST(request: Request) {
 
         console.log('[RESERVATIONS_CONFIRM] ✅ Reserva confirmada:', reservationId, paymentStatusLabel)
 
-        // Sincronizar com Channex (fechar datas no Airbnb/Booking)
+        // Sincronizar com Beds24 (fechar datas no Airbnb/Booking)
         try {
-            const channexResult = await syncReservationToChannex(supabase, reservationId)
-            if (!channexResult.synced && channexResult.error) {
-                console.warn('[RESERVATIONS_CONFIRM] Channex sync falhou (reserva já confirmada):', channexResult.error)
+            const beds24Result = await syncReservationToBeds24(supabase, reservationId)
+            if (!beds24Result.synced && beds24Result.error) {
+                console.warn('[RESERVATIONS_CONFIRM] Beds24 sync falhou (reserva já confirmada):', beds24Result.error)
             }
         } catch (e) {
-            console.warn('[RESERVATIONS_CONFIRM] Erro ao sincronizar Channex:', e)
+            console.warn('[RESERVATIONS_CONFIRM] Erro ao sincronizar Beds24:', e)
         }
 
         return NextResponse.json({

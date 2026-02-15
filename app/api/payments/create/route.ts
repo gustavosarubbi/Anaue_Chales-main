@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { createServerClient } from '@/lib/supabase'
 import { createInfinitePayPayment } from '@/lib/infinitepay'
+import { getChaletDisplayName } from '@/lib/utils/reservation'
 
 export async function POST(request: Request) {
   try {
@@ -22,10 +24,26 @@ export async function POST(request: Request) {
       )
     }
 
-    // Criar link de pagamento na InfinitePay
+    // Buscar a reserva para obter o chalé e garantir consistência (descrição na Infinite Pay + seu controle no site)
+    let chaletName = 'Chalé'
+    const supabase = createServerClient()
+    if (supabase) {
+      const { data: reservation } = await supabase
+        .from('reservations')
+        .select('chalet_id')
+        .eq('id', reservationId)
+        .single()
+      if (reservation?.chalet_id) {
+        chaletName = getChaletDisplayName(reservation.chalet_id)
+      }
+    }
+
+    const description = `Reserva ${chaletName} - ${guestName} (${checkIn} a ${checkOut})`
+
+    // Criar link de pagamento na InfinitePay (descrição com nome do chalé para aparecer no app Infinite Pay e no comprovante)
     const result = await createInfinitePayPayment({
       amount: parsedAmount,
-      description: `Reserva Chalé - ${guestName} (${checkIn} a ${checkOut})`,
+      description,
       orderId: reservationId,
       customer: {
         name: guestName,

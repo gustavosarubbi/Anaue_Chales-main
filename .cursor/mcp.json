@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--autoConnect"
+      ]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "env": {
+        "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "1",
+        "PUPPETEER_EXECUTABLE_PATH": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "PUPPETEER_LAUNCH_OPTIONS": "{\"headless\":false,\"executablePath\":\"C:/Program Files/Google/Chrome/Application/chrome.exe\"}",
+        "ALLOW_DANGEROUS": "true"
+      }
+    },
+    "fetch": {
+      "command": "npm",
+      "args": [
+        "run",
+        "mcp-fetch"
+      ]
+    }
+  }
+}

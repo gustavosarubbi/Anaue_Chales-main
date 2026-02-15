@@ -46,6 +46,17 @@ export const CHALET_PRICING: Record<string, { weekday: number; weekend: number }
   }
 }
 
+/** Nome de exibição por chalet_id (Infinite Pay, comprovantes, e-mail, site) */
+export const CHALET_DISPLAY_NAMES: Record<string, string> = {
+  'chale-anaue': 'Chalé Master',
+  'chale-2': 'Camping Luxo',
+}
+
+export function getChaletDisplayName(chaletId: string | null | undefined): string {
+  if (!chaletId) return 'Chalé'
+  return CHALET_DISPLAY_NAMES[chaletId] || chaletId
+}
+
 export const PRICING = {
   EXTRA_ADULT: 150, // Por adulto extra (acima de 2)
   EXTRA_CHILD: 100, // Por criança (6-15 anos)

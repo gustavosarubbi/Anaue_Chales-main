@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { getChaletDisplayName } from '@/lib/utils/reservation'
 
 export async function GET(
     request: Request,
@@ -37,7 +38,12 @@ export async function GET(
             paymentStatus: reservation.payment_status,
             expiresAt: reservation.expires_at,
             serverTime: now.toISOString(),
-            isExpired
+            isExpired,
+            chaletId: reservation.chalet_id ?? null,
+            chaletDisplayName: getChaletDisplayName(reservation.chalet_id),
+            checkIn: reservation.check_in,
+            checkOut: reservation.check_out,
+            guestName: reservation.guest_name,
         })
     } catch (error) {
         console.error('[RESERVATIONS_STATUS] Erro:', error)

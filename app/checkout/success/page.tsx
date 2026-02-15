@@ -26,6 +26,7 @@ function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const [confirmed, setConfirmed] = useState(false)
   const [confirming, setConfirming] = useState(true)
+  const [chaletDisplayName, setChaletDisplayName] = useState<string | null>(null)
   const hasAttempted = useRef(false)
 
   useEffect(() => {
@@ -63,8 +64,7 @@ function CheckoutSuccessContent() {
 
     console.log('[SUCCESS] Confirmando reserva:', effectiveId)
 
-    // 1. Primeiro, verificar status do pagamento na InfinitePay (opcional, double-check)
-    // 2. Confirmar a reserva no nosso banco
+    // 1. Confirmar a reserva no nosso banco
     fetch('/api/reservations/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -85,7 +85,6 @@ function CheckoutSuccessContent() {
             console.log('[SUCCESS] Reserva já estava confirmada (idempotência)')
             setConfirmed(true)
           } else {
-            // Outro erro - logar mas ainda mostrar sucesso (pagamento foi feito)
             console.error('[SUCCESS] Erro na confirmação:', data.error || data.message)
             setConfirmed(true)
           }
@@ -95,13 +94,21 @@ function CheckoutSuccessContent() {
       })
       .catch(err => {
         console.error('[SUCCESS] Erro na confirmação (pagamento já foi realizado):', err)
-        // Mesmo com erro, mostrar sucesso pois o pagamento foi feito
-        // O webhook vai confirmar depois se necessário
         setConfirmed(true)
       })
       .finally(() => {
         setConfirming(false)
       })
+
+    // Buscar detalhes da reserva (chalé) para exibir na página
+    fetch(`/api/reservations/status/${effectiveId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.chaletDisplayName) {
+          setChaletDisplayName(data.chaletDisplayName)
+        }
+      })
+      .catch(() => {})
   }, [searchParams])
 
   if (confirming) {
@@ -138,7 +145,14 @@ function CheckoutSuccessContent() {
             Reserva Confirmada!
           </h1>
           <p className="text-moss-600 max-w-md mx-auto text-lg font-light leading-relaxed">
-            Sua reserva foi realizada com sucesso. <br />
+            {chaletDisplayName ? (
+              <>
+                Sua reserva do <strong>{chaletDisplayName}</strong> foi realizada com sucesso.
+                <br />
+              </>
+            ) : (
+              <>Sua reserva foi realizada com sucesso. <br /></>
+            )}
             Em instantes você receberá a confirmação por e-mail e WhatsApp.
           </p>
         </div>

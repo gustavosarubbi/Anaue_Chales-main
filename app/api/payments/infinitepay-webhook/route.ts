@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { syncReservationToChannex } from '@/lib/channex-sync'
+import { syncReservationToBeds24 } from '@/lib/beds24-sync'
 
 /**
  * Webhook da InfinitePay - chamado automaticamente quando um pedido é criado ou pagamento é aprovado.
@@ -395,14 +395,14 @@ export async function POST(request: Request) {
                 processingTime: Date.now() - startTime,
             })
 
-            // Sincronizar com Channex (fechar datas no Airbnb/Booking)
+            // Sincronizar com Beds24 (fechar datas no Airbnb/Booking)
             try {
-                const channexResult = await syncReservationToChannex(supabase, reservationId)
-                if (!channexResult.synced && channexResult.error) {
-                    console.warn('[INFINITEPAY_WEBHOOK] Channex sync falhou:', channexResult.error)
+                const beds24Result = await syncReservationToBeds24(supabase, reservationId)
+                if (!beds24Result.synced && beds24Result.error) {
+                    console.warn('[INFINITEPAY_WEBHOOK] Beds24 sync falhou:', beds24Result.error)
                 }
             } catch (e) {
-                console.warn('[INFINITEPAY_WEBHOOK] Erro ao sincronizar Channex:', e)
+                console.warn('[INFINITEPAY_WEBHOOK] Erro ao sincronizar Beds24:', e)
             }
 
             return NextResponse.json({ 
