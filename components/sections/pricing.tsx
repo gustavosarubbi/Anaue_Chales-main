@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CreditCard, Smartphone, MessageCircle, AlertTriangle, RefreshCw, ShieldCheck, Info, ArrowRight, LogIn, LogOut } from "lucide-react"
+import { CreditCard, Smartphone, MessageCircle, AlertTriangle, RefreshCw, ShieldCheck, Info, ArrowRight, LogIn, LogOut, IdCard } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
@@ -252,12 +252,35 @@ export function Pricing() {
             </CardHeader>
             <CardContent className="p-6 sm:p-8">
               {/* Aviso de exclusividade */}
-              <div className="flex items-start gap-3 bg-gradient-to-r from-moss-50/60 to-beige-50/30 border border-moss-100 rounded-xl p-4 mb-7">
+              <div className="flex items-start gap-3 bg-gradient-to-r from-moss-50/60 to-beige-50/30 border border-moss-100 rounded-xl p-4 mb-4">
                 <div className="w-7 h-7 rounded-lg bg-moss-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Info className="h-3.5 w-3.5 text-moss-600" />
                 </div>
                 <p className="text-sm text-moss-700 leading-relaxed">
                   O valor pago garante a <strong className="text-moss-900">exclusividade da reserva</strong>. O chalé deixa de ser ofertado a outros hóspedes a partir da confirmação do pagamento.
+                </p>
+              </div>
+
+              {/* Restrição menor de idade + respaldo jurídico */}
+              <div className="flex items-start gap-3 bg-amber-50/80 border border-amber-100 rounded-xl p-4 mb-4">
+                <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                </div>
+                <div className="text-sm text-amber-900 leading-relaxed space-y-1">
+                  <p className="font-semibold">Não é permitida a hospedagem de menores de 18 anos.</p>
+                  <p className="text-amber-800 text-xs">
+                    Esta política é estabelecida em conformidade com a legislação aplicável. O responsável pela reserva declara ser maior de 18 anos. A não observância pode resultar em cancelamento da estadia sem direito a reembolso.
+                  </p>
+                </div>
+              </div>
+
+              {/* Aviso documento de identidade no check-in */}
+              <div className="flex items-start gap-3 bg-moss-50/60 border border-moss-100 rounded-xl p-4 mb-7">
+                <div className="w-7 h-7 rounded-lg bg-moss-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <IdCard className="h-3.5 w-3.5 text-moss-600" />
+                </div>
+                <p className="text-sm text-moss-700 leading-relaxed">
+                  É obrigatória a <strong className="text-moss-900">apresentação de documento de identidade com foto</strong> no momento do check-in.
                 </p>
               </div>
 
@@ -279,7 +302,7 @@ export function Pricing() {
                       </div>
                       <div>
                         <p className="text-sm text-green-900 font-semibold mb-0.5">Reembolso integral (100%)</p>
-                        <p className="text-xs text-green-700 leading-relaxed">Até 7 dias após pagamento + 72h antes do check-in.</p>
+                        <p className="text-xs text-green-700 leading-relaxed">Até 7 dias após o pagamento, ou 72h antes do check-in (em casos de compras feitas em menos de 7 dias antes do dia do check-in).</p>
                       </div>
                     </div>
                     
@@ -290,7 +313,7 @@ export function Pricing() {
                       </div>
                       <div>
                         <p className="text-sm text-amber-900 font-semibold mb-0.5">Reembolso parcial (50%)</p>
-                        <p className="text-xs text-amber-700 leading-relaxed">Mínimo de 10 dias antes do check-in, respeitando 72h.</p>
+                        <p className="text-xs text-amber-700 leading-relaxed">Mínimo de 10 dias antes do check-in, ou 48h antes do check-in (em casos de compras feitas em menos de 7 dias antes do check-in).</p>
                       </div>
                     </div>
 
@@ -340,8 +363,8 @@ export function Pricing() {
               {/* Aviso Legal / Disclaimer */}
               <div className="mt-8 pt-6 border-t border-moss-50 text-center">
                 <p className="text-[10px] text-moss-400 max-w-2xl mx-auto leading-normal">
-                  * De acordo com o Código de Defesa do Consumidor (Art. 49), o prazo de reflexão de 7 dias é garantido para compras online. 
-                  Ao realizar a reserva, você declara estar ciente e de acordo com as políticas de cancelamento e reagendamento acima descritas.
+                  * De acordo com o Código de Defesa do Consumidor (Art. 49), o prazo de reflexão de 7 dias é garantido para compras online.
+                  Ao realizar a reserva, você declara estar ciente e de acordo com as políticas de cancelamento e reagendamento acima descritas, com a restrição de idade (maior de 18 anos) e a obrigatoriedade de apresentação de documento de identidade no check-in.
                 </p>
               </div>
             </CardContent>

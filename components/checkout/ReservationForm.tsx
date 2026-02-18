@@ -23,6 +23,9 @@ const reservationSchema = z.object({
   termsAccepted: z.literal(true, {
     errorMap: () => ({ message: "Você precisa aceitar os termos e condições para continuar." }),
   }),
+  adultDeclaration: z.literal(true, {
+    errorMap: () => ({ message: "Você precisa declarar ser maior de 18 anos para continuar." }),
+  }),
 })
 
 export type ReservationFormData = z.infer<typeof reservationSchema>
@@ -69,6 +72,7 @@ export function ReservationForm({
       guestCount: 2,
       childrenCount: 0,
       captchaToken: "",
+      adultDeclaration: undefined,
       ...initialData,
     },
   })
@@ -280,6 +284,30 @@ export function ReservationForm({
           </ul>
         </div>
 
+        {/* Declaração de maior de 18 anos */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="adultDeclaration"
+              className="mt-1"
+              onCheckedChange={(checked) => {
+                setValue("adultDeclaration", checked === true ? true : undefined, { shouldValidate: true })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <Label
+                htmlFor="adultDeclaration"
+                className="text-sm font-medium leading-relaxed text-moss-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Declaro ser maior de 18 anos.
+              </Label>
+            </div>
+          </div>
+          {errors.adultDeclaration && (
+            <p className="text-xs text-red-500 font-medium ml-7 animate-fadeInUp">{errors.adultDeclaration.message}</p>
+          )}
+        </div>
+
         {/* Termos e Condições Checkbox */}
         <div className="flex flex-col gap-2">
           <div className="flex items-start space-x-2">
@@ -298,7 +326,7 @@ export function ReservationForm({
                 Li e concordo com os <a href="/#politica-cancelamento" target="_blank" className="underline text-moss-900 hover:text-moss-700">Termos de Uso e Política de Cancelamento</a>.
               </Label>
               <p className="text-[11px] text-moss-500 text-muted-foreground">
-                Ao continuar, você declara estar ciente das regras de hospedagem, horários e políticas de reembolso.
+                Ao continuar, você declara estar ciente das regras de hospedagem, horários, políticas de reembolso, e da obrigação de apresentar documento de identidade com foto no check-in.
               </p>
             </div>
           </div>

@@ -182,8 +182,9 @@ export async function checkReservationAvailability(
 
         // Disponível se:
         // 1. Check-in não está bloqueado
-        // 2. Todas as datas de estadia (exceto check-out) estão livres
-        const isAvailable = !checkInIsBooked && conflictingDates.length === 0 && conflictingCheckIns.length === 0
+        // 2. Tolerância de até 2 dias bloqueados na estadia (ex.: 8 a 11 com 9 e 10 bloqueados é permitido)
+        // 3. Nenhum check-in conflitante nas noites
+        const isAvailable = !checkInIsBooked && conflictingDates.length <= 2 && conflictingCheckIns.length === 0
 
         return {
             success: true,

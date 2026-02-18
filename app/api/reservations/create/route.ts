@@ -19,6 +19,9 @@ const reservationSchema = z.object({
   termsAccepted: z.literal(true, {
     errorMap: () => ({ message: "O aceite dos termos é obrigatório." }),
   }),
+  adultDeclaration: z.literal(true, {
+    errorMap: () => ({ message: "A declaração de maior de 18 anos é obrigatória." }),
+  }),
 })
 
 export async function POST(request: Request) {
@@ -37,7 +40,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount, chaletId, captchaToken, termsAccepted } = result.data
+    const { checkIn, checkOut, guestName, guestEmail, guestPhone, guestCount, childrenCount, chaletId, captchaToken, termsAccepted, adultDeclaration } = result.data
 
     // 2. Verificação do reCAPTCHA (se configurado)
     if (ENV.RECAPTCHA_SECRET_KEY && ENV.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
@@ -178,6 +181,7 @@ export async function POST(request: Request) {
         chalet_id: chaletId || 'chale-anaue',
         expires_at: expiresAt,
         terms_accepted: termsAccepted,
+        adult_declaration: adultDeclaration,
       })
       .select()
       .single()

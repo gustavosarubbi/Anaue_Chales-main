@@ -9,7 +9,7 @@ import { PaymentSummary } from "@/components/checkout/PaymentSummary"
 import { CheckoutProgressBar } from "@/components/checkout/CheckoutProgressBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Loader2, CheckCircle2, X, ArrowRight, ArrowLeft, Star, Sparkles, ExternalLink, Clock, Waves, TreePine, Wifi, Bath, Shield } from "lucide-react"
+import { Loader2, CheckCircle2, X, ArrowRight, ArrowLeft, Star, Sparkles, ExternalLink, Clock, Waves, TreePine, Wifi, Bath, Shield, IdCard, UserCheck } from "lucide-react"
 import { calculatePrice, validateReservationDates, formatDateForInput, CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -605,7 +605,24 @@ export function CheckoutPageContent() {
 
                 {/* ========== STEP: FORM ========== */}
                 {step === "form" && checkIn && checkOut && (
-                    <div className="animate-fadeInUp">
+                    <div className="animate-fadeInUp space-y-6">
+                        {/* Aviso: maior de 18 anos e documento no check-in */}
+                        <div className="flex items-start gap-3 p-4 rounded-xl bg-moss-50 border border-moss-100 text-moss-800">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-moss-200 flex items-center justify-center">
+                                <IdCard className="h-5 w-5 text-moss-700" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="font-semibold text-moss-900 text-sm sm:text-base flex items-center gap-2">
+                                    <UserCheck className="h-4 w-4 text-moss-600" />
+                                    Para fazer a reserva
+                                </p>
+                                <ul className="mt-1.5 text-sm text-moss-700 space-y-0.5 list-none">
+                                    <li>• É necessário ser <strong>maior de 18 anos</strong>.</li>
+                                    <li>• É obrigatória a apresentação de <strong>documento de identidade com foto</strong> no momento do check-in.</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <ReservationForm
                             onSubmit={handleFormSubmit}
                             onFormChange={handleFormChange}
