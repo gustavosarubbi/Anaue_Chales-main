@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/sync/beds24",
-      "schedule": "0 * * * *"
+      "schedule": "0 5 * * *"
     }
   ]
 }
