@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useSearchParams } from "next/navigation"
 import { AvailabilityCalendar } from "@/components/checkout/calendar/AvailabilityCalendar"
 import { ReservationForm, ReservationFormData } from "@/components/checkout/ReservationForm"
@@ -10,7 +10,7 @@ import { CheckoutProgressBar } from "@/components/checkout/CheckoutProgressBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, CheckCircle2, X, ArrowRight, ArrowLeft, Star, Sparkles, ExternalLink, Clock, Waves, TreePine, Wifi, Bath, Shield, IdCard, UserCheck } from "lucide-react"
-import { calculatePrice, validateReservationDates, formatDateForInput, CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
+import { calculatePrice, validateReservationDates, formatDateForInput, CHALET_PRICING, SPECIAL_PACKAGES, BOOKING_WINDOW_MONTHS } from "@/lib/utils/reservation"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -45,6 +45,13 @@ export function CheckoutPageContent() {
         const [year, month, day] = checkOutParam.split('-').map(Number)
         return new Date(year, month - 1, day, 0, 0, 0, 0)
     })
+
+    const calendarMaxDate = useMemo(() => {
+        const d = new Date()
+        d.setMonth(d.getMonth() + BOOKING_WINDOW_MONTHS)
+        d.setDate(0)
+        return d
+    }, [])
 
     // Form data
     const [formData, setFormData] = useState<ReservationFormData | null>(null)
@@ -164,6 +171,9 @@ export function CheckoutPageContent() {
             console.log('[CHECKOUT] Resposta da criação de reserva:', reservationResult)
 
             if (!reservationResult.success) {
+                if (res.status === 500 && reservationResult.details) {
+                    console.error('[CHECKOUT] Detalhe do erro 500:', reservationResult.details, 'code:', reservationResult.code)
+                }
                 toast.error(reservationResult.error || "Erro ao criar reserva")
                 setLoading(false)
                 return
@@ -532,6 +542,7 @@ export function CheckoutPageContent() {
                                     checkOut={checkOut}
                                     onDatesChange={handleDatesChange}
                                     minDate={new Date()}
+                                    maxDate={calendarMaxDate}
                                     numberOfMonths={1}
                                     chaletId={selectedChalet}
                                 />

@@ -86,12 +86,20 @@ export function AvailabilityCalendar({
     return keys
   }, [availability, disabledDates])
 
+  // Janela de 3 meses: último dia do 3.º mês (hoje + 3 meses)
   const effectiveMaxDate = useMemo(() => {
     if (maxDate) return maxDate
     const d = new Date()
-    d.setFullYear(d.getFullYear() + 2)
+    d.setMonth(d.getMonth() + 3)
+    d.setDate(0) // último dia do mês anterior (= último dia do 3.º mês da janela)
     return d
   }, [maxDate])
+
+  const today = useMemo(() => new Date(), [])
+  const isViewCurrentMonth = viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth()
+  const isViewLastMonth = viewDate.getFullYear() === effectiveMaxDate.getFullYear() && viewDate.getMonth() === effectiveMaxDate.getMonth()
+  const canGoPrev = !isViewCurrentMonth
+  const canGoNext = !isViewLastMonth
 
   // Build the grid of days for the current view month
   const calendarDays = useMemo<CalendarDay[]>(() => {
@@ -275,9 +283,13 @@ export function AvailabilityCalendar({
         <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-stone-100">
           <button
             type="button"
-            onClick={goToPrev}
+            onClick={canGoPrev ? goToPrev : undefined}
+            disabled={!canGoPrev}
             aria-label="Mês anterior"
-            className="p-2 rounded-full text-moss-500 hover:text-moss-800 hover:bg-moss-50 transition-colors"
+            className={cn(
+              "p-2 rounded-full transition-colors",
+              canGoPrev ? "text-moss-500 hover:text-moss-800 hover:bg-moss-50" : "text-stone-300 cursor-not-allowed"
+            )}
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -288,9 +300,13 @@ export function AvailabilityCalendar({
 
           <button
             type="button"
-            onClick={goToNext}
+            onClick={canGoNext ? goToNext : undefined}
+            disabled={!canGoNext}
             aria-label="Próximo mês"
-            className="p-2 rounded-full text-moss-500 hover:text-moss-800 hover:bg-moss-50 transition-colors"
+            className={cn(
+              "p-2 rounded-full transition-colors",
+              canGoNext ? "text-moss-500 hover:text-moss-800 hover:bg-moss-50" : "text-stone-300 cursor-not-allowed"
+            )}
           >
             <ChevronRight className="h-5 w-5" />
           </button>

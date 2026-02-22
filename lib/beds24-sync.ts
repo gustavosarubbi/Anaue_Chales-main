@@ -5,6 +5,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createBeds24Booking, setBeds24AvailabilityInRange } from '@/lib/beds24'
+import { BOOKING_WINDOW_MONTHS, getDatesBetween } from '@/lib/utils/reservation'
 
 function splitName(fullName: string): { name: string; surname: string } {
   const trimmed = (fullName || '').trim()
@@ -109,11 +110,32 @@ export async function syncBlockedDatesToBeds24(
     }
   }
 
+  // REGRAS DE NEGÓCIO: Bloquear datas fora da janela de reserva (3 meses)
+  // Isso garante que o Airbnb não abra datas que o site ainda não lançou
+  const limitDate = new Date(today)
+  limitDate.setMonth(limitDate.getMonth() + BOOKING_WINDOW_MONTHS)
+  limitDate.setDate(0) // Último dia do mês limite
+
+  const afterLimitStart = new Date(limitDate)
+  afterLimitStart.setDate(afterLimitStart.getDate() + 1)
+
+  const syncEnd = new Date(dateToStr)
+
+  if (afterLimitStart < syncEnd) {
+    const futureDates = getDatesBetween(afterLimitStart, syncEnd)
+    // Adicionar a última data (que o getDatesBetween costuma excluir)
+    futureDates.push(dateToStr)
+
+    for (const d of futureDates) {
+      blockedSet.add(d)
+    }
+  }
+
   if (options?.dryRun) {
     return {
       success: true,
       dateFrom,
-      dateTo,
+      dateTo: dateToStr,
       blockedDatesCount: blockedSet.size,
       datesSentToBeds24: 0,
       errors: [],
@@ -124,7 +146,7 @@ export async function syncBlockedDatesToBeds24(
   return {
     success: result.errors.length === 0,
     dateFrom,
-    dateTo,
+    dateTo: dateToStr,
     blockedDatesCount: blockedSet.size,
     datesSentToBeds24: result.setCount,
     errors: result.errors,

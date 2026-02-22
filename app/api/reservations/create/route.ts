@@ -165,38 +165,68 @@ export async function POST(request: Request) {
     // Expiration: 10 minutes from now
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString()
 
-    console.log('[RESERVATIONS_CREATE] Inserindo no banco de dados com expiração em:', expiresAt)
-    const { data: reservation, error } = await supabase
-      .from('reservations')
-      .insert({
-        check_in: checkIn,
-        check_out: checkOut,
-        guest_name: guestName,
-        guest_email: guestEmail,
-        guest_phone: guestPhone,
-        guest_count: guestCount || 2,
-        children_count: childrenCount || 0,
-        total_price: priceCalculation.totalPrice,
-        status: 'pending',
-        chalet_id: chaletId || 'chale-anaue',
-        expires_at: expiresAt,
-        terms_accepted: termsAccepted,
-        adult_declaration: adultDeclaration,
-      })
-      .select()
-      .single()
+    const fullPayload = {
+      check_in: checkIn,
+      check_out: checkOut,
+      guest_name: guestName,
+      guest_email: guestEmail,
+      guest_phone: guestPhone,
+      guest_count: guestCount || 2,
+      children_count: childrenCount || 0,
+      total_price: priceCalculation.totalPrice,
+      status: 'pending' as const,
+      chalet_id: chaletId || 'chale-anaue',
+      expires_at: expiresAt,
+      terms_accepted: termsAccepted,
+      adult_declaration: adultDeclaration,
+    }
+
+    const fallbackPayload = {
+      check_in: checkIn,
+      check_out: checkOut,
+      guest_name: guestName,
+      guest_email: guestEmail,
+      guest_phone: guestPhone,
+      guest_count: guestCount || 2,
+      children_count: childrenCount || 0,
+      total_price: priceCalculation.totalPrice,
+      status: 'pending' as const,
+      chalet_id: chaletId || 'chale-anaue',
+      expires_at: expiresAt,
+    }
+
+    console.log('[RESERVATIONS_CREATE] Inserindo no banco com expiração em:', expiresAt)
+    let insertResult = await supabase.from('reservations').insert(fullPayload).select().single()
+    let reservation = insertResult.data
+    let error = insertResult.error
+
+    if (error && (error.code === '42703' || error.code === 'PGRST204' || (error.message || '').includes('adult_declaration') || (error.message || '').includes('terms_accepted'))) {
+      console.warn('[RESERVATIONS_CREATE] Coluna terms_accepted ou adult_declaration ausente no banco. Inserindo sem elas. Execute as migrações para gravar esses campos.')
+      const retry = await supabase.from('reservations').insert(fallbackPayload).select().single()
+      reservation = retry.data
+      error = retry.error
+    }
 
     if (error) {
       console.error('[RESERVATIONS_CREATE] Erro ao inserir no Supabase:', error)
       let userError = 'Erro ao criar reserva. Tente novamente.'
 
-      // Detecção de coluna faltando (erro comum ao atualizar esquema)
-      if (error.code === '42703') {
-        userError = 'Erro de Banco de Dados: Colunas necessárias não encontradas (expires_at). Por favor, execute as migrações SQL.'
+      if (error.code === '42703' || error.code === 'PGRST204') {
+        const msg = (error.message || '').toLowerCase()
+        if (msg.includes('adult_declaration') || msg.includes('terms_accepted')) {
+          userError = 'Erro de configuração: execute as migrações do banco (terms_accepted e adult_declaration).'
+        } else {
+          userError = 'Erro de Banco de Dados: coluna não encontrada. Execute as migrações SQL no Supabase.'
+        }
       }
 
       return NextResponse.json(
-        { success: false, error: userError, details: error.message },
+        {
+          success: false,
+          error: userError,
+          details: error.message,
+          code: error.code,
+        },
         { status: 500 }
       )
     }

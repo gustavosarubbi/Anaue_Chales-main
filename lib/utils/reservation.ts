@@ -2,6 +2,8 @@
  * Utilitários para cálculo de preços e validação de reservas
  */
 
+export const BOOKING_WINDOW_MONTHS = 3 // Janela de reserva padrão de 3 meses
+
 export interface ReservationDates {
   checkIn: Date
   checkOut: Date

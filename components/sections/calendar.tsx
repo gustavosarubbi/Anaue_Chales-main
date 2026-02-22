@@ -84,6 +84,31 @@ function CalendarWidget({
     return dateStr < today
   }
 
+  // Janela de 3 meses: início do mês atual e último dia do 3.º mês
+  const { minViewDate, maxViewDate, availableMonthsInWindow, availableYearsInWindow } = useMemo(() => {
+    const today = new Date()
+    const min = new Date(today.getFullYear(), today.getMonth(), 1)
+    const max = new Date(today.getFullYear(), today.getMonth() + 3, 0)
+    const months: { month: number; year: number }[] = []
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + i, 1)
+      months.push({ month: d.getMonth(), year: d.getFullYear() })
+    }
+    const years = Array.from(new Set(months.map((m) => m.year))).sort((a, b) => a - b)
+    return {
+      minViewDate: min,
+      maxViewDate: max,
+      availableMonthsInWindow: months,
+      availableYearsInWindow: years,
+    }
+  }, [])
+
+  const isAfterMaxViewDate = (date: Date): boolean => {
+    const dateStr = normalizeDate(date)
+    const maxStr = normalizeDate(maxViewDate)
+    return dateStr > maxStr
+  }
+
   const isBooked = (date: Date | null): boolean => {
     if (!date) return false
     return bookedDatesList.has(normalizeDate(date))
@@ -123,6 +148,7 @@ function CalendarWidget({
 
   const handleMonthChange = (monthIndex: number) => {
     const newDate = new Date(currentDate)
+    newDate.setFullYear(currentDate.getFullYear())
     newDate.setMonth(monthIndex)
     setCurrentDate(newDate)
   }
@@ -130,6 +156,10 @@ function CalendarWidget({
   const handleYearChange = (year: number) => {
     const newDate = new Date(currentDate)
     newDate.setFullYear(year)
+    const monthsInYear = availableMonthsInWindow.filter((m) => m.year === year)
+    if (monthsInYear.length && !monthsInYear.some((m) => m.month === newDate.getMonth())) {
+      newDate.setMonth(monthsInYear[0].month)
+    }
     setCurrentDate(newDate)
   }
 
@@ -139,13 +169,32 @@ function CalendarWidget({
     setCurrentDate(newDate)
   }
 
-  const availableYears = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-    const years = []
-    for (let i = 0; i <= 2; i++) {
-      years.push(currentYear + i)
-    }
-    return years
+  const canGoPrev = currentDate.getFullYear() > minViewDate.getFullYear() ||
+    (currentDate.getFullYear() === minViewDate.getFullYear() && currentDate.getMonth() > minViewDate.getMonth())
+  const canGoNext = currentDate.getFullYear() < maxViewDate.getFullYear() ||
+    (currentDate.getFullYear() === maxViewDate.getFullYear() && currentDate.getMonth() < maxViewDate.getMonth())
+
+  const monthsForCurrentYear = useMemo(() =>
+    availableMonthsInWindow.filter((m) => m.year === currentDate.getFullYear()),
+    [availableMonthsInWindow, currentDate.getFullYear()]
+  )
+
+  // Manter currentDate dentro da janela ao montar
+  useEffect(() => {
+    setCurrentDate((prev) => {
+      const now = new Date()
+      const min = new Date(now.getFullYear(), now.getMonth(), 1)
+      const max = new Date(now.getFullYear(), now.getMonth() + 3, 0)
+      const y = prev.getFullYear()
+      const m = prev.getMonth()
+      if (y < min.getFullYear() || (y === min.getFullYear() && m < min.getMonth())) {
+        return new Date(min.getFullYear(), min.getMonth(), 1)
+      }
+      if (y > max.getFullYear() || (y === max.getFullYear() && m > max.getMonth())) {
+        return new Date(max.getFullYear(), max.getMonth(), 1)
+      }
+      return prev
+    })
   }, [])
 
   const isToday = (date: Date | null): boolean => {
@@ -153,11 +202,11 @@ function CalendarWidget({
     return normalizeDate(date) === normalizeDate(new Date())
   }
 
-  const getDayClasses = (calendarDay: CalendarDay, isPast: boolean, isBookedDate: boolean, isTodayDate: boolean) => {
+  const getDayClasses = (calendarDay: CalendarDay, isPast: boolean, isAfterMax: boolean, isBookedDate: boolean, isTodayDate: boolean) => {
     const baseClasses = "text-xs sm:text-sm rounded-lg flex items-center justify-center transition-all duration-200 font-medium relative min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
 
     if (!calendarDay.isCurrentMonth) return `${baseClasses} opacity-20 text-moss-900`
-    if (isPast) return `${baseClasses} bg-gray-50 text-gray-400 cursor-not-allowed`
+    if (isPast || isAfterMax) return `${baseClasses} bg-gray-50 text-gray-400 cursor-not-allowed`
     if (isBookedDate) return `${baseClasses} bg-red-100 text-red-700 font-bold shadow-sm`
     if (isTodayDate) return `${baseClasses} bg-moss-200 text-moss-900 font-bold ring-2 ring-moss-500 shadow-md transform scale-105 z-10`
 
@@ -171,8 +220,9 @@ function CalendarWidget({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigateMonth("prev")}
-            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
+            onClick={() => canGoPrev && navigateMonth("prev")}
+            disabled={!canGoPrev}
+            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full disabled:opacity-50 disabled:pointer-events-none"
           >
             <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
@@ -186,8 +236,8 @@ function CalendarWidget({
                 <SelectValue className="truncate">{MONTH_NAMES[currentDate.getMonth()]}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
-                {MONTH_NAMES.map((month, index) => (
-                  <SelectItem key={index} value={index.toString()} className="font-sans">{month}</SelectItem>
+                {monthsForCurrentYear.map(({ month }) => (
+                  <SelectItem key={month} value={month.toString()} className="font-sans">{MONTH_NAMES[month]}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -200,7 +250,7 @@ function CalendarWidget({
                 <SelectValue>{currentDate.getFullYear()}</SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white">
-                {availableYears.map((year) => (
+                {availableYearsInWindow.map((year) => (
                   <SelectItem key={year} value={year.toString()} className="font-sans">{year}</SelectItem>
                 ))}
               </SelectContent>
@@ -210,8 +260,9 @@ function CalendarWidget({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigateMonth("next")}
-            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full"
+            onClick={() => canGoNext && navigateMonth("next")}
+            disabled={!canGoNext}
+            className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 border-moss-200 text-moss-700 hover:bg-moss-50 rounded-full disabled:opacity-50 disabled:pointer-events-none"
           >
             <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
@@ -241,13 +292,14 @@ function CalendarWidget({
 
                   const { day, date } = calendarDay
                   const isPast = isPastDate(date)
+                  const isAfterMax = isAfterMaxViewDate(date)
                   const isBookedDate = isBooked(date)
                   const isTodayDate = isToday(date)
 
                   return (
                     <div
                       key={i}
-                      className={`${getDayClasses(calendarDay, isPast, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')} min-w-0 max-w-full`}
+                      className={`${getDayClasses(calendarDay, isPast, isAfterMax, isBookedDate, isTodayDate).replace('w-8 h-8', 'w-full aspect-square')} min-w-0 max-w-full`}
                     >
                       <span className="text-[11px] sm:text-xs md:text-sm">{day}</span>
                       {isBookedDate && !isPast && (
