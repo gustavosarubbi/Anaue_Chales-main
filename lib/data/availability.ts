@@ -22,5 +22,6 @@ export const MANUAL_BOOKED_DATES: Record<string, string[]> = {
         '2026-03-06', '2026-03-07', // Fechado manualmente
         '2026-03-13', // Camping fechado
         '2026-03-14', // Rayssa Lima - Crédito R$700 - Chalé Camping
+        '2026-04-17', // Bloqueio solicitado
     ]
 }
