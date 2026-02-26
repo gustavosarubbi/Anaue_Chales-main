@@ -137,9 +137,7 @@ export async function GET(request: Request) {
       console.error("Erro ao buscar reservas do Supabase:", dbError)
     }
 
-    // 5. OVERRIDE ESPECIAL: Abrir dia 04 de Março (conforme pedido do usuário)
-    // "Abrir os 2 chales no dia 4 março mesmo com reserva"
-    delete bookedDates['2026-03-04']
+
 
     return NextResponse.json({
       success: true,

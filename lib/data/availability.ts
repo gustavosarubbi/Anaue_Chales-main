@@ -13,7 +13,7 @@ const MASTER_FEB_2026 = [
 export const MANUAL_BOOKED_DATES: Record<string, string[]> = {
     'chale-anaue': [
         ...MASTER_FEB_2026,
-        '2026-03-08', '2026-03-09'
+        '2026-03-04', '2026-03-08', '2026-03-09', '2026-03-25'
     ],
     'chale-2': [
         '2026-02-05', '2026-02-07',
