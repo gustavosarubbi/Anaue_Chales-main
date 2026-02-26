@@ -11,7 +11,7 @@ import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 export function Pricing() {
   const masterPricing = CHALET_PRICING['chale-anaue']
   const campingPricing = CHALET_PRICING['chale-2']
-  const carnaval = SPECIAL_PACKAGES.carnaval
+
 
   return (
     <section id="pricing" className="py-24 relative overflow-hidden">
@@ -36,47 +36,6 @@ export function Pricing() {
           </p>
         </motion.div>
 
-        {/* Carnaval Banner — full width, integrado */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mx-auto mb-10"
-        >
-          <div className="relative bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-5 sm:p-6 shadow-lg shadow-purple-500/15 overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-xl translate-y-1/2 -translate-x-1/4" />
-
-            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <div className="bg-white/15 backdrop-blur-sm p-2.5 rounded-xl">
-                  <MessageCircle className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="font-heading font-bold text-white text-lg leading-tight">{carnaval.name}</p>
-                  <p className="text-purple-100 text-xs font-medium">13 a 17 de Fevereiro</p>
-                </div>
-              </div>
-
-              <div className="h-px sm:h-10 sm:w-px w-full bg-white/20 flex-shrink-0" />
-
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-white flex-grow">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-purple-200 font-medium">Diária</p>
-                  <p className="text-2xl font-bold font-heading">R$ {carnaval.price.toFixed(0)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-purple-200 font-medium">Dia 18/02</p>
-                  <p className="text-xl font-bold font-heading">R$ {carnaval.latePrice.toFixed(0)}</p>
-                </div>
-              </div>
-
-              <Badge className="bg-white/15 backdrop-blur-sm text-white border-white/20 text-xs px-3 py-1.5 font-medium whitespace-nowrap flex-shrink-0">
-                Consulte via WhatsApp
-              </Badge>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto mb-8">
@@ -305,7 +264,7 @@ export function Pricing() {
                         <p className="text-xs text-green-700 leading-relaxed">Até 7 dias após o pagamento, ou 72h antes do check-in (em casos de compras feitas em menos de 7 dias antes do dia do check-in).</p>
                       </div>
                     </div>
-                    
+
                     {/* Card 50% */}
                     <div className="flex items-start gap-4 p-4 rounded-xl bg-amber-50/60 border border-amber-100/70 hover:border-amber-200 transition-colors">
                       <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
@@ -345,7 +304,7 @@ export function Pricing() {
                       </div>
                       <p className="text-lg text-moss-900 font-bold">Taxa de R$ 100,00</p>
                     </div>
-                    
+
                     <p className="text-sm text-moss-600 leading-relaxed mb-6 pl-16">
                       O reagendamento é permitido sempre mediante taxa de R$ 100,00, desde que solicitado com <strong>no mínimo 72h de antecedência</strong> do check-in.
                     </p>

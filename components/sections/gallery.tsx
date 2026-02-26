@@ -83,6 +83,7 @@ const galleryImages = [
   { id: 215, category: "chale2", title: "Chalé Camping Luxo - Deck", description: "Aproveite a brisa", image: "/Chale 2/IMG_3224.jpg" },
   { id: 216, category: "chale2", title: "Chalé Camping Luxo - Pôr do Sol", description: "Momentos mágicos", image: "/Chale 2/IMG_3225.jpg" },
   { id: 217, category: "chale2", title: "Chalé Camping Luxo - Noite", description: "Iluminação aconchegante", image: "/Chale 2/IMG_3226.jpg" },
+  { id: 218, category: "chale2", title: "Chalé Camping Luxo - Hidromassagem", description: "Nova banheira relaxante", image: "/Chale 2/banheira-camping.jpg", featured: true },
 
   // Natureza & Rio
   {
@@ -113,6 +114,14 @@ const galleryImages = [
     title: "Stand-Up Paddle",
     description: "Aventura no rio",
     image: "/Stand-Up-Paddle.jpg",
+  },
+  {
+    id: 17,
+    category: "natureza",
+    title: "Equipamentos de Lazer",
+    description: "SUP, Bóias e Caiaques para sua diversão",
+    image: "/equipamentos-lazer.jpg",
+    featured: true
   },
   {
     id: 16,

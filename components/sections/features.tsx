@@ -21,7 +21,7 @@ const features = [
   {
     icon: Flame,
     title: "Churrasqueira Privativa",
-    description: "À beira do rio para você usar à vontade (traga o carvão)",
+    description: "Churrasqueira privativa em cada chalé e outra à beira do rio para você usar à vontade (traga o carvão)",
     highlight: true,
   },
   {
@@ -56,8 +56,8 @@ const features = [
   },
   {
     icon: Waves,
-    title: "Prancha de SUP",
-    description: "Disponível por adicional de R$ 50",
+    title: "Lazer no Rio",
+    description: "Bóias (R$ 20), Prancha de SUP e Caiaques (R$ 50) disponíveis para aluguel no local",
     highlight: false,
   },
   {
@@ -71,12 +71,6 @@ const features = [
     title: "Jacuzzi",
     description: "Banheira relaxante com Jacuzzi para momentos de total relaxamento e bem-estar",
     highlight: true,
-  },
-  {
-    icon: LifeBuoy,
-    title: "Aluguel de Bóias",
-    description: "Bóias disponíveis para diversão no rio por R$ 20 cada",
-    highlight: false,
   },
 ]
 

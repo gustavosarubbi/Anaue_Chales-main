@@ -24,16 +24,8 @@ export interface PriceCalculation {
   }
 }
 
-// Configuração de pacotes especiais (como Carnaval)
+// Configuração de pacotes especiais
 export const SPECIAL_PACKAGES = {
-  carnaval: {
-    name: "🎭 Pacote Carnaval",
-    startDate: "2026-02-13",
-    endDate: "2026-02-17",
-    price: 950,
-    lateDate: "2026-02-18",
-    latePrice: 800,
-  }
 }
 
 // Preços por tipo de chalé e tipo de dia
@@ -132,17 +124,9 @@ export function calculatePrice(
     const date = new Date(dateStr + 'T00:00:00')
     let nightPrice = 0
 
-    // VERIFICAÇÃO DE PACOTES ESPECIAIS (ex: Carnaval)
-    const carnival = SPECIAL_PACKAGES.carnaval
-    if (dateStr >= carnival.startDate && dateStr <= carnival.endDate) {
-      nightPrice = carnival.price
-    } else if (dateStr === carnival.lateDate) {
-      nightPrice = carnival.latePrice
-    } else {
-      // Preço normal (Semana vs Fim de Semana)
-      const isWeekendDay = isWeekendOrHoliday(date)
-      nightPrice = isWeekendDay ? pricing.weekend : pricing.weekday
-    }
+    // Preço normal (Semana vs Fim de Semana)
+    const isWeekendDay = isWeekendOrHoliday(date)
+    nightPrice = isWeekendDay ? pricing.weekend : pricing.weekday
 
     basePrice += nightPrice
 

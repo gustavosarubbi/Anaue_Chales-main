@@ -12,7 +12,7 @@ import { CHALET_PRICING, SPECIAL_PACKAGES } from "@/lib/utils/reservation"
 export function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const carnaval = SPECIAL_PACKAGES.carnaval
+
   const masterPricing = CHALET_PRICING['chale-anaue']
   const campingPricing = CHALET_PRICING['chale-2']
 
@@ -174,16 +174,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-purple-600/90 to-pink-600/90 text-white px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg mb-6 border border-white/20 backdrop-blur-sm"
-                >
-                  <span className="text-base sm:text-lg md:text-xl flex-shrink-0">🎭</span>
-                  <span className="whitespace-nowrap">Pacote Carnaval: 13 a 17 de Fev</span>
-                  <span className="text-base sm:text-lg md:text-xl flex-shrink-0">🎭</span>
-                </motion.div>
+
                 <div className="block">
                   <Badge variant="outline" className="mb-6 border-white/30 text-white px-4 py-1 text-sm tracking-wider uppercase backdrop-blur-sm bg-white/5">
                     Bem-vindo à Amazônia
@@ -265,17 +256,6 @@ export function Hero() {
                     </div>
 
                     <div className="space-y-4 bg-black/20 rounded-xl p-5 border border-white/5">
-                      {/* Carnaval Special */}
-                      <div className="flex justify-between items-center border-b border-purple-500/30 bg-purple-900/20 px-3 py-2 rounded-lg -mx-1 mb-1">
-                        <div>
-                          <p className="text-xs font-bold text-purple-200 uppercase tracking-tighter">{carnaval.name.split(' ')[1]} 🎭</p>
-                          <p className="text-[10px] text-purple-300/70">13 a 17 de Fev</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-purple-100">R$ {carnaval.price}</p>
-                          <p className="text-[10px] text-purple-300/70">noite</p>
-                        </div>
-                      </div>
 
                       <div className="flex justify-between items-center border-b border-white/10 pb-3">
                         <div>

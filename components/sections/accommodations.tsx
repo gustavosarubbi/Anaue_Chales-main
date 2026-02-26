@@ -28,7 +28,7 @@ export function Accommodations() {
       title: "Chalé Camping Luxo",
       description: "Uma experiência moderna de imersão na natureza com Jacuzzi, design industrial e todo conforto necessário.",
       image: "/Chale 2/IMG_3189.jpg",
-      features: ["Jacuzzi", "Design Moderno", "Imersão Natureza"],
+      features: ["Nova Banheira", "Design Moderno", "Imersão Natureza"],
       price: `A partir de R$ ${campingPrice}`,
       whatsappMessage: "Olá! Gostaria de saber mais sobre o Chalé Camping Luxo.",
       link: "/checkout?chalet=chale-2"

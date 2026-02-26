@@ -11,7 +11,10 @@ const MASTER_FEB_2026 = [
 ]
 
 export const MANUAL_BOOKED_DATES: Record<string, string[]> = {
-    'chale-anaue': [...MASTER_FEB_2026],
+    'chale-anaue': [
+        ...MASTER_FEB_2026,
+        '2026-03-08', '2026-03-09'
+    ],
     'chale-2': [
         '2026-02-05', '2026-02-07',
         // Fechado: 10 a 20 de fevereiro

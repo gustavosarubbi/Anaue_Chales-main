@@ -96,11 +96,11 @@ export async function GET(request: Request) {
             // Filtrar: só bloquear pending se for cartão de crédito
             if (reservation.status === 'pending') {
               const paymentStatus = (reservation.payment_status || '').toLowerCase()
-              const isCreditCard = paymentStatus.includes('credit_card') || 
-                                 paymentStatus.includes('creditcard') ||
-                                 paymentStatus.includes('cartão') ||
-                                 paymentStatus.includes('cartao')
-              
+              const isCreditCard = paymentStatus.includes('credit_card') ||
+                paymentStatus.includes('creditcard') ||
+                paymentStatus.includes('cartão') ||
+                paymentStatus.includes('cartao')
+
               // Se não for cartão de crédito, não bloquear
               if (!isCreditCard) {
                 return
@@ -136,6 +136,10 @@ export async function GET(request: Request) {
     } catch (dbError) {
       console.error("Erro ao buscar reservas do Supabase:", dbError)
     }
+
+    // 5. OVERRIDE ESPECIAL: Abrir dia 04 de Março (conforme pedido do usuário)
+    // "Abrir os 2 chales no dia 4 março mesmo com reserva"
+    delete bookedDates['2026-03-04']
 
     return NextResponse.json({
       success: true,
