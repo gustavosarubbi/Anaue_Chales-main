@@ -12,13 +12,19 @@ import { syncBlockedDatesToBeds24, syncConfirmedReservationsToBeds24 } from '@/l
  *   deve refletir no Beds24 (via canal Beds24↔Airbnb); confira no painel Beds24 se o canal está ativo.
  *
  * GET ou POST. Query: dryRun=true para simular (não chama Beds24).
- * Se CRON_SECRET estiver definido, exige header x-cron-secret.
+ * Se CRON_SECRET estiver definido, aceita:
+ * - x-cron-secret: <secret> (GitHub Actions/scripts)
+ * - Authorization: Bearer <secret> (Vercel Cron)
  */
 function checkCronSecret(request: Request): Response | null {
   const secret = process.env.CRON_SECRET?.trim()
   if (!secret) return null
-  const header = request.headers.get('x-cron-secret')?.trim()
-  if (header !== secret) {
+
+  const xCronSecret = request.headers.get('x-cron-secret')?.trim()
+  const authorization = request.headers.get('authorization')?.trim() || ''
+  const bearer = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : ''
+
+  if (xCronSecret !== secret && bearer !== secret) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },

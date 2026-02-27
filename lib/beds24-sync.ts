@@ -7,6 +7,14 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createBeds24Booking, getBeds24Availability, setBeds24AvailabilityInRange } from '@/lib/beds24'
 import { BOOKING_WINDOW_MONTHS, getDatesBetween } from '@/lib/utils/reservation'
 
+function areSetsEqual(a: Set<string>, b: Set<string>): boolean {
+  if (a.size !== b.size) return false
+  for (const item of a) {
+    if (!b.has(item)) return false
+  }
+  return true
+}
+
 function splitName(fullName: string): { name: string; surname: string } {
   const trimmed = (fullName || '').trim()
   const firstSpace = trimmed.indexOf(' ')
@@ -145,7 +153,20 @@ export async function syncBlockedDatesToBeds24(
     }
   }
 
+  const currentBlockedSet = new Set(Object.keys(currentBeds24.bookedDates))
   Object.keys(currentBeds24.bookedDates).forEach((d) => blockedSet.add(d))
+
+  // Se não houve mudança, evita reenvio completo (cron mais rápido e menos carga no Beds24).
+  if (areSetsEqual(blockedSet, currentBlockedSet)) {
+    return {
+      success: true,
+      dateFrom,
+      dateTo: dateToStr,
+      blockedDatesCount: blockedSet.size,
+      datesSentToBeds24: 0,
+      errors: [],
+    }
+  }
 
   if (options?.dryRun) {
     return {

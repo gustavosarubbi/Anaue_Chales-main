@@ -33,7 +33,10 @@ Configure em `.env.local` (veja `.env.example`):
 
 - **Reservas confirmadas**: já são enviadas ao Beds24 no momento da confirmação (webhook InfinitePay ou página de sucesso).
 - **Datas bloqueadas e pendências**:
-  - **GitHub Actions (recomendado)**: o workflow `.github/workflows/sync-beds24.yml` chama `POST /api/sync/beds24` **a cada 5 minutos**. Configure no repositório: **Settings → Secrets and variables → Actions**:
+  - **Vercel Cron (Pro)**: `vercel.json` chama `/api/sync/beds24` **a cada 1 minuto** (`* * * * *`).
+    - Se `CRON_SECRET` estiver definido, a rota aceita `Authorization: Bearer <secret>` (padrão do Vercel Cron).
+    - Também aceita `x-cron-secret` para chamadas manuais/scripts.
+  - **GitHub Actions (fallback)**: o workflow `.github/workflows/sync-beds24.yml` chama `POST /api/sync/beds24` **a cada 5 minutos**. Configure no repositório: **Settings → Secrets and variables → Actions**:
     - `SYNC_API_URL` = `https://SEU-PROJETO.vercel.app/api/sync/beds24`
     - `CRON_SECRET` (opcional) = mesmo valor da variável `CRON_SECRET` na Vercel; se definir, a rota só aceita requests com header `x-cron-secret`.
     - Com GitHub CLI: `gh secret set SYNC_API_URL` e `gh secret set CRON_SECRET` (e na Vercel defina `CRON_SECRET` igual).

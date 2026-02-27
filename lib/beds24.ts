@@ -8,11 +8,8 @@ import { ENV } from '@/lib/utils/env'
 import { getDatesBetween } from '@/lib/utils/reservation'
 
 const BEDS24_API_BASE = 'https://api.beds24.com/json'
-// Vercel Hobby timeout 10s: 5 chunks × ~1s cada precisa caber; 800ms no serverless
-const THROTTLE_MS =
-  typeof process !== 'undefined' && process.env.VERCEL
-    ? 800
-    : Number(process.env.BEDS24_THROTTLE_MS) || 1500
+// Permite ajustar o throttle por ambiente. Em Vercel, padrão é 800ms.
+const THROTTLE_MS = Number(process.env.BEDS24_THROTTLE_MS) || (process.env.VERCEL ? 800 : 1500)
 
 let lastCallTime = 0
 
