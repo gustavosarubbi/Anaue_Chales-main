@@ -58,6 +58,12 @@ export async function POST(request: Request) {
     ok: true,
     table: 'blocked_dates',
     event: body.type,
-    blocked: { rangesSynced: result.synced, errors: result.errors },
+    blocked: {
+      dateFrom: result.dateFrom,
+      dateTo: result.dateTo,
+      blockedDatesInDb: result.blockedDatesCount,
+      datesSentToBeds24: result.datesSentToBeds24,
+      errors: result.errors,
+    },
   })
 }

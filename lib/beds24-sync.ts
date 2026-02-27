@@ -4,7 +4,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createBeds24Booking, setBeds24AvailabilityInRange } from '@/lib/beds24'
+import { createBeds24Booking, getBeds24Availability, setBeds24AvailabilityInRange } from '@/lib/beds24'
 import { BOOKING_WINDOW_MONTHS, getDatesBetween } from '@/lib/utils/reservation'
 
 function splitName(fullName: string): { name: string; surname: string } {
@@ -130,6 +130,22 @@ export async function syncBlockedDatesToBeds24(
       blockedSet.add(d)
     }
   }
+
+  // Preservar bloqueios já existentes no Beds24 para evitar efeito "fecha e abre de novo"
+  // quando houver bloqueio manual no Airbnb/Beds24 ainda não espelhado no Supabase.
+  const currentBeds24 = await getBeds24Availability(dateFrom, dateToStr)
+  if (!currentBeds24.success || !currentBeds24.bookedDates) {
+    return {
+      success: false,
+      dateFrom,
+      dateTo: dateToStr,
+      blockedDatesCount: blockedSet.size,
+      datesSentToBeds24: 0,
+      errors: [currentBeds24.error || 'Falha ao ler bloqueios atuais no Beds24'],
+    }
+  }
+
+  Object.keys(currentBeds24.bookedDates).forEach((d) => blockedSet.add(d))
 
   if (options?.dryRun) {
     return {
